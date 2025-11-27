@@ -30,6 +30,6 @@ This phase includes full documentation and system analysis — such as UML diagr
 ---
 
 ## ✉️ Author
-Created by **Andrei Beloziorove, Asaf Eliahu, Aviv Per and shay Gonen**  
+Created by **Andrei Beloziorove, Asaf Eliyahu, Aviv Peer and Shay Gonen**  
 Developed as part of the courses Software Engineering Methods, Introduction to Software Testing, and Human–Computer Interaction 
 Software Engineering Students – Braude College
