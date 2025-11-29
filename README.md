@@ -14,7 +14,8 @@ This phase includes full documentation and system analysis — such as UML diagr
 ---
 
 ## 📂 Included in This Repository
-- 🧩 **Use Case Diagram** – defines system interactions and user actions  
+- 🧩 **Use Case Diagram** – defines system interactions and user actions
+- 🏋 **Activity**
 - 🧱 **Work Breakdown Structure (WBS)** – outlines project deliverables  
 - ⏰ **Gantt Chart** – schedules and time planning  
 - ⚙️ **Functional & Non-Functional Requirements** – defines system expectations  
