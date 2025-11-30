@@ -5,4 +5,6 @@ module com.andreibel.server {
 
     opens com.andreibel.server to javafx.fxml;
     exports com.andreibel.server;
+    exports com.andreibel.server.controller;
+    opens com.andreibel.server.controller to javafx.fxml;
 }

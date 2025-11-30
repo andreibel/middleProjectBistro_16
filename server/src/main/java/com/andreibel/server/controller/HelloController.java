@@ -1,4 +1,4 @@
-package com.andreibel.server;
+package com.andreibel.server.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
