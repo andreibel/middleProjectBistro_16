@@ -2,6 +2,7 @@ module com.andreibel.server {
     requires javafx.controls;
     requires javafx.fxml;
     requires static lombok;
+    requires java.sql;
 
 
     opens com.andreibel.server to javafx.fxml;
