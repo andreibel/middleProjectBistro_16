@@ -1,5 +1,5 @@
 package com.andreibel.client;
-import OCSF.src.ocsf.client.*;
+
 
 
 public class BistroClient {
