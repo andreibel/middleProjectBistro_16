@@ -5,7 +5,14 @@ package com.andreibel.server.dbController;
 public class JDBCConnector {
 
     private static JDBCConnector instance;
-    private JDBCConnector(){}
+    private String url;
+    private String username;
+    private String password;
+    private JDBCConnector(){
+        url = "jdbc:mysql://localhost/placeholder";
+        username = "placeholder";
+        password = "placeholder";
+    }
     public static JDBCConnector getInstance(){
         if(instance == null){
             instance = new JDBCConnector();
