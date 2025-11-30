@@ -15,10 +15,11 @@ import java.util.UUID;
 @Builder
 public class Order {
 
-    private UUID orderId;
+    private int orderId;
     private int numberOfGuests;
     private LocalDateTime orderDateTime;
     private LocalDateTime placedOrderDateTime;
+    private int conformationCode;
     private boolean orderCancelled;
     private boolean orderCompleted;
     private boolean orderPaid;
