@@ -1,14 +1,15 @@
-package com.andreibel.client;
+package com.andreibel.server.controller;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 
 public class HelloController {
+
     @FXML
     private Label welcomeText;
 
     @FXML
     protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to Bistro Application!");
+        welcomeText.setText("Welcome to JavaFX server side!");
     }
 }

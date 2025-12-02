@@ -1,0 +1,35 @@
+package com.andreibel.server.services;
+
+import com.andreibel.server.dbController.repository.OrderRepository;
+import com.andreibel.server.entity.Order;
+import com.andreibel.server.utils.Mapper;
+import message.DTO.OrderResponse;
+
+import java.util.List;
+
+public class OrderService {
+    private static OrderService instance;
+    private final OrderRepository orderRepository;
+
+    private OrderService() {
+        this.orderRepository = OrderRepository.getInstance();
+    }
+
+    public static OrderService getInstance() {
+        if (instance == null) {
+            instance = new OrderService();
+        }
+        return instance;
+    }
+
+    public List<OrderResponse> getAllOrders() {
+    	List<Order> orders = orderRepository.getAllOrders();
+        return orders.stream().map(Mapper::mapOrderToOrderResponse).toList();
+    }
+
+    public OrderResponse updateOrder(Order order) {
+        var SavedOrder = orderRepository.editOrder(order);
+        return Mapper.mapOrderToOrderResponse(SavedOrder);
+
+    }
+}
