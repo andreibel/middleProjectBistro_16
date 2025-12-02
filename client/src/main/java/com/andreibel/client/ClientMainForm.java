@@ -34,6 +34,6 @@ public class ClientMainForm extends Application {
     }
 
     public static List<Object> pushOrdersFromServer(){
-
+        return null;
     }
 }
