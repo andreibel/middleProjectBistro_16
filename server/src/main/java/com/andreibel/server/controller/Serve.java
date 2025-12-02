@@ -4,6 +4,7 @@ import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
 
 public class Serve extends AbstractServer {
+    public static final int PORT = 8080;
     /**
      * Constructs a new server.
      *
