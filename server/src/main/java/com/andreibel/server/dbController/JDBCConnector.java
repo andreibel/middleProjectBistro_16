@@ -14,7 +14,7 @@ public class JDBCConnector {
     private Connection conn;
 
     private JDBCConnector() {
-        String url = "jdbc:mysql://localhost:3306/bistro?allowLoadLocalInfile=true&serverTimezone=Asia/Jerusalem&useSSL=false";
+        String url = "jdbc:mysql://localhost:3306/bistro?allowLoadLocalInfile=true&serverTimezone=Asia/Jerusalem&useSSL=false&allowPublicKeyRetrieval=true";
         String username = "root";
         String password = "tikraetzeM4!";
         try {
