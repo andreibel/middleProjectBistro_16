@@ -10,16 +10,16 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="632.0" prefWidth="608.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="632.0" prefWidth="608.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.BistroClientGUIController">
    <children>
       <TableView fx:id="tableViewOrders" prefHeight="569.0" prefWidth="590.0">
          <columns>
-            <TableColumn prefWidth="89.5" text="Order Number" />
-            <TableColumn prefWidth="69.5" text="Order Date" />
-            <TableColumn prefWidth="76.0" text="# of Guests" />
-            <TableColumn prefWidth="117.0" text="Confirmation Code" />
-            <TableColumn prefWidth="95.0" text="Subscriber ID" />
-            <TableColumn prefWidth="136.0" text="Date of Placing Order" />
+            <TableColumn fx:id="orderNumberColumn" prefWidth="89.5" text="Order Number" />
+            <TableColumn fx:id="orderDateTimeColumn" prefWidth="69.5" text="Order Date" />
+            <TableColumn fx:id="numberOfGuestsColumn" prefWidth="76.0" text="# of Guests" />
+            <TableColumn fx:id="conformationCodeColumn" prefWidth="117.0" text="Confirmation Code" />
+            <TableColumn fx:id="subscriberIdColumn" prefWidth="95.0" text="Subscriber ID" />
+            <TableColumn fx:id="placedOrderDateTimeColumn" prefWidth="136.0" text="Date of Placing Order" />
          </columns>
          <columnResizePolicy>
             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
