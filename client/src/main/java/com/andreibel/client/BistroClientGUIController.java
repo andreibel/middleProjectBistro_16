@@ -1,6 +1,6 @@
 package com.andreibel.client;
 
-import com.andreibel.client.message.DTO.OrderResponse;
+import message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

@@ -1,4 +1,4 @@
-package com.andreibel.client.message;
+package message;
 
 public enum APICallType {
     UPDATE_ORDER,

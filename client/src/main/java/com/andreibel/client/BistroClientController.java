@@ -1,8 +1,8 @@
 package com.andreibel.client;
-import com.andreibel.client.message.APICallType;
-import com.andreibel.client.message.DTO.OrderRequest;
-import com.andreibel.client.message.DTO.OrderResponse;
-import com.andreibel.client.message.Message;
+import message.APICallType;
+import message.DTO.OrderRequest;
+import message.DTO.OrderResponse;
+import message.Message;
 
 import java.time.LocalDateTime;
 import java.util.List;

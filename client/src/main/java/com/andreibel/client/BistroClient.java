@@ -1,5 +1,5 @@
 package com.andreibel.client;
-import com.andreibel.client.message.Message;
+import message.Message;
 import ocsf.client.AbstractClient;
 
 public class BistroClient extends AbstractClient {

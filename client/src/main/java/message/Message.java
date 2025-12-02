@@ -1,4 +1,4 @@
-package com.andreibel.client.message;
+package message;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
