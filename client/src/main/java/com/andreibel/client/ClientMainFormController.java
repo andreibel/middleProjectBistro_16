@@ -7,7 +7,11 @@ import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
-public class ClientMainController {
+import java.util.ArrayList;
+import java.util.List;
+
+public class ClientMainFormController {
+
     @FXML
     private Button btnUpdateOrder;
     @FXML
@@ -19,8 +23,15 @@ public class ClientMainController {
     @FXML
     private TextField txtNumberOfGuests;
 
+    @FXML
+    public void initialize() {
+        //List<Object> orders = ClientMainForm.pushOrdersFromServer();
+    }
     private void onUpdateOrderButtonClicked(ActionEvent event) {
 
     }
 
+    private void onSelectedOrderFromTableView(){
+
+    }
 }
