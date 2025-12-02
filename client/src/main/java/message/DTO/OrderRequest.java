@@ -8,8 +8,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class OrderRequest implements Serializable {
     private int orderNumber;
     private int numberOfGuests;
