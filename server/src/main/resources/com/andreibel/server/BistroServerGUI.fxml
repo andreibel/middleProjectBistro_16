@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="serverGUI" alignment="CENTER" prefHeight="485.0" prefWidth="335.0" spacing="20.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.server.BistroServerGUIController">
+  <padding>
+    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+  </padding>
+   <TableView fx:id="connectionsTableView" prefHeight="329.0" prefWidth="316.0">
+     <columns>
+       <TableColumn fx:id="ipAddressColumn" prefWidth="75.0" text="IP Address" />
+       <TableColumn fx:id="statusColumn" prefWidth="75.0" text="Status" />
+     </columns>
+      <columnResizePolicy>
+         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+      </columnResizePolicy>
+   </TableView>
+</VBox>
