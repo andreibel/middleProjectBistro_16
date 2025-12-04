@@ -33,7 +33,6 @@ public class OrderRepository {
             stmt = connector.getConn().prepareStatement("SELECT t.* FROM bistro.`order` t WHERE t.conformation_code = ?;");
             ResultSet rs = stmt.executeQuery("SELECT t.* FROM bistro.`order` t;");
             while(rs.next()) {
-                //System.out.println(rs.getString(1) + " " + rs.getString(2));
                 orders.add(mapRelToOrder(rs));
             }
             rs.close();
@@ -47,15 +46,17 @@ public class OrderRepository {
     }
 
 
+    
+    
     public Order editOrder(OrderRequest order) {
         Connection conn = connector.getConn();
+
         String updateSql = """
         UPDATE bistro.`order`\s
         SET number_of_guests = ?,\s
             order_date = ?\s
         WHERE order_number = ?;
        \s""";
-
         String selectSql = """
         SELECT *
         FROM bistro.`order`
@@ -66,7 +67,7 @@ public class OrderRepository {
 
         try {
             // Start transaction
-            conn.setAutoCommit(false);
+            connector.StartTransaction();
 
             // UPDATE
             try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
@@ -91,7 +92,7 @@ public class OrderRepository {
             }
 
             // Commit transaction
-            conn.commit();
+            connector.CommitTransaction();
         } catch (SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
