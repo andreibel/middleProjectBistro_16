@@ -1,5 +1,6 @@
 package com.andreibel.server.controller;
 
+import com.andreibel.server.BistroServerGUIController;
 import com.andreibel.server.services.OrderService;
 import message.APICallType;
 import message.DTO.OrderRequest;
@@ -11,10 +12,15 @@ import java.io.IOException;
 
 public class Serve extends AbstractServer {
     OrderService instance;
+    private BistroServerGUIController controller;
 
     public Serve(int port) {
         super(port);
         instance = OrderService.getInstance();
+    }
+
+    public void setGUIController(BistroServerGUIController controller) {
+        this.controller = controller;
     }
 
     @Override
@@ -36,13 +42,24 @@ public class Serve extends AbstractServer {
                 default -> null;
             };
             System.out.println(response);
+            Thread.sleep(2000);
 
             client.sendToClient(new Message(responseType, response));
 
 
-        } catch (IllegalArgumentException | IOException e) {
+        } catch (IllegalArgumentException | IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    protected void clientConnected(ConnectionToClient client){
+        controller.addNewConnection(client);
+    }
+
+    @Override
+    protected void clientDisconnected(ConnectionToClient client){
+        controller.editConnection(client);
     }
 }
