@@ -1,5 +1,6 @@
 package com.andreibel.client;
 
+import javafx.collections.ObservableList;
 import message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -46,7 +47,7 @@ public class BistroClientGUIController {
     private TableColumn<OrderResponse, LocalDateTime> placedOrderDateTimeColumn;
 
     private BistroClientController controller;
-    private javafx.collections.ObservableList<OrderResponse> orders;
+    private ObservableList<OrderResponse> orders;
 
     @FXML
     public void initialize() {

@@ -1,6 +1,5 @@
 package com.andreibel.server.controller;
 
-import com.andreibel.server.entity.Order;
 import com.andreibel.server.services.OrderService;
 import message.APICallType;
 import message.DTO.OrderRequest;
