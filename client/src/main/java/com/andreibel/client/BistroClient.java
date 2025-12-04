@@ -1,36 +1,52 @@
 package com.andreibel.client;
+
 import message.Message;
 import ocsf.client.AbstractClient;
 
+import java.io.IOException;
+
 public class BistroClient extends AbstractClient {
 
-    private BistroClientController mainUI;
+    private BistroClientController controller;
 
-    public BistroClient(String host, int port, BistroClientController mainUI) {
+    public BistroClient(String host, int port) {
         super(host, port);
-        this.mainUI = mainUI;
+    }
+
+    public void setController(BistroClientController controller) {
+        this.controller = controller;
     }
 
     @Override
     protected void handleMessageFromServer(Object msg) {
-        if (msg instanceof Message) {
-            //mainUI.handleServerResponse((Message) msg);
+        if (controller == null) {
+            return;
+        }
+
+        if (msg instanceof Message m) {
+            controller.handleServerResponse(m);
+        } else {
+            controller.showError("Unknown message from server: " + msg);
         }
     }
 
     public void send(Object msg) {
         try {
             sendToServer(msg);
-        } catch (Exception e) {
-            mainUI.showError("Failed to send message: " + e.getMessage());
+        } catch (IOException e) {
+            if (controller != null) {
+                controller.showError("Failed to send to server: " + e.getMessage());
+            }
         }
     }
 
     public void connectToServer() {
         try {
             openConnection();
-        } catch (Exception e) {
-            mainUI.showError("Could not connect to server.");
+        } catch (IOException e) {
+            if (controller != null) {
+                controller.showError("Failed to connect to server: " + e.getMessage());
+            }
         }
     }
 }

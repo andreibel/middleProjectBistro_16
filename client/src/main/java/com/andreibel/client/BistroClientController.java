@@ -1,4 +1,6 @@
 package com.andreibel.client;
+
+import javafx.application.Platform;
 import message.APICallType;
 import message.DTO.OrderRequest;
 import message.DTO.OrderResponse;
@@ -6,48 +8,72 @@ import message.Message;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class BistroClientController {
-    private static BistroClient client;
-    private static List<OrderResponse> orders;
+
+    private BistroClient client;
+    private final BistroClientGUIController guiController;
+
+    public BistroClientController(BistroClientGUIController guiController) {
+        this.guiController = guiController;
+    }
 
     public void attachClient(BistroClient c) {
-        client = c;
+        this.client = c;
+        c.setController(this);
     }
 
+    // ----- called from BistroClient (when AbstractClient gets a message) -----
     public void handleServerResponse(Message response) {
-       switch (response.getApiCallType()){
-           case GET_ORDERS:
-               if (response.getObject() != null){
-                   try{
-                       orders = (List<OrderResponse>) response.getObject();
-                   }
-                   catch (ClassCastException e) { e.printStackTrace(); }
-               }
-               else throw new NoSuchElementException("Unable to retrieve orders");
-           case UPDATE_ORDER:
-               System.out.println("Update Order");
-               //Validate Table View
-               break;
-       }
+        if (response == null || response.getType() == null) {
+            showError("Empty response from server");
+            return;
+        }
+
+        switch (response.getType()) {
+            case GET_ORDER_RESPONSE -> {
+                @SuppressWarnings("unchecked")
+                List<OrderResponse> orders = (List<OrderResponse>) response.getData();
+                Platform.runLater(() -> guiController.setOrdersToGUI(orders));
+            }
+
+            case UPDATE_ORDER_RESPONSE -> {
+                OrderResponse updated = (OrderResponse) response.getData();
+                Platform.runLater(() -> guiController.refreshSingleOrder(updated));
+            }
+
+            case ERROR -> {
+                String msg = response.getData() != null ?
+                        response.getData().toString() : "Unknown error";
+                showError(msg);
+            }
+
+            default -> showError("Unhandled response type: " + response.getType());
+        }
     }
 
-    public static void requestOrders() {
+    // ----- called from GUI controller -----
+
+    public void requestOrders() {
+        if (client == null) {
+            showError("Client not connected");
+            return;
+        }
         client.send(new Message(APICallType.GET_ORDERS, null));
     }
 
-    public static void updateOrder(int orderNumber, int numberOfPeople, LocalDateTime date) {
-        client.send(new Message(APICallType.UPDATE_ORDER, new OrderRequest(orderNumber, numberOfPeople, date)
-        ));
+    public void updateOrder(int orderNumber, int numberOfPeople, LocalDateTime date) {
+        if (client == null) {
+            showError("Client not connected");
+            return;
+        }
+        OrderRequest req = new OrderRequest(orderNumber, numberOfPeople, date);
+        client.send(new Message(APICallType.UPDATE_ORDER, req));
     }
 
-    public static List<OrderResponse> getListOfOrders() {
-        if (orders == null) return null;
-        return orders;
-    }
+    // ----- error handling -----
 
     public void showError(String msg) {
-        System.err.println(msg);
+        Platform.runLater(() -> guiController.showError(msg));
     }
 }

@@ -12,6 +12,4 @@ import java.io.Serializable;
 public class Message implements Serializable {
     private APICallType type;
     private Object data;
-
-
 }

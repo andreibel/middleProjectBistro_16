@@ -3,6 +3,7 @@ package com.andreibel.server.controller;
 import com.andreibel.server.entity.Order;
 import com.andreibel.server.services.OrderService;
 import message.APICallType;
+import message.DTO.OrderRequest;
 import message.Message;
 import ocsf.server.AbstractServer;
 import ocsf.server.ConnectionToClient;
@@ -29,11 +30,14 @@ public class Serve extends AbstractServer {
                     yield instance.getAllOrders();
                 }
                 case UPDATE_ORDER -> {
+                    System.out.println("Update order");
                     responseType = APICallType.UPDATE_ORDER_RESPONSE;
-                    yield instance.updateOrder((Order) message.getData());
+                    yield instance.updateOrder((OrderRequest) message.getData());
                 }
                 default -> null;
             };
+            System.out.println(response);
+
             client.sendToClient(new Message(responseType, response));
 
 

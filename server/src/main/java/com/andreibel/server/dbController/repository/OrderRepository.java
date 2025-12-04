@@ -2,6 +2,7 @@ package com.andreibel.server.dbController.repository;
 
 import com.andreibel.server.dbController.JDBCConnector;
 import com.andreibel.server.entity.Order;
+import message.DTO.OrderRequest;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -26,13 +27,12 @@ public class OrderRepository {
 
     public List<Order> getAllOrders() {
         // Implementation to retrieve all orders from the database
-        Statement stmt;
+        PreparedStatement stmt;
         List<Order> orders = new ArrayList<>();
         try {
-            stmt = connector.getConn().createStatement();
+            stmt = connector.getConn().prepareStatement("SELECT t.* FROM bistro.`order` t WHERE t.conformation_code = ?;");
             ResultSet rs = stmt.executeQuery("SELECT t.* FROM bistro.`order` t;");
             while(rs.next()) {
-                //System.out.println(rs.getString(1) + " " + rs.getString(2));
                 orders.add(mapRelToOrder(rs));
             }
             rs.close();
@@ -45,25 +45,20 @@ public class OrderRepository {
         }
     }
 
-    public Order editOrder(Order order) {
+
+    
+    
+    public Order editOrder(OrderRequest order) {
         Connection conn = connector.getConn();
+
         String updateSql = """
         UPDATE bistro.`order`\s
         SET number_of_guests = ?,\s
-            conformation_code = ?,\s
-            subscriber_id = ?,\s
-            order_date = ?,\s
-            date_of_placing_order = ?
+            order_date = ?\s
         WHERE order_number = ?;
        \s""";
-
         String selectSql = """
-        SELECT order_number,
-               order_date,
-               number_of_guests,
-               conformation_code,
-               subscriber_id,
-               date_of_placing_order
+        SELECT *
         FROM bistro.`order`
         WHERE order_number = ?;
         """;
@@ -72,16 +67,13 @@ public class OrderRepository {
 
         try {
             // Start transaction
-            conn.setAutoCommit(false);
+            connector.StartTransaction();
 
             // UPDATE
             try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
                 stmt.setInt(1, order.getNumberOfGuests());
-                stmt.setInt(2, order.getConformationCode());
-                stmt.setInt(3, order.getSubscriberId());
-                stmt.setTimestamp(4, Timestamp.valueOf(order.getOrderDateTime()));
-                stmt.setTimestamp(5, Timestamp.valueOf(order.getPlacedOrderDateTime()));
-                stmt.setInt(6, order.getOrderNumber());
+                stmt.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
+                stmt.setInt(3, order.getOrderNumber());
 
                 int rows = stmt.executeUpdate();
                 if (rows == 0) {
@@ -100,7 +92,7 @@ public class OrderRepository {
             }
 
             // Commit transaction
-            conn.commit();
+            connector.CommitTransaction();
         } catch (SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
