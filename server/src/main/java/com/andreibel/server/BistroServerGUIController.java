@@ -1,44 +1,42 @@
 package com.andreibel.server;
 
-import com.mysql.cj.xdevapi.Client;
+import com.andreibel.server.controller.ClientConnection;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import ocsf.server.ConnectionToClient;
 
 import java.net.InetAddress;
 
 public class BistroServerGUIController {
     @FXML
-    private TableView<Object> connectionsTableView;
+    private TableView<ClientConnection> connectionsTableView;
     @FXML
-    private TableColumn<ConnectionToClient, InetAddress> ipAddressColumn;
+    private TableColumn<ClientConnection, InetAddress> ipAddressColumn;
     @FXML
-    private TableColumn<ConnectionToClient, String> statusColumn;
+    private TableColumn<ClientConnection, String> statusColumn;
 
     private ObservableList<ClientConnection> connections;
 
     @FXML
     private void initialize() {
         connections = FXCollections.observableArrayList();
+        connectionsTableView.setItems(connections);
         setTableView();
     }
 
     public void addNewConnection(ConnectionToClient client) {
-        connections.add(new ClientConnection(client.getInetAddress(), "Open"));
-        connectionsTableView.getItems().add(connections.get(connections.size() - 1));
+        connections.add(new ClientConnection(client.getId(), client.getInetAddress(), "Open"));
     }
 
     public void editConnection(ConnectionToClient client) {
         for (ClientConnection connection : connections) {
-            if (connection.getIpAddress() == client.getInetAddress()) {
-                connection.setIpAddress(client.getInetAddress());
-                connectionsTableView.getSelectionModel().select(connection);
+            if (connection.getId() == client.getId()) {
+                connection.setStatus("closed");
+                connectionsTableView.refresh();
                 break;
             }
         }
@@ -48,11 +46,6 @@ public class BistroServerGUIController {
         ipAddressColumn.setCellValueFactory(new PropertyValueFactory<>("ipAddress"));
         statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
     }
-    @Data
-    @AllArgsConstructor
-    class ClientConnection {
-        private InetAddress ipAddress;
-        private String status;
 
-    }
+
 }
