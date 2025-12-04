@@ -3,6 +3,7 @@ package com.andreibel.server.services;
 import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.entity.Order;
 import com.andreibel.server.utils.Mapper;
+import message.DTO.OrderRequest;
 import message.DTO.OrderResponse;
 
 import java.util.List;
@@ -27,8 +28,8 @@ public class OrderService {
         return orders.stream().map(Mapper::mapOrderToOrderResponse).toList();
     }
 
-    public OrderResponse updateOrder(Order order) {
-        var SavedOrder = orderRepository.editOrder(order);
+    public OrderResponse updateOrder(OrderRequest orderRequest) {
+        var SavedOrder = orderRepository.editOrder(orderRequest);
         return Mapper.mapOrderToOrderResponse(SavedOrder);
 
     }
