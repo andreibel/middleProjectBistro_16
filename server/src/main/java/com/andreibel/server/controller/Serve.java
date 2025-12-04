@@ -1,6 +1,6 @@
 package com.andreibel.server.controller;
 
-import com.andreibel.server.entity.Order;
+import com.andreibel.server.BistroServerGUIController;
 import com.andreibel.server.services.OrderService;
 import message.APICallType;
 import message.DTO.OrderRequest;
@@ -12,16 +12,21 @@ import java.io.IOException;
 
 public class Serve extends AbstractServer {
     OrderService instance;
+    private BistroServerGUIController controller;
 
     public Serve(int port) {
         super(port);
         instance = OrderService.getInstance();
     }
 
+    public void setGUIController(BistroServerGUIController controller) {
+        this.controller = controller;
+    }
+
     @Override
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         try {
-            System.out.println(msg);
+            //System.out.println(msg);
             if (!(msg instanceof Message message)) throw new IllegalArgumentException("Invalid message type");
             APICallType responseType = APICallType.ERROR;
             Object response = switch (message.getType()) {
@@ -36,7 +41,7 @@ public class Serve extends AbstractServer {
                 }
                 default -> null;
             };
-            System.out.println(response);
+            //System.out.println(response);
 
             client.sendToClient(new Message(responseType, response));
 
@@ -45,5 +50,21 @@ public class Serve extends AbstractServer {
             throw new RuntimeException(e);
         }
 
+    }
+
+    @Override
+    protected void clientConnected(ConnectionToClient client){
+        controller.addNewConnection(client);
+    }
+
+    @Override
+    protected void clientDisconnected(ConnectionToClient client){
+        controller.editConnection(client);
+    }
+
+    @Override
+    protected void clientException(ConnectionToClient client, Throwable exception) {
+        System.out.println("Client exception: " + client.getId() + " - " + exception.getMessage());
+        controller.editConnection(client);
     }
 }
