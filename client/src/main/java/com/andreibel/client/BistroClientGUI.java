@@ -32,6 +32,13 @@ public class BistroClientGUI extends Application {
         stage.setTitle("Bistro Restaurant Alpha Build");
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.setOnCloseRequest(event -> {
+            try {
+                client.closeConnection();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
         stage.show();
     }
 }
