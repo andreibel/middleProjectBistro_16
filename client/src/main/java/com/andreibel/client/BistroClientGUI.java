@@ -20,7 +20,7 @@ public class BistroClientGUI extends Application {
 
         String host = params.getOrDefault("host", "localhost");
         int port = Integer.parseInt(params.getOrDefault("port", "8080"));
-
+        System.out.println("Connecting to " + host + ":" + port);
         Parent root = fxmlLoader.load();
         BistroClientGUIController guiController = fxmlLoader.getController();
 
