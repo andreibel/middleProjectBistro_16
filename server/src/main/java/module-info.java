@@ -1,4 +1,7 @@
+
+// module-info.java
 module com.andreibel.client {
+
     requires javafx.controls;
     requires javafx.fxml;
     requires static lombok;
