@@ -16,11 +16,16 @@ public class BistroClientGUI extends Application {
                 BistroClientGUI.class.getResource("ClientOrdersGUI.fxml")
         );
 
+        var params = getParameters().getNamed();
+
+        String host = params.getOrDefault("host", "localhost");
+        int port = Integer.parseInt(params.getOrDefault("port", "8080"));
+        System.out.println("Connecting to " + host + ":" + port);
         Parent root = fxmlLoader.load();
         BistroClientGUIController guiController = fxmlLoader.getController();
 
         // create client + controller + wire them
-        BistroClient client = new BistroClient("localhost", 8080); // adjust port/host as needed
+        BistroClient client = new BistroClient(host, port); // adjust port/host as needed
         BistroClientController appController = new BistroClientController(guiController);
         appController.attachClient(client);
         guiController.setController(appController);
