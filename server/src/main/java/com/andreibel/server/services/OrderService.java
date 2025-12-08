@@ -12,13 +12,10 @@ import java.util.List;
 public class OrderService {
     private static OrderService instance;
     private final OrderRepository orderRepository;
-    private final JDBCConnector connector;
 
     private OrderService() {
         this.orderRepository = OrderRepository.getInstance();
-        this.connector = JDBCConnector.getInstance();
     }
-
     public static OrderService getInstance() {
         if (instance == null) {
             instance = new OrderService();
