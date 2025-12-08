@@ -1,7 +1,7 @@
 package com.andreibel.client;
 
 import javafx.collections.ObservableList;
-import message.DTO.OrderResponse;
+import com.andreibel.message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

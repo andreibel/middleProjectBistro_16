@@ -1,7 +1,7 @@
 package com.andreibel.server.utils;
 
 import com.andreibel.server.entity.Order;
-import message.DTO.OrderResponse;
+import com.andreibel.message.DTO.OrderResponse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

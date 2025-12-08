@@ -1,7 +1,7 @@
 package com.andreibel.client;
 
-import message.Message;
-import ocsf.client.AbstractClient;
+import com.andreibel.message.Message;
+import com.lloseng.ocsf.client.AbstractClient;
 
 import java.io.IOException;
 

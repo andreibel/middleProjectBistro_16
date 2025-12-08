@@ -51,6 +51,16 @@
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.andreibel</groupId>
+            <artifactId>message</artifactId>
+            <version>1.0-SNAPSHOT-FIX</version>
+        </dependency>
+        <dependency>
+            <groupId>com.lloseng</groupId>
+            <artifactId>ocsf</artifactId>
+            <version>2.31</version>
+        </dependency>
     </dependencies>
 
     <build>

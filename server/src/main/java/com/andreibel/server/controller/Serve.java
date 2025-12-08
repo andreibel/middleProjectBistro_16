@@ -1,12 +1,12 @@
 package com.andreibel.server.controller;
 
+import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.Message;
 import com.andreibel.server.BistroServerGUIController;
 import com.andreibel.server.services.OrderService;
-import message.APICallType;
-import message.DTO.OrderRequest;
-import message.Message;
-import ocsf.server.AbstractServer;
-import ocsf.server.ConnectionToClient;
+import com.lloseng.ocsf.server.AbstractServer;
+import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
 
@@ -53,12 +53,12 @@ public class Serve extends AbstractServer {
     }
 
     @Override
-    protected void clientConnected(ConnectionToClient client){
+    protected void clientConnected(ConnectionToClient client) {
         controller.addNewConnection(client);
     }
 
     @Override
-    protected void clientDisconnected(ConnectionToClient client){
+    protected void clientDisconnected(ConnectionToClient client) {
         controller.editConnection(client);
     }
 

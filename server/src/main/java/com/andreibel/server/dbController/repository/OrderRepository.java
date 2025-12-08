@@ -2,7 +2,7 @@ package com.andreibel.server.dbController.repository;
 
 import com.andreibel.server.dbController.JDBCConnector;
 import com.andreibel.server.entity.Order;
-import message.DTO.OrderRequest;
+import com.andreibel.message.DTO.OrderRequest;
 
 import java.sql.*;
 import java.util.ArrayList;

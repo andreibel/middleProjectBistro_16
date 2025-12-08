@@ -1,10 +1,10 @@
 package com.andreibel.client;
 
 import javafx.application.Platform;
-import message.APICallType;
-import message.DTO.OrderRequest;
-import message.DTO.OrderResponse;
-import message.Message;
+import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.OrderResponse;
+import com.andreibel.message.Message;
 
 import java.time.LocalDateTime;
 import java.util.List;

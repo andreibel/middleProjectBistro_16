@@ -7,8 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import ocsf.server.ConnectionToClient;
-
+import com.lloseng.ocsf.server.ConnectionToClient;
 import java.net.InetAddress;
 
 public class BistroServerGUIController {
