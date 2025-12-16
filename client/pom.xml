@@ -54,7 +54,7 @@
         <dependency>
             <groupId>com.andreibel</groupId>
             <artifactId>message</artifactId>
-            <version>1.0-SNAPSHOT-FIX</version>
+            <version>1.1-SNAPSHOT-FIX</version>
         </dependency>
         <dependency>
             <groupId>com.lloseng</groupId>
