@@ -1,0 +1,31 @@
+package com.andreibel.server.entity;
+
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
+/**
+ * <h1>Worker entity class.</h1>
+ * <hr/>
+ * this class is used to represent the worker entity in the database. <br/>
+ * <h3>Attributes:</h3>
+ * <b>PK</b> - workerName: {@code String}<br/>
+ * <b>C</b> - workerPassword: {@code String}<br/>
+ * <b>C</b> - workerEmail: {@code String}<br/>
+ * <b>C</b> - isManager: {@code boolean}<br/>
+ * @author andrei beloziorove
+ */
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder
+public class Worker {
+    // PK
+    private String workerName;
+    private String workerPassword;
+    private String workerEmail;
+    private boolean isManager;
+}
