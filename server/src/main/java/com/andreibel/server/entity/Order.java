@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * <h1>Order entity class.</h1>
@@ -36,7 +37,7 @@ public class Order {
     // PK
     private int orderNumber;
     private int numberOfGuests;
-    private int conformationCode;
+    private UUID conformationCode;
     private LocalDateTime orderDateTime;
     private LocalDateTime placedOrderDateTime;
     private boolean orderCancelled;

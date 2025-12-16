@@ -5,6 +5,7 @@ import com.andreibel.message.DTO.OrderResponse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.UUID;
 
 public class Mapper {
 
@@ -13,7 +14,7 @@ public class Mapper {
         return Order.builder()
                 .orderNumber(rs.getInt("order_number"))
                 .numberOfGuests(rs.getInt("number_of_guests"))
-                .conformationCode(rs.getInt("conformation_code"))
+                .conformationCode(UUID.fromString(rs.getString("conformation_code")))
                 .subscriberId(rs.getInt("subscriber_id"))
                 .orderDateTime(rs.getTimestamp("order_date").toLocalDateTime())
                 .placedOrderDateTime(rs.getTimestamp("date_of_placing_order").toLocalDateTime())
