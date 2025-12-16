@@ -16,6 +16,18 @@ import lombok.NoArgsConstructor;
  * <b>C</b> - workerPassword: {@code String}<br/>
  * <b>C</b> - workerEmail: {@code String}<br/>
  * <b>C</b> - isManager: {@code boolean}<br/>
+ * <hr/>
+ * <h3>DDL</h3>
+ * <blockquote>
+ *     <pre>
+ * create table Worker (
+ *     workerName     varchar(30)          not null,
+ *     workerPassword varchar(70)          not null,
+ *     workerEmail    varchar(30)          not null,
+ *     isManager      tinyint(1) default 0 not null
+ * );
+ * </blockquote>
+ * <hr/>
  * @author andrei beloziorove
  */
 @AllArgsConstructor
