@@ -14,7 +14,7 @@ import java.util.UUID;
  * <h3>Attributes:</h3>
  * <b>PK</b> - orderNumber: {@code int}<br/>
  * <b>C</b> - numberOfGuests: {@code int}<br/>
- * <b>C</b> - conformationCode: {@code int}<br/>
+ * <b>C</b> - conformationCode: {@code UUID}<br/>
  * <b>C</b> - orderDateTime: {@code LocalDateTime}<br/>
  * <b>C</b> - placedOrderDateTime: {@code LocalDateTime}<br/>
  * <b>C</b> - orderCancelled: {@code boolean}<br/>

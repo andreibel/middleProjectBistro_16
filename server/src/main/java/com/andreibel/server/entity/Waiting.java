@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 /**
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * <b>PK</b> - waitingNumber: {@code int}<br/>
  * <b>C</b> - waitingDateTime: {@code LocalDateTime}<br/>
  * <b>C</b> - isCurrentlyWaiting: {@code boolean}<br/>
+ * <b>C</b> - conformationCode: {@code UUID}<br/>
  * <b>FK</b> - orderNumber: {@code int} (Optional)<br/>
  * <b>FK</b> - subscriberId: {@code int} (Optional)<br/>
  * <b>C</b> - email: {@code String} (Optional)<br/>
@@ -39,6 +41,7 @@ public class Waiting {
     private int waitingNumber;
     private LocalDateTime waitingDateTime;
     private boolean isCurrentlyWaiting;
+    private UUID conformationCode;
     // FK
     private Integer orderNumber; // Optional
     // FK
