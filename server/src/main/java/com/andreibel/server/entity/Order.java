@@ -25,8 +25,7 @@ import java.util.UUID;
  * <b>C</b> - phoneNumber: {@code String} (Optional)<br/>
  * <hr/>
  * <h3>DDL</h3>
- * <blockquote>
- *     <pre>
+ * <blockquote> <pre>
  * create table `Order`(
  *     orderNumber         int auto_increment
  *         primary key,
@@ -44,7 +43,7 @@ import java.util.UUID;
  *         foreign key (subscriberId) references Subscriber (subscriberId)
  *             on delete cascade
  * );
- * </blockquote>
+ * </pre></blockquote>
  * <hr/>
  * the columns email and phoneNumber are optional because it related to order by regular customer (then only one necessary)
  * if the order is placed by a subscriber, then both columns are null, and the subscriberId is not null.
