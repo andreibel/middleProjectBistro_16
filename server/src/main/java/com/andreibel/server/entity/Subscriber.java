@@ -18,11 +18,24 @@ import java.util.List;
  * <b>C</b> - name: {@code String}<br/>
  * <b>C</b> - phoneNumber: {@code String}<br/>
  * <hr/>
+ * <h3>DDL</h3>
+ * <blockquote>
+ *     <pre>
+ * create table Subscriber (
+ *      subscriberId int auto_increment
+ *      primary key,
+ *      email        varchar(30) not null,
+ *      name         varchar(30) not null,
+ *      phoneNumber  varchar(10) not null
+ *  );
+ * </blockquote>
+ * <hr/>
  * lists of orders and waiting are not part of the table, but they are used to get all the orders and waiting
  * orders of a subscriber.
  * @see Order
  * @see Waiting
  * @author Andrei Beloziyorove
+ * <blockwate
  */
 @AllArgsConstructor
 @NoArgsConstructor

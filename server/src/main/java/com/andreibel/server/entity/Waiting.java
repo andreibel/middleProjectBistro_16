@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 /**
@@ -16,10 +17,32 @@ import java.time.LocalDateTime;
  * <b>PK</b> - waitingNumber: {@code int}<br/>
  * <b>C</b> - waitingDateTime: {@code LocalDateTime}<br/>
  * <b>C</b> - isCurrentlyWaiting: {@code boolean}<br/>
+ * <b>C</b> - conformationCode: {@code UUID}<br/>
  * <b>FK</b> - orderNumber: {@code int} (Optional)<br/>
  * <b>FK</b> - subscriberId: {@code int} (Optional)<br/>
  * <b>C</b> - email: {@code String} (Optional)<br/>
  * <b>C</b> - phoneNumber: {@code String} (Optional)<br/>
+ * <hr/>
+ * <h3>DDL</h3>
+ * <blockquote>
+ *     <pre>
+ * create table Waiting(
+ *     waitingNumber      int auto_increment
+ *         primary key,
+ *     waitingDateTime    datetime   default CURRENT_TIMESTAMP null,
+ *     isCurrentlyWaiting tinyint(1) default 1                 null,
+ *     conformationCode   varchar(36)                          not null,
+ *     orderNumber        int                                  null,
+ *     subscriberId       int                                  null,
+ *     email              varchar(30)                          null,
+ *     phoneNumber        varchar(10)                          null,
+ *     constraint Waiting_Order_orderNumber_fk
+ *         foreign key (orderNumber) references `Order` (orderNumber),
+ *     constraint Waiting_Subscriber_subscriberId_fk
+ *         foreign key (subscriberId) references Subscriber (subscriberId)
+ * );
+ * </pre>
+ * </blockquote>
  * <hr/>
  * the columns email and phoneNumber are optional. It related to a waiting list by regular customer (then only one
  * necessary)
@@ -39,6 +62,7 @@ public class Waiting {
     private int waitingNumber;
     private LocalDateTime waitingDateTime;
     private boolean isCurrentlyWaiting;
+    private UUID conformationCode;
     // FK
     private Integer orderNumber; // Optional
     // FK
