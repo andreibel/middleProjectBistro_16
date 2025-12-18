@@ -1,5 +1,6 @@
 package com.andreibel.client;
 
+import com.andreibel.client.Main.MainForm;
 import javafx.application.Application;
 
 import java.util.Arrays;

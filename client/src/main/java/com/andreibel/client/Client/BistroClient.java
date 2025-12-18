@@ -1,4 +1,4 @@
-package com.andreibel.client;
+package com.andreibel.client.Client;
 
 import com.andreibel.message.Message;
 import com.lloseng.ocsf.client.AbstractClient;
