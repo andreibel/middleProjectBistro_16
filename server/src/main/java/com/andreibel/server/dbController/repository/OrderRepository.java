@@ -1,10 +1,13 @@
 package com.andreibel.server.dbController.repository;
 
-import com.andreibel.server.dbController.JDBCConnector;
-import com.andreibel.server.entity.Order;
 import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.server.dbController.TransactionManager;
+import com.andreibel.server.entity.Order;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,103 +16,69 @@ import static com.andreibel.server.utils.Mapper.mapRelToOrder;
 public class OrderRepository {
 
     private static OrderRepository instance;
-    private final JDBCConnector connector;
+    private final TransactionManager tx;
+
     private OrderRepository() {
-        connector = JDBCConnector.getInstance();
+        this.tx = TransactionManager.getInstance();
     }
 
     public static OrderRepository getInstance() {
-        if (instance == null) {
-            instance = new OrderRepository();
-        }
+        if (instance == null) instance = new OrderRepository();
         return instance;
     }
 
-    public List<Order> getAllOrders() {
-        // Implementation to retrieve all orders from the database
-        PreparedStatement stmt;
+    public List<Order> findAll() throws SQLException {
+        String sql = "SELECT * FROM bistro.`order`;";
         List<Order> orders = new ArrayList<>();
-        try {
-            stmt = connector.getConn().prepareStatement("SELECT t.* FROM bistro.`order` t WHERE t.conformation_code = ?;");
-            ResultSet rs = stmt.executeQuery("SELECT t.* FROM bistro.`order` t;");
-            while(rs.next()) {
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
                 orders.add(mapRelToOrder(rs));
             }
-            rs.close();
-            return orders;
-        } catch (SQLException ex) {
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-            return null;
+        }
+        return orders;
+    }
+
+    public Order findById(int orderNumber) throws SQLException {
+        String sql = "SELECT * FROM bistro.`order` WHERE {0} = ?;";
+        sql = String.format(sql, Order.ORDER_NUMBER);
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setInt(1, orderNumber);
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? mapRelToOrder(rs) : null;
+            }
         }
     }
 
+    public void update(OrderRequest order) throws SQLException {
+        String sql = "UPDATE bistro.`order` SET {0} = ?, {1} = ? WHERE {2} = ?; ";
+        sql = String.format(sql, Order.NUMBER_OF_GUESTS, Order.ORDER_DATE_TIME, Order.ORDER_NUMBER);
 
-    
-    
-    public Order editOrder(OrderRequest order) {
-        Connection conn = connector.getConn();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setInt(1, order.getNumberOfGuests());
+            stmt.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
+            stmt.setInt(3, order.getOrderNumber());
 
-        String updateSql = """
-        UPDATE bistro.`order`\s
-        SET number_of_guests = ?,\s
-            order_date = ?\s
-        WHERE order_number = ?;
-       \s""";
-        String selectSql = """
-        SELECT *
-        FROM bistro.`order`
-        WHERE order_number = ?;
-        """;
-
-        Order updatedOrder = null;
-
-        try {
-            // Start transaction
-            connector.StartTransaction();
-
-            // UPDATE
-            try (PreparedStatement stmt = conn.prepareStatement(updateSql)) {
-                stmt.setInt(1, order.getNumberOfGuests());
-                stmt.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
-                stmt.setInt(3, order.getOrderNumber());
-
-                int rows = stmt.executeUpdate();
-                if (rows == 0) {
-                    throw new SQLException("No order found with order_number = " + order.getOrderNumber());
-                }
-            }
-
-            // SELECT updated row
-            try (PreparedStatement stmt = conn.prepareStatement(selectSql)) {
-                stmt.setInt(1, order.getOrderNumber());
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        updatedOrder = mapRelToOrder(rs); // helper method below
-                    }
-                }
-            }
-
-            // Commit transaction
-            connector.CommitTransaction();
-        } catch (SQLException ex) {
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-            try {
-                conn.rollback();
-            } catch (SQLException rollEx) {
-                System.out.println("Rollback failed: " + rollEx.getMessage());
-            }
-        } finally {
-            try {
-                conn.setAutoCommit(true);
-            } catch (SQLException e) {
-                System.out.println("Failed to reset autoCommit: " + e.getMessage());
+            if (stmt.executeUpdate() == 0) {
+                throw new SQLException("Order not found: " + order.getOrderNumber());
             }
         }
+    }
 
-        return updatedOrder;
+    public List<Order> findBySubscriberId(int subscriberId) throws SQLException {
+        String sql = "SELECT * FROM bistro.`order` WHERE {0} = ?;";
+        sql = String.format(sql, Order.SUBSCRIBER_ID);
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setInt(1, subscriberId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    orders.add(mapRelToOrder(rs));
+                }
+            }
+            return orders;
+        }
     }
 }

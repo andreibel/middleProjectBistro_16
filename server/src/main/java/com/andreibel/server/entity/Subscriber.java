@@ -21,13 +21,18 @@ import java.util.List;
  * <h3>DDL</h3>
  * <blockquote>
  *     <pre>
- * create table Subscriber (
- *      subscriberId int auto_increment
- *      primary key,
- *      email        varchar(30) not null,
- *      name         varchar(30) not null,
- *      phoneNumber  varchar(10) not null
- *  );
+ * create table Subscriber
+ * (
+ *     subscriberId int auto_increment
+ *         primary key,
+ *     email        varchar(30) not null,
+ *     name         varchar(30) not null,
+ *     phoneNumber  varchar(10) not null,
+ *     constraint email
+ *         unique (email),
+ *     constraint phone
+ *         unique (phoneNumber)
+ * );
  * </blockquote>
  * <hr/>
  * lists of orders and waiting are not part of the table, but they are used to get all the orders and waiting
@@ -53,4 +58,12 @@ public class Subscriber {
     private List<Order> orders;
     // if you want to get all the waiting orders of a subscriber, use the waiting list
     private List<Waiting> waiting;
+
+
+
+    //columns name in the database
+    public static final String SUBSCRIBER_ID = "subscriberId";
+    public static final String EMAIL = "email";
+    public static final String NAME = "name";
+    public static final String PHONE_NUMBER = "phoneNumber";
 }

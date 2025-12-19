@@ -68,5 +68,21 @@ public class Order {
     private Integer subscriberId; // optional
     private String email; // optional
     private String phoneNumber; // optional
+
+
+
+    //columns name in the database
+    public static final String ORDER_NUMBER = "orderNumber";
+    public static final String NUMBER_OF_GUESTS = "numberOfGuests";
+    public static final String CONFIRMATION_CODE = "conformationCode";
+    public static final String ORDER_DATE_TIME = "orderDateTime";
+    public static final String PLACED_ORDER_DATE_TIME = "placedOrderDateTime";
+    public static final String ORDER_CANCELLED = "orderCancelled";
+    public static final String ORDER_COMPLETED = "orderCompleted";
+    public static final String ORDER_PAID = "orderPaid";
+    public static final String SUBSCRIBER_ID = "subscriberId";
+    public static final String EMAIL = "email";
+    public static final String PHONE_NUMBER = "phoneNumber";
+
 }
 

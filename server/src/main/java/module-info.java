@@ -9,6 +9,8 @@ module com.andreibel.client {
     requires message;
     requires ocsf;
 
+    //requires com.andreibel.client;
+
     // FXML controllers:
     opens com.andreibel.server to javafx.fxml;
 
