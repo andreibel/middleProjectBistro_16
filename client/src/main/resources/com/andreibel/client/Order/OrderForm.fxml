@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="450.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.OrderFormGUIController"> <!-- warm solid background -->
+<AnchorPane prefHeight="450.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.OrderFormGUIController"> <!-- warm solid background -->
 
    <children>
       <!-- Title Label -->
@@ -34,11 +34,11 @@
 
       <!-- Who Am I (Guest/Subscriber) -->
       <Label fx:id="lblWhoAmI" layoutX="173.0" layoutY="218.0" style="-fx-font-size: 14px;" text="I am:" />
-      <RadioButton fx:id="radioGuest" layoutX="248.0" layoutY="217.0" mnemonicParsing="false" text="Guest">
+      <RadioButton fx:id="radioGuest" layoutX="248.0" layoutY="217.0" mnemonicParsing="false" onAction="#adjustFormBasedOnType" selected="true" text="Guest">
          <toggleGroup>
-            <ToggleGroup fx:id="userType" />
+            <ToggleGroup fx:id="typeGroup" />
          </toggleGroup></RadioButton>
-      <RadioButton fx:id="radioSubscriber" layoutX="344.0" layoutY="217.0" mnemonicParsing="false" text="Subscriber" toggleGroup="$userType" />
+      <RadioButton fx:id="radioSubscriber" layoutX="344.0" layoutY="217.0" mnemonicParsing="false" onAction="#adjustFormBasedOnType" text="Subscriber" toggleGroup="$typeGroup" />
 
       <!-- Subscriber ID / Email -->
       <Label fx:id="lblSubscriberId" layoutX="148.0" layoutY="250.0" style="-fx-font-size: 14px;" text="Subscriber ID:" />
