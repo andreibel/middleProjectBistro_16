@@ -1,14 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.andreibel.client.Subscriber.SubscriberLoginFormGUIController"
-            prefHeight="400.0" prefWidth="600.0">
 
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Subscriber.SubscriberLoginFormGUIController">
+   <children>
+      <Label fx:id="lblTitle" layoutX="50.0" layoutY="29.0" text="Welcome dear subscriber, please login to access your features:">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblSubscriberId" layoutX="50.0" layoutY="131.0" text="Subscriber ID:">
+         <font>
+            <Font size="19.0" />
+         </font>
+      </Label>
+   </children>
 </AnchorPane>
