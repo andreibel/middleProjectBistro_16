@@ -35,6 +35,12 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class Worker {
+    // Database Column Names
+    public static final String WORKER_NAME = "workerName";
+    public static final String WORKER_PASSWORD = "workerPassword";
+    public static final String WORKER_EMAIL = "workerEmail";
+    public static final String IS_MANAGER = "isManager";
+
     // PK
     private String workerName;
     private String workerPassword;
