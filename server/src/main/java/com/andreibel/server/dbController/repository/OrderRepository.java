@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,7 @@ public class OrderRepository {
         String sql = "SELECT * FROM bistro.`order`;";
         List<Order> orders = new ArrayList<>();
 
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 orders.add(mapRelToOrder(rs));
             }
@@ -66,6 +66,30 @@ public class OrderRepository {
             }
         }
     }
+
+    public List<Order> findOrdersCollideByDateTime(LocalDateTime date) throws SQLException {
+        Timestamp start = Timestamp.valueOf(date);
+        Timestamp end = Timestamp.valueOf(date.plusHours(2));
+
+        String sql =
+                " SELECT * FROM bistro.`order` o WHERE o.{0} = 0 AND o.{1} = 0 AND o{1} < ? AND DATE_ADD(o.{1}, " +
+                        "INTERVAL 2 HOUR) > ? ORDER BY o.{1} ASC;";
+        sql = String.format(sql, Order.ORDER_CANCELLED, Order.ORDER_COMPLETED, Order.ORDER_DATE_TIME, Order.ORDER_DATE_TIME, Order.ORDER_DATE_TIME);
+
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setTimestamp(1, end);   // existing.start < requested.end
+            stmt.setTimestamp(2, start); // existing.end > requested.start
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    orders.add(mapRelToOrder(rs));
+                }
+            }
+        }
+        return orders;
+    }
+
 
     public List<Order> findBySubscriberId(int subscriberId) throws SQLException {
         String sql = "SELECT * FROM bistro.`order` WHERE {0} = ?;";
