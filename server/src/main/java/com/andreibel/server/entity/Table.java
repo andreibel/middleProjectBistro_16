@@ -2,10 +2,11 @@ package com.andreibel.server.entity;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
- /**
+/**
  * <h1>Worker entity class.</h1>
  * <hr/>
  * this class is used to represent the worker entity in the database. <br/>
@@ -17,7 +18,7 @@ import lombok.NoArgsConstructor;
  * <h3>DDL</h3>
  * <blockquote>
  * <pre>
- *create table `Table`
+ * create table `Table`
  * (
  *     tableId  int auto_increment
  *         primary key,
@@ -33,13 +34,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Tables {
+@Builder
+public class Table {
     //PK
     private int tableId;
     private int capacity;
     private int quantity;
 
-    static final String TABLE_ID = "tableId";
-    static final String CAPACITY = "capacity";
-    static final String QUANTITY = "quantity";
+    public static final String TABLE_ID = "tableId";
+    public static final String CAPACITY = "capacity";
+    public static final String QUANTITY = "quantity";
 }

@@ -8,6 +8,7 @@ module com.andreibel.client {
     requires java.sql;
     requires message;
     requires ocsf;
+    //requires com.andreibel.client;
 
     //requires com.andreibel.client;
 
@@ -16,6 +17,5 @@ module com.andreibel.client {
 
     // *** important line: allow JavaFX reflection on DTOs ***
 
-    // if other modules need these types too:
-    exports com.andreibel.server;
+
 }

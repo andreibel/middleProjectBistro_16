@@ -6,6 +6,7 @@ import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.server.entity.Subscriber;
 import com.andreibel.message.DTO.WorkerRequest;
 import com.andreibel.message.DTO.WorkerResponse;
+import com.andreibel.server.entity.Table;
 import com.andreibel.server.entity.Worker;
 
 import java.sql.ResultSet;
@@ -76,6 +77,14 @@ public class Mapper {
                 .workerPassword(request.getWorkerPassword())
                 .workerEmail(request.getWorkerEmail())
                 .isManager(request.isManager())
+                .build();
+    }
+
+
+    public static Table mapRelToTable(ResultSet rs) throws SQLException {
+        return Table.builder().tableId(rs.getInt(Table.TABLE_ID))
+                .capacity(rs.getInt(Table.CAPACITY))
+                .quantity(rs.getInt(Table.QUANTITY))
                 .build();
     }
 }

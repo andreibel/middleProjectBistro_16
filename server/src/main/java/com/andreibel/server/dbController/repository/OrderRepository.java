@@ -74,7 +74,7 @@ public class OrderRepository {
         String sql =
                 " SELECT * FROM bistro.`order` o WHERE o.{0} = 0 AND o.{1} = 0 AND o{1} < ? AND DATE_ADD(o.{1}, " +
                         "INTERVAL 2 HOUR) > ? ORDER BY o.{1} ASC;";
-        sql = String.format(sql, Order.ORDER_CANCELLED, Order.ORDER_COMPLETED, Order.ORDER_DATE_TIME, Order.ORDER_DATE_TIME, Order.ORDER_DATE_TIME);
+        sql = String.format(sql, Order.ORDER_CANCELLED, Order.ORDER_COMPLETED, Order.ORDER_DATE_TIME);
 
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {

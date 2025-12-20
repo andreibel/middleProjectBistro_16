@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
  * <hr/>
  * <h3>DDL</h3>
  * <blockquote>
- *     <pre>
+ * <pre>
  * create table Worker (
  *     workerName     varchar(30)          not null,
  *     workerPassword varchar(70)          not null,
@@ -35,15 +35,18 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 public class Worker {
-    // Database Column Names
-    public static final String WORKER_NAME = "workerName";
-    public static final String WORKER_PASSWORD = "workerPassword";
-    public static final String WORKER_EMAIL = "workerEmail";
-    public static final String IS_MANAGER = "isManager";
 
     // PK
     private String workerName;
     private String workerPassword;
     private String workerEmail;
     private boolean isManager;
+
+
+    // Database Column Names
+    public static final String WORKER_NAME = "workerName";
+    public static final String WORKER_PASSWORD = "workerPassword";
+    public static final String WORKER_EMAIL = "workerEmail";
+    public static final String IS_MANAGER = "isManager";
+
 }
