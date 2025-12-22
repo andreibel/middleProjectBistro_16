@@ -41,6 +41,10 @@ public class Serve extends AbstractServer {
                     responseType = APICallType.UPDATE_ORDER_RESPONSE;
                     yield orderService.updateOrder((OrderRequest) message.getData());
                 }
+                case CREATE_ORDER -> {
+                    responseType = APICallType.CREATE_ORDER_RESPONSE;
+                    yield orderService.createOrder((OrderRequest) message.getData());
+                }
                 default -> null;
             };
 
