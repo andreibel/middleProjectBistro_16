@@ -9,14 +9,17 @@ import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 public class Serve extends AbstractServer {
-    OrderService instance;
+    OrderService orderService;
     private BistroServerGUIController controller;
 
     public Serve(int port) {
         super(port);
-        instance = OrderService.getInstance();
+        orderService = OrderService.getInstance();
+
+
     }
 
     public void setGUIController(BistroServerGUIController controller) {
@@ -26,22 +29,20 @@ public class Serve extends AbstractServer {
     @Override
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         try {
-            //System.out.println(msg);
             if (!(msg instanceof Message message)) throw new IllegalArgumentException("Invalid message type");
             APICallType responseType = APICallType.ERROR;
             Object response = switch (message.getType()) {
                 case GET_ORDERS -> {
                     responseType = APICallType.GET_ORDER_RESPONSE;
-                    yield instance.getAllOrders();
+                    yield orderService.getAllOrders();
                 }
                 case UPDATE_ORDER -> {
                     System.out.println("Update order");
                     responseType = APICallType.UPDATE_ORDER_RESPONSE;
-                    yield instance.updateOrder((OrderRequest) message.getData());
+                    yield orderService.updateOrder((OrderRequest) message.getData());
                 }
                 default -> null;
             };
-            //System.out.println(response);
 
             client.sendToClient(new Message(responseType, response));
 
@@ -67,4 +68,5 @@ public class Serve extends AbstractServer {
         System.out.println("Client exception: " + client.getId() + " - " + exception.getMessage());
         controller.editConnection(client);
     }
+
 }

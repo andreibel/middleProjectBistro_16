@@ -37,5 +37,8 @@ public class BistroServer extends Application {
         stage.setTitle("Server");
         stage.setScene(scene);
         stage.show();
+
+
+
     }
 }

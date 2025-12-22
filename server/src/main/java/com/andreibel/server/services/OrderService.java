@@ -7,7 +7,7 @@ import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.TableRepository;
 import com.andreibel.server.entity.Order;
 import com.andreibel.server.entity.Table;
-import com.andreibel.server.utils.Mapper;
+import com.andreibel.server.utils.OrderMapper;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -31,48 +31,60 @@ public class OrderService {
     }
 
     public List<OrderResponse> getAllOrders() {
-
-        return tx.inTransaction(orderRepository::findAll).stream().map(Mapper::mapOrderToOrderResponse).toList();
-
+        return tx.inTransaction(orderRepository::findAll).stream().map(OrderMapper::mapOrderToOrderResponse).toList();
     }
 
     public OrderResponse updateOrder(OrderRequest request) {
-
         return tx.inTransaction(() -> {
             orderRepository.update(request);
             var updated = orderRepository.findById(request.getOrderNumber());
-            return Mapper.mapOrderToOrderResponse(updated);
+            return OrderMapper.mapOrderToOrderResponse(updated);
         });
-
     }
 
     public OrderResponse createOrder(OrderRequest request) {
-
         return tx.inTransaction(() -> {
             List<Table> types = tableRepository.findAll();
             List<Order> collide = orderRepository.findOrdersCollideByDateTime(request.getOrderDateTime());
-            Order newOrder = Order.builder()
-                    .numberOfGuests(request.getNumberOfGuests())
-                    .orderDateTime(request.getOrderDateTime())
-                    .orderCancelled(false)
-                    .orderCompleted(false)
-                    .build();
-            collide.add(newOrder);
-
+            Order newOrder = OrderMapper.mapNewOrderRequestToOrder(request);
             TreeMap<Integer, Integer> available = new TreeMap<>();
             for (Table t : types) {
                 available.merge(t.getCapacity(), t.getQuantity(), Integer::sum);
             }
 
-            // TODO : hash map for orders collide in the same time
             Map<LocalDateTime, List<Order>> starts = new HashMap<>();
             for (Order o : collide) {
                 starts.computeIfAbsent(o.getOrderDateTime(), k -> new ArrayList<>()).add(o);
             }
             Map<Integer, Integer> assignedCap = new HashMap<>();
             LocalDateTime from = request.getOrderDateTime().minusHours(2);
-            LocalDateTime to   = request.getOrderDateTime().plusHours(2);
-            return null;
+            LocalDateTime to = request.getOrderDateTime().plusHours(2);
+            for (LocalDateTime t = from; t.isBefore(to); t.plusMinutes(30)) {
+                // Free orders that ended now (started exactly 2h ago)
+                LocalDateTime endedStart = t.minusHours(2);
+                for (Order o : starts.getOrDefault(endedStart, List.of())) {
+                    Integer cap = assignedCap.remove(o.getOrderNumber());
+                    if (cap != null) available.put(cap, available.get(cap) + 1);
+                }
+
+                // Assign tables to orders starting now
+                List<Order> startingNow = new ArrayList<>(starts.getOrDefault(t, List.of()));
+                startingNow.sort(Comparator.comparingInt(Order::getNumberOfGuests).reversed());
+
+                for (Order o : startingNow) {
+                    int g = o.getNumberOfGuests();
+
+                    Integer cap = available.ceilingKey(g);
+                    while (cap != null && available.get(cap) == 0) {
+                        cap = available.higherKey(cap);
+                    }
+                    if (cap == null) return null;
+
+                    available.put(cap, available.get(cap) - 1);
+                    assignedCap.put(o.getOrderNumber(), cap);
+                }
+            }
+            return OrderMapper.mapOrderToOrderResponse(orderRepository.save(newOrder));
         });
 
 

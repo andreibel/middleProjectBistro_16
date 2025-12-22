@@ -15,6 +15,8 @@ public class OrderResponse implements Serializable {
     private int numberOfGuests;
     private UUID conformationCode;
     private int subscriberId; // optional
+    private String email; // optional
+    private String phoneNumber; // optionals
     private LocalDateTime orderDateTime;
     private LocalDateTime placedOrderDateTime;
 }

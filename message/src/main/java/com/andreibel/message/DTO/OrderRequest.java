@@ -14,4 +14,7 @@ public class OrderRequest implements Serializable {
     private int orderNumber;
     private int numberOfGuests;
     private LocalDateTime orderDateTime;
+    private Integer subscriberId; // optional
+    private String email; // optional
+    private String phoneNumber; // optional
 }
