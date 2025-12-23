@@ -9,7 +9,6 @@ import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 public class Serve extends AbstractServer {
     OrderService orderService;
@@ -32,8 +31,8 @@ public class Serve extends AbstractServer {
             if (!(msg instanceof Message message)) throw new IllegalArgumentException("Invalid message type");
             APICallType responseType = APICallType.ERROR;
             Object response = switch (message.getType()) {
-                case GET_ORDERS -> {
-                    responseType = APICallType.GET_ORDER_RESPONSE;
+                case GET_ALL_ORDERS -> {
+                    responseType = APICallType.GET_ALL_ORDERS_RESPONSE;
                     yield orderService.getAllOrders();
                 }
                 case UPDATE_ORDER -> {

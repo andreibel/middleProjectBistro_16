@@ -8,7 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static com.andreibel.server.utils.Mapper.mapRelToSubscriber;
+import static com.andreibel.server.utils.SubscriberMapper.mapRelToSubscriber;
 
 public class SubscriberRepository {
 

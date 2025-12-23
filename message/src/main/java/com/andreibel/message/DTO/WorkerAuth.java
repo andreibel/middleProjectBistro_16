@@ -13,9 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class WorkerRequest {
+public class WorkerAuth {
     private String workerName;
     private String workerPassword;
-    private String workerEmail;
-    private boolean isManager;
 }

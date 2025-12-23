@@ -1,18 +1,25 @@
 package com.andreibel.server.services;
 
-import com.andreibel.message.DTO.WorkerRequest;
+import com.andreibel.message.DTO.WorkerAuth;
+import com.andreibel.message.DTO.WorkerNewRequest;
 import com.andreibel.message.DTO.WorkerResponse;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.WorkerRepository;
-import com.andreibel.server.utils.Mapper;
+import com.andreibel.server.entity.Worker;
+import com.andreibel.server.utils.HmacUtil;
+import com.andreibel.server.utils.WorkerMapper;
 
-import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 public class WorkerService {
 
     private static WorkerService instance;
     private final WorkerRepository workerRepository;
     private final TransactionManager tx;
+
+    // TODO: move to config or ENV file
+    private static final String SECRET =
+            "8b6de9f7c15fa54fd4fb30e5fc583fa237e0b39bc24264c4c93426a1a4b585ab";
 
     private WorkerService() {
         this.workerRepository = WorkerRepository.getInstance();
@@ -24,57 +31,51 @@ public class WorkerService {
         return instance;
     }
 
-    public WorkerResponse createWorker(WorkerRequest request) {
+    public WorkerResponse authWorker(WorkerAuth request) {
+        Worker worker = tx.inTransaction(() ->
+                workerRepository.findByWorkerName(request.getWorkerName())
+        );
+
+        if (worker == null) return null;
+
+        if (verifyPassword(request.getWorkerPassword(), worker.getWorkerPassword())) {
+            return WorkerMapper.mapWorkerToWorkerResponse(worker);
+        }
+
+        return null;
+    }
+
+    public WorkerResponse createWorker(WorkerNewRequest request) {
+
         return tx.inTransaction(() -> {
-            workerRepository.addWorker(request);
-            var created = workerRepository.findByWorkerName(request.getWorkerName());
-            return Mapper.mapWorkerToWorkerResponse(created);
+            // prevent duplicates
+            Worker existing = workerRepository.findByWorkerName(request.getName());
+            if (existing != null) return null; // or throw "already exists"
+
+            String passwordHmacHex = HmacUtil.hmacSha256Hex(
+                    request.getPassword().getBytes(StandardCharsets.UTF_8),
+                    SECRET
+            );
+
+            Worker toInsert = Worker.builder()
+                    .workerName(request.getName())
+                    .workerPassword(passwordHmacHex)
+                    .workerEmail(request.getEmail())
+                    .isManager(request.isManager())
+                    .build();
+            Worker saved = workerRepository.addWorker(toInsert);
+            return WorkerMapper.mapWorkerToWorkerResponse(saved);
         });
     }
 
-    public WorkerResponse getWorker(String workerName) {
-        return tx.inTransaction(() -> {
-            var worker = workerRepository.findByWorkerName(workerName);
-            return worker != null ? Mapper.mapWorkerToWorkerResponse(worker) : null;
-        });
-    }
+    private static boolean verifyPassword(String password, String hashedPasswordHex) {
+        if (password == null || hashedPasswordHex == null) return false;
 
-    public List<WorkerResponse> getAllWorkers() {
-        return tx.inTransaction(workerRepository::findAll)
-                .stream()
-                .map(Mapper::mapWorkerToWorkerResponse)
-                .toList();
-    }
+        String expectedHex = HmacUtil.hmacSha256Hex(
+                password.getBytes(StandardCharsets.UTF_8),
+                SECRET
+        );
 
-    public List<WorkerResponse> getManagers() {
-        return tx.inTransaction(workerRepository::findManagers)
-                .stream()
-                .map(Mapper::mapWorkerToWorkerResponse)
-                .toList();
-    }
-
-    public List<WorkerResponse> getNonManagers() {
-
-        return tx.inTransaction(workerRepository::findNonManagers)
-                .stream()
-                .map(Mapper::mapWorkerToWorkerResponse)
-                .toList();
-
-    }
-
-    public WorkerResponse updateWorker(WorkerRequest request) {
-        return tx.inTransaction(() -> {
-            workerRepository.update(request);
-            var updated = workerRepository.findByWorkerName(request.getWorkerName());
-            return Mapper.mapWorkerToWorkerResponse(updated);
-        });
-
-    }
-
-    public void deleteWorker(String workerName) {
-        tx.inTransaction(() -> {
-            workerRepository.delete(workerName);
-            return null;
-        });
+        return HmacUtil.constantTimeEqualsHex(expectedHex, hashedPasswordHex);
     }
 }

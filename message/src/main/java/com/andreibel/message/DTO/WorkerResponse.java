@@ -15,7 +15,5 @@ import lombok.NoArgsConstructor;
 @Builder
 public class WorkerResponse {
     private String workerName;
-    private String workerEmail;
     private boolean isManager;
-
 }

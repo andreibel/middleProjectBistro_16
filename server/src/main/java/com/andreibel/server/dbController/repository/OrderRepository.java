@@ -12,46 +12,61 @@ import java.util.List;
 import static com.andreibel.server.utils.OrderMapper.mapRelToOrder;
 
 /**
- * <h1>Order repository class.</h1>
- * <hr/>
- * this class is used to manage the orders in the database.
- * in this class has all the methods to interact with the database.
- * the methods are to create new orders, update orders, find orders, etc.
- * this class is a singleton class.<br/>
- * use TransactionManager.getInstance() to get the instance of this class.
+ * Repository responsible for database access related to {@link Order} entities.
  *
+ * <p>
+ * This repository uses plain JDBC and depends on {@link TransactionManager}
+ * to provide the active transactional {@link java.sql.Connection}.
+ * All methods must be executed within an active transaction
+ * (via {@link TransactionManager#inTransaction}).
+ * </p>
+ *
+ * <h2>Responsibilities</h2>
+ * <ul>
+ *   <li>Create new orders</li>
+ *   <li>Update existing orders</li>
+ *   <li>Retrieve orders by different criteria (id, subscriber id, date collision)</li>
+ * </ul>
+ *
+ * <p>
+ * The class follows the Singleton pattern to ensure a single instance
+ * is used throughout the application lifecycle.
+ * </p>
  * @author Andrei Beloziyorove
- * @see TransactionManager
  */
 public class OrderRepository {
 
+    /**
+     * Singleton instance of {@code OrderRepository}.
+     */
     private static OrderRepository instance;
-    private final TransactionManager tx;
 
     /**
-     * private constructor.<br/>
-     * use TransactionManager.getInstance() to get the instance of this class.
+     * Transaction manager used to access the current JDBC connection.
      */
+    private final TransactionManager tx;
+
     private OrderRepository() {
         this.tx = TransactionManager.getInstance();
     }
 
     /**
-     * get the instance of this class.<br/>
-     * use this method to get the instance of this class.
+     * Returns the singleton instance of {@code OrderRepository}.
      *
-     * @return the instance of this class.
+     * @return the global OrderRepository instance
      */
     public static OrderRepository getInstance() {
-        if (instance == null) instance = new OrderRepository();
+        if (instance == null) {
+            instance = new OrderRepository();
+        }
         return instance;
     }
 
     /**
-     * get all orders from the database.
+     * Retrieves all {@link Order} records from the database.
      *
-     * @return a list of orders. {@code List<Order>}
-     * @throws SQLException if an error occurs while getting orders from the database.
+     * @return a list of all orders; an empty list if no records exist
+     * @throws SQLException if a database access error occurs
      */
     public List<Order> findAll() throws SQLException {
         String sql = "SELECT * FROM bistro.`order`;";
@@ -67,13 +82,11 @@ public class OrderRepository {
     }
 
     /**
-     * find order by order number.
-     * use to get order by order number if save new order.
-     * or update order if the order is already in the database.
+     * Retrieves an {@link Order} by its order number (primary key).
      *
-     * @param orderNumber order number.
-     * @return order entity. {@code Order}
-     * @throws SQLException if an error occurs while getting order from the database.
+     * @param orderNumber the order number to search for
+     * @return the matching order, or {@code null} if none exists
+     * @throws SQLException if a database access error occurs
      */
     public Order findById(int orderNumber) throws SQLException {
         String sql = "SELECT * FROM bistro.`order` WHERE {0} = ?;";
@@ -88,11 +101,10 @@ public class OrderRepository {
     }
 
     /**
-     * update order in the database.
-     * use this method to update order in the database.
+     * Updates an existing order (currently: number of guests and order date/time).
      *
-     * @param order order entity to be updated. {@code Order}
-     * @throws SQLException if an error occurs while updating order in the database.
+     * @param order the update request containing the order number and updated fields
+     * @throws SQLException if the order does not exist or a database access error occurs
      */
     public void update(OrderRequest order) throws SQLException {
         String sql = "UPDATE bistro.`order` SET {0} = ?, {1} = ? WHERE {2} = ?; ";
@@ -110,13 +122,20 @@ public class OrderRepository {
     }
 
     /**
-     * find orders that collide with the requested date time.
-     * use this method to find orders that collide with the requested date time.
-     * to check if we can place a new order at the requested time.
+     * Finds orders that collide (overlap) with the requested reservation time window.
      *
-     * @param date requested date time.
-     * @return a list of orders that collide with the requested date time. {@code List<Order>}
-     * @throws SQLException if an error occurs while getting orders from the database.
+     * <p>
+     * This method assumes a fixed reservation duration of 2 hours:
+     * requested window = [{@code date}, {@code date + 2 hours}].
+     * </p>
+     *
+     * <p>
+     * The query filters out orders that are marked as cancelled or completed.
+     * </p>
+     *
+     * @param date requested reservation start date/time
+     * @return a list of orders that overlap the requested window; empty list if none collide
+     * @throws SQLException if a database access error occurs
      */
     public List<Order> findOrdersCollideByDateTime(LocalDateTime date) throws SQLException {
         Timestamp start = Timestamp.valueOf(date);
@@ -141,15 +160,16 @@ public class OrderRepository {
     }
 
     /**
-     * find orders by subscriber id.
-     * use this method to find orders by subscriber id.
-     * @param subscriberId subscriber id.
-     * @return a list of orders by subscriber id. {@code List<Order>}
-     * @throws SQLException if an error occurs while getting orders from the database.
+     * Retrieves all orders for a given subscriber.
+     *
+     * @param subscriberId the subscriber id to search for
+     * @return a list of orders for the subscriber; empty list if none exist
+     * @throws SQLException if a database access error occurs
      */
     public List<Order> findBySubscriberId(int subscriberId) throws SQLException {
         String sql = "SELECT * FROM bistro.`order` WHERE {0} = ?;";
         sql = String.format(sql, Order.SUBSCRIBER_ID);
+
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setInt(1, subscriberId);
@@ -163,12 +183,17 @@ public class OrderRepository {
     }
 
     /**
-     * save a new order in the database.
-     * use this method to save new order in the database.
-     * return a new instance of the order entity that was saved.
-     * @param newOrder order entity to be saved. {@code Order}
-     * @return a new instance of the order entity that was saved. {@code Order}
-     * @throws SQLException if an error occurs while saving order in the database.
+     * Persists a new order into the database and returns the stored entity.
+     *
+     * <p>
+     * Nullable fields are supported (e.g. subscriberId / email / phoneNumber).
+     * After insert, the generated order number is used to fetch and return
+     * the saved order.
+     * </p>
+     *
+     * @param newOrder the order entity to insert
+     * @return the persisted order fetched from the database
+     * @throws SQLException if insert fails or a database access error occurs
      */
     public Order save(Order newOrder) throws SQLException {
         String sql = "INSERT INTO bistro.`order` ({0}, {1}, {2}, {3},{4},{5}) VALUES (?,?,?,?,?,?); ";
@@ -206,4 +231,3 @@ public class OrderRepository {
         }
     }
 }
-
