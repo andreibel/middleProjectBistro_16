@@ -1,23 +1,21 @@
 package com.andreibel.server.controller;
 
-import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.BistroServerGUIController;
-import com.andreibel.server.services.OrderService;
 import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
 
 public class Serve extends AbstractServer {
-    OrderService orderService;
+    OrderController orderController;
+    SubscriberController subscriberController;
     private BistroServerGUIController controller;
 
     public Serve(int port) {
         super(port);
-        orderService = OrderService.getInstance();
-
+        orderController = OrderController.getInstance();
+        subscriberController = SubscriberController.getInstance();
 
     }
 
@@ -29,25 +27,25 @@ public class Serve extends AbstractServer {
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         try {
             if (!(msg instanceof Message message)) throw new IllegalArgumentException("Invalid message type");
-            APICallType responseType = APICallType.ERROR;
-            Object response = switch (message.getType()) {
-                case GET_ALL_ORDERS -> {
-                    responseType = APICallType.GET_ALL_ORDERS_RESPONSE;
-                    yield orderService.getAllOrders();
-                }
-                case UPDATE_ORDER -> {
-                    System.out.println("Update order");
-                    responseType = APICallType.UPDATE_ORDER_RESPONSE;
-                    yield orderService.updateOrder((OrderRequest) message.getData());
-                }
-                case CREATE_ORDER -> {
-                    responseType = APICallType.CREATE_ORDER_RESPONSE;
-                    yield orderService.createOrder((OrderRequest) message.getData());
-                }
+            Message response = switch (message.getType()) {
+                // orders calls
+                case GET_ALL_ORDERS -> orderController.getAllOrders();
+                case UPDATE_ORDER -> orderController.updateOrder(message);
+                case CREATE_ORDER -> orderController.createOrder(message);
+                case GET_ONE_ORDER -> orderController.getOrder(message);
+                case DELETE_ORDER -> orderController.deleteOrder(message);
+                // workers calls
+                case LOGIN_WORKER -> null; //TODO: implement login for workers
+                // subscribers calls
+                case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();
+                case GET_ONE_SUBSCRIBER -> subscriberController.getSub(message);
+                case GET_SUBSCRIBER_ORDERS -> subscriberController.getSubOrders(message);
+                case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
+
                 default -> null;
             };
 
-            client.sendToClient(new Message(responseType, response));
+            client.sendToClient(response);
 
 
         } catch (IllegalArgumentException | IOException e) {

@@ -8,6 +8,7 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.andreibel.server.utils.OrderMapper.mapRelToOrder;
 
@@ -101,6 +102,25 @@ public class OrderRepository {
     }
 
     /**
+     * Retrieves an {@link Order} by its order number (primary key).
+     *
+     * @param conformationCode the order number to search for
+     * @return the matching order, or {@code null} if none exists
+     * @throws SQLException if a database access error occurs
+     */
+    public Order findByConformationCode(UUID conformationCode) throws SQLException {
+        String sql = "SELECT * FROM bistro.`order` WHERE {0} = ?;";
+        sql = String.format(sql, Order.CONFIRMATION_CODE);
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? mapRelToOrder(rs) : null;
+            }
+        }
+    }
+
+    /**
      * Updates an existing order (currently: number of guests and order date/time).
      *
      * @param order the update request containing the order number and updated fields
@@ -108,15 +128,15 @@ public class OrderRepository {
      */
     public void update(OrderRequest order) throws SQLException {
         String sql = "UPDATE bistro.`order` SET {0} = ?, {1} = ? WHERE {2} = ?; ";
-        sql = String.format(sql, Order.NUMBER_OF_GUESTS, Order.ORDER_DATE_TIME, Order.ORDER_NUMBER);
+        sql = String.format(sql, Order.NUMBER_OF_GUESTS, Order.ORDER_DATE_TIME, Order.CONFIRMATION_CODE);
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setInt(1, order.getNumberOfGuests());
             stmt.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
-            stmt.setInt(3, order.getOrderNumber());
+            stmt.setString(3, order.getConformationCode().toString());
 
             if (stmt.executeUpdate() == 0) {
-                throw new SQLException("Order not found: " + order.getOrderNumber());
+                throw new SQLException("Order not found: " + order.getConformationCode());
             }
         }
     }
@@ -228,6 +248,16 @@ public class OrderRepository {
             }
 
             return findById(generatedId);
+        }
+    }
+
+    public int deleteByConformationCode(UUID conformationCode) throws SQLException {
+        String sql = "delete FROM bistro.`order` WHERE {0} = ?;";
+        sql = String.format(sql, Order.CONFIRMATION_CODE);
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            return stmt.executeUpdate();
         }
     }
 }

@@ -37,7 +37,7 @@ public class OrderService {
     public OrderResponse updateOrder(OrderRequest request) {
         return tx.inTransaction(() -> {
             orderRepository.update(request);
-            var updated = orderRepository.findById(request.getOrderNumber());
+            var updated = orderRepository.findByConformationCode(request.getConformationCode());
             return OrderMapper.mapOrderToOrderResponse(updated);
         });
     }
@@ -86,9 +86,16 @@ public class OrderService {
             }
             return OrderMapper.mapOrderToOrderResponse(orderRepository.save(newOrder));
         });
-
-
     }
 
 
+    public OrderResponse getOrderByConformationCode(OrderRequest data) {
+        return tx.inTransaction(() -> OrderMapper.mapOrderToOrderResponse(
+                orderRepository.findByConformationCode(data.getConformationCode()
+                )));
+    }
+
+    public void deleteOrder(OrderRequest data) {
+        tx.inTransaction( () -> orderRepository.deleteByConformationCode(data.getConformationCode()));
+    }
 }

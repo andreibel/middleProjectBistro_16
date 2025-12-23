@@ -40,7 +40,14 @@ public class OrderMapper {
      * @return {@link Order} entity.
      */
     public static Order mapOrderRequestToOrder(OrderRequest order) {
-        return Order.builder().orderNumber(order.getOrderNumber()).numberOfGuests(order.getNumberOfGuests()).orderDateTime(order.getOrderDateTime()).subscriberId(order.getSubscriberId()).email(order.getEmail()).phoneNumber(order.getPhoneNumber()).build();
+        return Order.builder()
+                .orderNumber(-1)
+                .numberOfGuests(order.getNumberOfGuests())
+                .orderDateTime(order.getOrderDateTime())
+                .subscriberId(order.getSubscriberId())
+                .email(order.getEmail())
+                .phoneNumber(order.getPhoneNumber())
+                .build();
     }
 
     /**
