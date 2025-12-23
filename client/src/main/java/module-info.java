@@ -11,5 +11,9 @@ module com.andreibel.client {
 
     // if other modules need these types too:
     exports com.andreibel.client;
+//    exports com.andreibel.client.Client;
+//    opens com.andreibel.client.Client to javafx.fxml;
+    exports com.andreibel.client.Main;
+    opens com.andreibel.client.Main to javafx.fxml;
 
 }
