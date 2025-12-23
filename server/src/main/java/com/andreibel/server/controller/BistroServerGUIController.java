@@ -1,6 +1,5 @@
-package com.andreibel.server;
+package com.andreibel.server.controller;
 
-import com.andreibel.server.controller.ClientConnection;
 import com.lloseng.ocsf.server.ConnectionToClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

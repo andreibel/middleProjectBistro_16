@@ -12,23 +12,51 @@ import java.util.List;
 
 import static com.andreibel.server.utils.SubscriberMapper.mapRelToSubscriber;
 
+/**
+ * JDBC repository for {@link Subscriber} entities.
+ *
+ * <p>
+ * Uses {@link TransactionManager} to access the current transactional
+ * JDBC connection. All methods must be executed inside
+ * an active transaction.
+ * </p>
+ *
+ * <p>
+ * Implemented as a Singleton.
+ * </p>
+ * @author Andrei Beloziyorove
+ */
 public class SubscriberRepository {
 
-    private final TransactionManager tx;
     private static SubscriberRepository instance;
+    private final TransactionManager tx;
 
     private SubscriberRepository() {
         this.tx = TransactionManager.getInstance();
     }
 
+    /**
+     * @return singleton instance of SubscriberRepository
+     */
     public static SubscriberRepository getInstance() {
-        if (instance == null) instance = new SubscriberRepository();
+        if (instance == null) {
+            instance = new SubscriberRepository();
+        }
         return instance;
     }
 
+    /**
+     * Inserts a new subscriber and returns the persisted entity.
+     *
+     * @param sub subscriber creation request
+     * @return stored subscriber
+     */
     public Subscriber addSubscriber(SubscriberRequest sub) throws SQLException {
-        String sql = "INSERT INTO bistro.subscriber ({0}, {1}, {2}) VALUES (?,?,?);";
-        sql = String.format(sql, Subscriber.EMAIL, Subscriber.NAME, Subscriber.PHONE_NUMBER);
+        String sql = "INSERT INTO bistro.subscriber ("
+                + Subscriber.EMAIL + ", "
+                + Subscriber.NAME + ", "
+                + Subscriber.PHONE_NUMBER + ") VALUES (?,?,?);";
+
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, sub.getEmail());
             stmt.setString(2, sub.getName());
@@ -38,9 +66,13 @@ public class SubscriberRepository {
         return getSubscriberByEmail(sub.getEmail());
     }
 
+    /**
+     * @param email subscriber email
+     * @return matching subscriber or {@code null}
+     */
     public Subscriber getSubscriberByEmail(String email) throws SQLException {
-        String sql = "SELECT * FROM bistro.subscriber WHERE {0} = ?;";
-        sql = String.format(sql, Subscriber.EMAIL);
+        String sql = "SELECT * FROM bistro.subscriber WHERE " + Subscriber.EMAIL + " = ?;";
+
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, email);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -49,9 +81,13 @@ public class SubscriberRepository {
         }
     }
 
+    /**
+     * @param phone subscriber phone number
+     * @return matching subscriber or {@code null}
+     */
     public Subscriber getSubscriberByPhone(String phone) throws SQLException {
-        String sql = "SELECT * FROM bistro.subscriber WHERE {0} = ?;";
-        sql = String.format(sql, Subscriber.PHONE_NUMBER);
+        String sql = "SELECT * FROM bistro.subscriber WHERE " + Subscriber.PHONE_NUMBER + " = ?;";
+
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, phone);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -59,9 +95,14 @@ public class SubscriberRepository {
             }
         }
     }
+
+    /**
+     * @param subscriberId subscriber primary key
+     * @return matching subscriber or {@code null}
+     */
     public Subscriber getSubscriberById(int subscriberId) throws SQLException {
-        String sql = "SELECT * FROM bistro.subscriber WHERE {0} = ?;";
-        sql = String.format(sql, Subscriber.SUBSCRIBER_ID);
+        String sql = "SELECT * FROM bistro.subscriber WHERE " + Subscriber.SUBSCRIBER_ID + " = ?;";
+
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setInt(1, subscriberId);
             try (ResultSet rs = stmt.executeQuery()) {
@@ -70,17 +111,20 @@ public class SubscriberRepository {
         }
     }
 
-
+    /**
+     * @return all subscribers in the database
+     */
     public List<Subscriber> findAll() throws SQLException {
         String sql = "SELECT * FROM bistro.`subscriber`;";
-        List<Subscriber> orders = new ArrayList<>();
+        List<Subscriber> subscribers = new ArrayList<>();
 
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            ResultSet rs = stmt.executeQuery();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                orders.add(mapRelToSubscriber(rs));
+                subscribers.add(mapRelToSubscriber(rs));
             }
         }
-        return orders;
+        return subscribers;
     }
 }

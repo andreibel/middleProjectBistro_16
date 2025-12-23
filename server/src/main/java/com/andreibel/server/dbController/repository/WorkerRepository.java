@@ -29,6 +29,7 @@ import static com.andreibel.server.utils.WorkerMapper.mapRelToWorker;
  * This class follows the Singleton pattern to provide a single repository
  * instance throughout the application lifecycle.
  * </p>
+ *
  * @author Aviv peer
  */
 public class WorkerRepository {
@@ -67,19 +68,12 @@ public class WorkerRepository {
      * @param workerRequest the worker entity to insert
      * @return the persisted worker fetched from the database
      * @throws SQLException if a database error occurs
-     *
      * @see #findByWorkerName(String)
      */
     public Worker addWorker(Worker workerRequest) throws SQLException {
-        String sql = "INSERT INTO bistro.worker ({0}, {1}, {2}, {3}) VALUES (?,?,?,?)";
-        sql = String.format(
-                sql,
-                Worker.WORKER_NAME,
-                Worker.WORKER_PASSWORD,
-                Worker.WORKER_EMAIL,
-                Worker.IS_MANAGER
-        );
-
+        String sql =
+                "INSERT INTO bistro.worker (" + Worker.WORKER_NAME + "," + Worker.WORKER_PASSWORD + ", " +
+                        Worker.WORKER_EMAIL + ", " + Worker.IS_MANAGER + ") VALUES (?,?,?,?)";
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerRequest.getWorkerName());
             stmt.setString(2, workerRequest.getWorkerPassword());
@@ -99,8 +93,9 @@ public class WorkerRepository {
      * @throws SQLException if a database error occurs
      */
     public Worker findByWorkerName(String workerName) throws SQLException {
-        String sql = "SELECT * FROM bistro.worker WHERE {0} = ?";
-        sql = String.format(sql, Worker.WORKER_NAME);
+        String sql = "SELECT * " +
+                "FROM bistro.worker " +
+                "WHERE " + Worker.WORKER_NAME + "= ?";
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerName);
