@@ -10,6 +10,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 public class SubscriberRequest implements Serializable {
+    private Integer subscriberId;
     private String email;
     private String name;
     private String phoneNumber;
