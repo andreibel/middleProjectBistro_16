@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="320.0" prefWidth="581.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Subscriber.SubscriberZoneFormGUIController">
+
+    <children>
+
+        <!-- Title -->
+        <Label fx:id="lblSubscriber" layoutX="14.0" layoutY="23.0" prefWidth="550.0" text="Hi SUBSCRIBER_NAME, please select the following options:" wrapText="true">
+            <font>
+                <Font size="19.0" />
+            </font>
+        </Label>
+
+        <!-- View Order History -->
+        <Button fx:id="btnOrderHistory" layoutX="204.0" layoutY="89.0" mnemonicParsing="false" onAction="#onButtonOrderHistoryClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="View my last orders">
+            <tooltip>
+                <Tooltip text="View your previous orders and their details." wrapText="true" />
+            </tooltip>
+        </Button>
+
+        <!-- Get Table / Arrival -->
+        <Button fx:id="btnGetTable" layoutX="202.0" layoutY="140.0" mnemonicParsing="false" onAction="#onButtonGetTableClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px;" text="I have arrived for my order">
+            <tooltip>
+                <Tooltip text="Confirm your arrival so we can prepare your table." wrapText="true" />
+            </tooltip>
+        </Button>
+
+        <!-- Order Now -->
+        <Button fx:id="btnOrderNow" layoutX="204.0" layoutY="190.0" mnemonicParsing="false" onAction="#onButtonOrderNowClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Order Now">
+            <tooltip>
+                <Tooltip text="Place a new order using your subscriber benefits." wrapText="true" />
+            </tooltip>
+        </Button>
+
+        <!-- Go Back -->
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="267.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="40.0" prefWidth="112.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+
+    </children>
+</AnchorPane>

@@ -1,5 +1,6 @@
-package com.andreibel.client;
+package com.andreibel.client.Main;
 
+import com.andreibel.client.BistroClientGUI;
 import com.andreibel.client.Client.BistroClient;
 import com.andreibel.client.Client.BistroClientController;
 import javafx.application.Application;
@@ -10,12 +11,12 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class BistroClientGUI extends Application {
+public class MainForm extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(
-                BistroClientGUI.class.getResource("ClientOrdersGUI.fxml")
+                MainForm.class.getResource("MainForm.fxml")
         );
 
         var params = getParameters().getNamed();
@@ -24,21 +25,21 @@ public class BistroClientGUI extends Application {
         int port = Integer.parseInt(params.getOrDefault("port", "8080"));
         System.out.println("Connecting to " + host + ":" + port);
         Parent root = fxmlLoader.load();
-        BistroClientGUIController guiController = fxmlLoader.getController();
+        MainFormGUIController guiController = fxmlLoader.getController();
 
         // create client + controller + wire them
         BistroClient client = new BistroClient(host, port); // adjust port/host as needed
-        //BistroClientController appController = new BistroClientController(guiController);
-//        appController.attachClient(client);
-//        guiController.setController(appController);
-//
-//        client.connectToServer();
-//        appController.requestOrders();   // load initial data
+        BistroClientController appController = new BistroClientController(guiController);
+        appController.attachClient(client);
+        guiController.setController(appController);
 
-        Scene scene = new Scene(root, 800, 600);
-        stage.setTitle("Bistro Restaurant Alpha Build");
+        client.connectToServer();
+
+        Scene scene = new Scene(root, 600, 411);
+        stage.setTitle("Bistro Restaurant");
         stage.setScene(scene);
         stage.setResizable(false);
+        stage.sizeToScene();
         stage.setOnCloseRequest(event -> {
             try {
                 client.closeConnection();

@@ -1,5 +1,8 @@
-package com.andreibel.client;
+package com.andreibel.client.Client;
 
+import com.andreibel.client.BistroClientGUIController;
+import com.andreibel.client.Main.MainForm;
+import com.andreibel.client.Main.MainFormGUIController;
 import javafx.application.Platform;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderRequest;
@@ -9,12 +12,13 @@ import com.andreibel.message.Message;
 import java.time.LocalDateTime;
 import java.util.List;
 
+//================ Need to Change GUI Controller to MainFormGUIController ==================
 public class BistroClientController {
 
     private BistroClient client;
-    private final BistroClientGUIController guiController;
+    private final MainFormGUIController guiController;
 
-    public BistroClientController(BistroClientGUIController guiController) {
+    public BistroClientController(MainFormGUIController guiController) {
         this.guiController = guiController;
     }
 
@@ -34,12 +38,12 @@ public class BistroClientController {
             case GET_ORDER_RESPONSE -> {
                 @SuppressWarnings("unchecked")
                 List<OrderResponse> orders = (List<OrderResponse>) response.getData();
-                Platform.runLater(() -> guiController.setOrdersToGUI(orders));
+                //Platform.runLater(() -> guiController.setOrdersToGUI(orders));
             }
 
             case UPDATE_ORDER_RESPONSE -> {
                 OrderResponse updated = (OrderResponse) response.getData();
-                Platform.runLater(() -> guiController.refreshSingleOrder(updated));
+                //Platform.runLater(() -> guiController.refreshSingleOrder(updated));
             }
 
             case ERROR -> {
@@ -74,6 +78,6 @@ public class BistroClientController {
     // ----- error handling -----
 
     public void showError(String msg) {
-        Platform.runLater(() -> guiController.showError(msg));
+        //Platform.runLater(() -> guiController.showError(msg));
     }
 }
