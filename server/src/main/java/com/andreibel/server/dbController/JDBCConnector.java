@@ -1,71 +1,47 @@
 package com.andreibel.server.dbController;
 
-import lombok.Getter;
+import com.andreibel.server.BistroServer;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * JDBC connector class.
- * this class is responsible for connecting to the database.
- * and give this connection to the other repositories.
- * also class is singleton.
+ * <h1>JDBC connector class.</h1>
  * <hr/>
- * provide option for start and commit transaction. and rollback.
- * */
-@Getter
+ * this class is used to connect to the database.
+ * singleton class.
+ * @author Andrei Beloziyorove
+ */
 public class JDBCConnector {
 
+    // singleton instance
     private static JDBCConnector instance;
-    private Connection conn;
 
-    // TODO: change credentials to env variables
-    /**
-     * Constructor: creates a new JDBC connector.
-     * */
-    private JDBCConnector() {
-        String url = "jdbc:mysql://localhost:3306/bistro?allowLoadLocalInfile=true&serverTimezone=Asia/Jerusalem&useSSL=false&allowPublicKeyRetrieval=true";
-        String username = "root";
-        String password = "tikraetzeM4!";
-        try {
-            conn = DriverManager.getConnection(url, username, password);
-        } catch (SQLException ex) {
-            System.out.println("SQLException: " + ex.getMessage());
-            System.out.println("SQLState: " + ex.getSQLState());
-            System.out.println("VendorError: " + ex.getErrorCode());
-        }
-    }
+    // database settings
+    private final String DB_SETTINGS =
+            "?allowLoadLocalInfile=true&serverTimezone=Asia/Jerusalem&useSSL=false&allowPublicKeyRetrieval=true";
+
+    private JDBCConnector() {}
 
     /**
-     * Returns the singleton instance of the JDBC connector ({@code JDBCConnector}).
-     * */
+     * get the instance of this class.<br/>
+     * use this method to get the instance of this class.
+     * @return the instance of this class.
+     */
     public static JDBCConnector getInstance() {
-        if (instance == null) {
-            instance = new JDBCConnector();
-        }
+        if (instance == null) instance = new JDBCConnector();
         return instance;
     }
 
     /**
-     * Starts a transaction.
-     * @throws SQLException  if failed to start transaction.
-     * */
-    public void StartTransaction() throws SQLException {
-        conn.setAutoCommit(false);
-    }
-    /**
-     * commit / finish a transaction.
-     * @throws SQLException  if failed to commit / finish a transaction.
-     * */
-    public void CommitTransaction() throws SQLException {
-        conn.commit();
-    }
-    /**
-     * roll-back the transaction if something was fail. a transaction.
-     * @throws SQLException  if failed to make role-back a transaction.
-     * */
-    public void RollbackTransaction() throws SQLException {
-        conn.rollback();
+     * open a connection to the database.
+     * use this method to open a connection to the database, per transaction.
+     * @return a connection to the database.
+     * @throws SQLException if an error occurs while opening a connection to the database.
+     */
+    public Connection openConnection() throws SQLException {
+        String url = BistroServer.DB_URL + DB_SETTINGS;
+        return DriverManager.getConnection(url, BistroServer.DB_USER, BistroServer.DB_PASSWORD);
     }
 }

@@ -6,12 +6,17 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest implements Serializable {
-    private int orderNumber;
+    private UUID ConformationCode;
     private int numberOfGuests;
     private LocalDateTime orderDateTime;
+    private Integer subscriberId; // optional
+    private String email; // optional
+    private String phoneNumber; // optional
+
 }
