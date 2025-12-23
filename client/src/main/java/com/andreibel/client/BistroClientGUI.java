@@ -1,5 +1,7 @@
 package com.andreibel.client;
 
+import com.andreibel.client.Client.BistroClient;
+import com.andreibel.client.Client.BistroClientController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -26,12 +28,12 @@ public class BistroClientGUI extends Application {
 
         // create client + controller + wire them
         BistroClient client = new BistroClient(host, port); // adjust port/host as needed
-        BistroClientController appController = new BistroClientController(guiController);
-        appController.attachClient(client);
-        guiController.setController(appController);
-
-        client.connectToServer();
-        appController.requestOrders();   // load initial data
+        //BistroClientController appController = new BistroClientController(guiController);
+//        appController.attachClient(client);
+//        guiController.setController(appController);
+//
+//        client.connectToServer();
+//        appController.requestOrders();   // load initial data
 
         Scene scene = new Scene(root, 800, 600);
         stage.setTitle("Bistro Restaurant Alpha Build");

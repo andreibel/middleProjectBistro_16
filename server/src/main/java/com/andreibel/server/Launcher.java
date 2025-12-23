@@ -1,6 +1,5 @@
 package com.andreibel.server;
 
-import com.andreibel.server.controller.Serve;
 import javafx.application.Application;
 
 import java.io.IOException;

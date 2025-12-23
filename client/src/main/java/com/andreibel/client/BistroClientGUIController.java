@@ -1,5 +1,6 @@
 package com.andreibel.client;
 
+import com.andreibel.client.Client.BistroClientController;
 import javafx.collections.ObservableList;
 import com.andreibel.message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
@@ -12,6 +13,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 public class BistroClientGUIController {
 
@@ -38,7 +40,7 @@ public class BistroClientGUIController {
     private TableColumn<OrderResponse, Integer> numberOfGuestsColumn;
 
     @FXML
-    private TableColumn<OrderResponse, Integer> conformationCodeColumn;
+    private TableColumn<OrderResponse, UUID> conformationCodeColumn;
 
     @FXML
     private TableColumn<OrderResponse, Integer> subscriberIdColumn;

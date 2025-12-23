@@ -1,67 +1,181 @@
 package com.andreibel.server.controller;
 
-import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.Message;
-import com.andreibel.server.BistroServerGUIController;
-import com.andreibel.server.services.OrderService;
+import com.andreibel.server.controller.BistroServerGUIController;
 import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
 
+/**
+ * OCSF-based server implementation for the Bistro system.
+ *
+ * <p>
+ * This class extends {@link AbstractServer} and acts as the main networking layer:
+ * it receives incoming objects from clients, validates they are {@link Message} instances,
+ * routes them by {@code message.getType()} to the appropriate controller, and sends a
+ * response back to the client.
+ * </p>
+ *
+ * <p>
+ * The server also reports connection lifecycle events (connect/disconnect/exceptions)
+ * to the {@link BistroServerGUIController} to allow the GUI to reflect current client state.
+ * </p>
+ *
+ * <h3>Responsibilities</h3>
+ * <ul>
+ *   <li>Initialize controllers used to handle requests.</li>
+ *   <li>Dispatch incoming client messages using a switch on message type.</li>
+ *   <li>Send response {@link Message} objects back to the client.</li>
+ *   <li>Notify GUI controller about connection changes.</li>
+ * </ul>
+ *
+ * @see AbstractServer
+ * @see ConnectionToClient
+ * @see Message
+ * @see OrderController
+ * @see SubscriberController
+ *
+ * @author Andrei Beloziyorove
+ */
 public class Serve extends AbstractServer {
-    OrderService instance;
+
+    /** Controller responsible for order-related operations. */
+    OrderController orderController;
+
+    /** Controller responsible for subscriber-related operations. */
+    SubscriberController subscriberController;
+
+    /**
+     * GUI controller reference (optional).
+     * Used to update UI on client connect/disconnect/exception events.
+     */
     private BistroServerGUIController controller;
 
+    /**
+     * Constructs a server that listens on the given port.
+     *
+     * <p>
+     * Initializes internal controllers (Singleton instances) used for handling requests.
+     * </p>
+     *
+     * @param port server port to listen on
+     */
     public Serve(int port) {
         super(port);
-        instance = OrderService.getInstance();
+        orderController = OrderController.getInstance();
+        subscriberController = SubscriberController.getInstance();
     }
 
+    /**
+     * Attaches the GUI controller used for displaying and updating connection state.
+     *
+     * @param controller GUI controller instance
+     */
     public void setGUIController(BistroServerGUIController controller) {
         this.controller = controller;
     }
 
+    /**
+     * Handles an incoming message received from a specific client connection.
+     *
+     * <p>
+     * The OCSF framework calls this method whenever the client sends an object.
+     * This implementation:
+     * </p>
+     * <ol>
+     *   <li>Validates that {@code msg} is a {@link Message}.</li>
+     *   <li>Routes the request by {@code message.getType()} to the correct controller method.</li>
+     *   <li>Sends a {@link Message} response back to the client.</li>
+     * </ol>
+     *
+     * <p>
+     * If the incoming object is not a {@link Message}, an {@link IllegalArgumentException} is thrown.
+     * IO failures while responding are converted into a {@link RuntimeException}.
+     * </p>
+     *
+     * @param msg the object received from the client (expected to be {@link Message})
+     * @param client the client connection that sent the object
+     *
+     * @throws RuntimeException if an {@link IOException} occurs while sending the response
+     *                          or if the message type is invalid
+     */
     @Override
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         try {
-            //System.out.println(msg);
-            if (!(msg instanceof Message message)) throw new IllegalArgumentException("Invalid message type");
-            APICallType responseType = APICallType.ERROR;
-            Object response = switch (message.getType()) {
-                case GET_ORDERS -> {
-                    responseType = APICallType.GET_ORDER_RESPONSE;
-                    yield instance.getAllOrders();
-                }
-                case UPDATE_ORDER -> {
-                    System.out.println("Update order");
-                    responseType = APICallType.UPDATE_ORDER_RESPONSE;
-                    yield instance.updateOrder((OrderRequest) message.getData());
-                }
+            if (!(msg instanceof Message message)) {
+                throw new IllegalArgumentException("Invalid message type");
+            }
+
+            Message response = switch (message.getType()) {
+                // orders calls
+                case GET_ALL_ORDERS -> orderController.getAllOrders();
+                case UPDATE_ORDER -> orderController.updateOrder(message);
+                case CREATE_ORDER -> orderController.createOrder(message);
+                case GET_ONE_ORDER -> orderController.getOrder(message);
+                case DELETE_ORDER -> orderController.deleteOrder(message);
+
+                // workers calls
+                case LOGIN_WORKER -> null; // TODO: implement login for workers
+
+                // subscribers calls
+                case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();
+                case GET_ONE_SUBSCRIBER -> subscriberController.getSub(message);
+                case GET_SUBSCRIBER_ORDERS -> subscriberController.getSubOrders(message);
+                case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
+
+                // unknown / unsupported
                 default -> null;
             };
-            //System.out.println(response);
 
-            client.sendToClient(new Message(responseType, response));
-
+            client.sendToClient(response);
 
         } catch (IllegalArgumentException | IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
+    /**
+     * Hook method called by OCSF when a client successfully connects.
+     *
+     * <p>
+     * This implementation notifies the GUI controller (if set) to record/display
+     * the new connection.
+     * </p>
+     *
+     * @param client the connected client
+     */
     @Override
     protected void clientConnected(ConnectionToClient client) {
         controller.addNewConnection(client);
     }
 
+    /**
+     * Hook method called by OCSF when a client disconnects.
+     *
+     * <p>
+     * This implementation notifies the GUI controller (if set) to update the
+     * displayed connection status.
+     * </p>
+     *
+     * @param client the disconnected client
+     */
     @Override
     protected void clientDisconnected(ConnectionToClient client) {
         controller.editConnection(client);
     }
 
+    /**
+     * Hook method called by OCSF when an exception occurs for a client connection.
+     *
+     * <p>
+     * Logs the exception and updates the GUI controller (if set) to reflect
+     * that the client encountered an error / disconnected unexpectedly.
+     * </p>
+     *
+     * @param client the client connection where the exception occurred
+     * @param exception the thrown exception
+     */
     @Override
     protected void clientException(ConnectionToClient client, Throwable exception) {
         System.out.println("Client exception: " + client.getId() + " - " + exception.getMessage());

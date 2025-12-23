@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="450.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.OrderFormGUIController"> <!-- warm solid background -->
+
+   <children>
+      <!-- Title Label -->
+      <Label fx:id="lblTitle" layoutX="196.0" layoutY="25.0" text="Place your order now!" textAlignment="CENTER">
+         <font>
+            <Font size="23.0" />
+         </font>
+      </Label>
+
+      <!-- Date Label & Picker -->
+      <Label fx:id="lblDate" layoutX="138.0" layoutY="91.0" style="-fx-font-size: 14px;" text="Date of Order:" />
+      <DatePicker fx:id="datePickerOrder" layoutX="239.0" layoutY="87.0" prefHeight="28.0" prefWidth="195.0" promptText="Choose your preferred date" />
+
+      <!-- Time Label & ComboBox -->
+      <Label fx:id="lblTime" layoutX="138.0" layoutY="134.0" style="-fx-font-size: 14px;" text="Time of Order:" />
+      <ComboBox fx:id="comboBoxTime" layoutX="239.0" layoutY="130.0" prefHeight="28.0" prefWidth="195.0" promptText="Select available times" />
+
+      <!-- Number of People -->
+      <Label fx:id="lblNumberOfPeople" layoutX="127.0" layoutY="179.0" style="-fx-font-size: 14px;" text="Number of People:" />
+      <TextField fx:id="txtFieldNumberOfPeople" layoutX="239.0" layoutY="175.0" prefHeight="28.0" prefWidth="195.0" promptText="# of people (including yourself)" />
+
+      <!-- Who Am I (Guest/Subscriber) -->
+      <Label fx:id="lblWhoAmI" layoutX="173.0" layoutY="218.0" style="-fx-font-size: 14px;" text="I am:" />
+      <RadioButton fx:id="radioGuest" layoutX="248.0" layoutY="217.0" mnemonicParsing="false" onAction="#adjustFormBasedOnType" selected="true" text="Guest">
+         <toggleGroup>
+            <ToggleGroup fx:id="typeGroup" />
+         </toggleGroup></RadioButton>
+      <RadioButton fx:id="radioSubscriber" layoutX="344.0" layoutY="217.0" mnemonicParsing="false" onAction="#adjustFormBasedOnType" text="Subscriber" toggleGroup="$typeGroup" />
+
+      <!-- Subscriber ID / Email -->
+      <Label fx:id="lblSubscriberId" layoutX="148.0" layoutY="250.0" style="-fx-font-size: 14px;" text="Subscriber ID:" />
+      <TextField fx:id="txtFieldSubscriberId" layoutX="239.0" layoutY="246.0" prefHeight="28.0" prefWidth="195.0" promptText="Enter your Subscriber ID here" />
+
+      <Label fx:id="lblEmail" layoutX="170.0" layoutY="250.0" style="-fx-font-size: 14px;" text="Email:" />
+      <TextField fx:id="txtFieldEmail" layoutX="239.0" layoutY="246.0" prefHeight="28.0" prefWidth="195.0" promptText="Enter your email here" />
+
+      <!-- Phone Number -->
+      <Label layoutX="135.0" layoutY="286.0" style="-fx-font-size: 14px;" text="Phone Number:" />
+      <TextField fx:id="txtFieldPhoneNumber" layoutX="239.0" layoutY="282.0" prefHeight="28.0" prefWidth="195.0" promptText="Enter your phone number here" />
+
+      <!-- Buttons -->
+      <Button fx:id="btnOrderNow" layoutX="249.0" layoutY="328.0" mnemonicParsing="false" onAction="#onOrderNowButtonClicked" prefHeight="35.0" prefWidth="113.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Order Now" />
+
+      <Button fx:id="btnGoBack" layoutX="14.0" layoutY="345.0" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="35.0" prefWidth="77.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+   </children>
+</AnchorPane>
