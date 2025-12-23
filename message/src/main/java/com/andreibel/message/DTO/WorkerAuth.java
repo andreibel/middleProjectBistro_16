@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 /**
  * WorkerRequest DTO for transferring worker data from client to server.
  * Used for creating and updating worker information.
@@ -13,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @Builder
-public class WorkerAuth {
+public class WorkerAuth implements Serializable {
     private String workerName;
     private String workerPassword;
 }

@@ -3,12 +3,14 @@ package com.andreibel.message;
 public enum APICallType {
 
     // order-related calls client -> server
+    // already authenticated in the server the behavior
     CREATE_ORDER,
     UPDATE_ORDER,
     DELETE_ORDER,
     GET_ALL_ORDERS,
     GET_ONE_ORDER,
     // order-related calls server -> client
+    // already authenticated in the server the behavior
     GET_ALL_ORDERS_RESPONSE,
     GET_ONE_ORDER_RESPONSE,
     UPDATE_ORDER_RESPONSE,
