@@ -11,26 +11,37 @@
     <children>
 
         <!-- Title -->
-        <Label fx:id="lblTitle" layoutX="14.0" layoutY="21.0" prefHeight="50.0" prefWidth="531.0" text="If you lost your confirmation code, please enter your order number and we'll send it to you:" wrapText="true">
+        <Label fx:id="lblTitle" layoutX="14.0" layoutY="21.0" prefHeight="50.0" prefWidth="531.0" text="If you lost your confirmation code, please enter your USER_TYPE and we'll send it to you:" wrapText="true">
             <font>
                 <Font size="19.0" />
             </font>
         </Label>
 
-        <!-- Order Number -->
-        <Label fx:id="lblOrderNumber" layoutX="135.0" layoutY="133.0" text="Order Number:">
+        <Label fx:id="lblSubscriberID" layoutX="127.0" layoutY="99.0" text="Subscriber ID:">
             <font>
                 <Font size="16.0" />
             </font>
         </Label>
 
-        <TextField fx:id="txtFieldOrderNumber" layoutX="247.0" layoutY="130.0" prefHeight="28.0" prefWidth="193.0" promptText="Enter your order number here..." style="-fx-font-size: 13px;" />
+        <TextField fx:id="txtFieldSubscriberID" layoutX="244.0" layoutY="95.0" prefHeight="28.0" prefWidth="193.0" promptText="Enter your subscriber id here..." style="-fx-font-size: 13px;" />
 
         <!-- Retrieve Code -->
-        <Button fx:id="btnRetrieveCode" layoutX="243.0" layoutY="192.0" mnemonicParsing="false" onAction="#onButtonRetrieveCodeClicked" prefHeight="44.0" prefWidth="135.0" style="-fx-background-color: #FF9800;                        -fx-text-fill: white;                        -fx-font-size: 14px;                        -fx-font-weight: bold;" text="Retrieve Code" />
+        <Button fx:id="btnRetrieveCode" layoutX="244.0" layoutY="247.0" mnemonicParsing="false" onAction="#onButtonRetrieveCodeClicked" prefHeight="44.0" prefWidth="135.0" style="-fx-background-color: #FF9800;                        -fx-text-fill: white;                        -fx-font-size: 14px;                        -fx-font-weight: bold;" text="Retrieve Code" />
 
         <!-- Go Back -->
         <Button fx:id="btnGoBack" layoutX="14.0" layoutY="300.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="44.0" prefWidth="115.0" style="-fx-background-color: #607D8B;                        -fx-text-fill: white;                        -fx-font-size: 13px;" text="Go Back" />
+      <Label fx:id="lblEmail" layoutX="159.0" layoutY="147.0" text="Email:">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblPhoneNumber" layoutX="122.0" layoutY="190.0" text="Phone Number:">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtFieldEmail" layoutX="244.0" layoutY="145.0" prefHeight="25.0" prefWidth="193.0" promptText="Enter your email here..." />
+      <TextField fx:id="txtFieldPhoneNumber" layoutX="244.0" layoutY="188.0" prefHeight="25.0" prefWidth="193.0" promptText="Enter your phone number here..." />
 
     </children>
 </AnchorPane>

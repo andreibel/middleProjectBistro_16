@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.andreibel.client.Worker.WorkerLoginFormGUIController"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerLoginFormGUIController">
 
+    <children>
+
+        <!-- Title -->
+        <Label fx:id="lblTitle" layoutX="139.0" layoutY="35.0" prefWidth="360.0" text="Hello Staff, please login to continue" wrapText="true">
+            <font>
+                <Font size="22.0" />
+            </font>
+        </Label>
+
+        <!-- Staff Name -->
+        <Label fx:id="lblStaffName" layoutX="150.0" layoutY="121.0" text="Staff Name:">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </Label>
+
+        <!-- Password -->
+        <Label fx:id="lblPassword" layoutX="155.0" layoutY="187.0" text="Password:">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </Label>
+
+        <!-- Inputs -->
+        <TextField fx:id="txtFieldStaffName" layoutX="248.0" layoutY="119.0" promptText="Enter your name here..." />
+
+        <TextField fx:id="txtFieldPassword" layoutX="248.0" layoutY="185.0" promptText="Enter your password here..." />
+
+        <!-- Login -->
+        <Button fx:id="btnLogin" layoutX="257.0" layoutY="242.0" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Login" />
+
+        <!-- Go Back -->
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="347.0" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+
+    </children>
 </AnchorPane>

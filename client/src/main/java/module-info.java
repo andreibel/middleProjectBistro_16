@@ -4,6 +4,7 @@ module com.andreibel.client {
     requires static lombok;
     requires ocsf;
     requires message;
+    requires jdk.compiler;
 
     // FXML controllers:
     opens com.andreibel.client to javafx.fxml;
@@ -15,5 +16,4 @@ module com.andreibel.client {
 //    opens com.andreibel.client.Client to javafx.fxml;
     exports com.andreibel.client.Main;
     opens com.andreibel.client.Main to javafx.fxml;
-
 }

@@ -7,12 +7,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 
 public class LostMyCodeFormGUIController {
+
     @FXML
-    private Label lblOrderNumber;
+    private Label lblTitle;
     @FXML
-    private TextField txtFieldOrderNumber;
+    private Label lblSubscriberID;
     @FXML
-    private Button btnRetrieveCo;
+    private Label lblEmail;
+    @FXML
+    private Label lblPhoneNumber;
+    @FXML
+    private TextField txtFieldSubscriberID;
+    @FXML
+    private TextField txtFieldEmail;
+    @FXML
+    private TextField txtFieldPhoneNumber;
+    @FXML
+    private Button btnRetrieveCode;
     @FXML
     private Button btnGoBack;
 
