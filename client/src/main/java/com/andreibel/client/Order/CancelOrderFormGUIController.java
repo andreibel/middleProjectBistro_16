@@ -1,5 +1,6 @@
 package com.andreibel.client.Order;
 
+import com.andreibel.client.util.ScreenTransfer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,5 +15,11 @@ public class CancelOrderFormGUIController {
     private TextField txtFieldOrderNumber;
 
     public void onCancelOrderButtonClicked(ActionEvent event) {}
-    public void onGoBackButtonClicked(ActionEvent event) {}
+    public void onGoBackButtonClicked(ActionEvent event) {
+        ScreenTransfer.switchScreen(
+                event,
+                "/Main/MainFormGUIController.fxml",
+                "MainFormGUIController"
+        );
+    }
 }

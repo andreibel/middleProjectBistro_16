@@ -11,6 +11,7 @@ import com.andreibel.message.Message;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 //================ Need to Change GUI Controller to MainFormGUIController ==================
 public class BistroClientController {
@@ -35,7 +36,7 @@ public class BistroClientController {
         }
 
         switch (response.getType()) {
-            case GET_ORDER_RESPONSE -> {
+            case GET_ALL_ORDERS_RESPONSE -> {
                 @SuppressWarnings("unchecked")
                 List<OrderResponse> orders = (List<OrderResponse>) response.getData();
                 //Platform.runLater(() -> guiController.setOrdersToGUI(orders));
@@ -63,17 +64,35 @@ public class BistroClientController {
             showError("Client not connected");
             return;
         }
-        client.send(new Message(APICallType.GET_ORDERS, null));
+        client.send(new Message(APICallType.GET_ALL_ORDERS, null));
     }
 
-    public void updateOrder(int orderNumber, int numberOfPeople, LocalDateTime date) {
+    public void updateOrder(int orderNumber,
+                            int numberOfPeople,
+                            LocalDateTime date,
+                            Integer subscriberId,
+                            String email,
+                            String phoneNumber) {
+
         if (client == null) {
             showError("Client not connected");
             return;
         }
-        OrderRequest req = new OrderRequest(orderNumber, numberOfPeople, date);
-        client.send(new Message(APICallType.UPDATE_ORDER, req));
+
+        UUID confirmationCode = UUID.randomUUID();
+
+        OrderRequest req = new OrderRequest(
+                confirmationCode,
+                numberOfPeople,
+                date,
+                subscriberId,
+                email,
+                phoneNumber
+        );
+
+        client.send(new Message(APIcallType.UPDATE_ORDER, req));
     }
+
 
     // ----- error handling -----
 
