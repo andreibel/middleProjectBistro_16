@@ -1,14 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="com.andreibel.client.Worker.SubscriberReportsFormGUIController"
-            prefHeight="400.0" prefWidth="600.0">
+<AnchorPane prefHeight="774.0" prefWidth="1048.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.SubscriberReportsFormGUIController">
 
+   <children>
+
+      <!-- Title -->
+      <Label fx:id="lblTitle" layoutX="299.0" layoutY="27.0" text="Subscribers Report for Month: MONTH_NAME" wrapText="true">
+         <font>
+            <Font size="24.0" />
+         </font>
+      </Label>
+
+      <!-- Subscribers Orders Chart -->
+      <BarChart fx:id="barChartSubscribersOrders" layoutX="37.0" layoutY="94.0" prefHeight="296.0" prefWidth="980.0" title="Subscribers Orders">
+         <xAxis>
+            <CategoryAxis fx:id="xDayAxisOrders" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yOrdersAxis" />
+         </yAxis>
+      </BarChart>
+
+      <!-- Subscribers Waiting Chart -->
+      <BarChart fx:id="barChartSubscribersWaiting" layoutX="37.0" layoutY="405.0" prefHeight="296.0" prefWidth="980.0" title="Subscribers Waiting">
+         <xAxis>
+            <CategoryAxis fx:id="xDayAxisWaiting" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yWaitingAxis" />
+         </yAxis>
+      </BarChart>
+
+      <!-- Go Back Button -->
+      <Button fx:id="btnGoBack" layoutX="14.0" layoutY="721.0" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="39.0" prefWidth="91.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+
+   </children>
 </AnchorPane>
