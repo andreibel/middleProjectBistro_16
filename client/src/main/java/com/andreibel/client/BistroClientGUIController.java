@@ -8,7 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
+import com.andreibel.client.Order.OrderFormGUIController;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -125,7 +125,46 @@ public class BistroClientGUIController {
 
         LocalDateTime orderDateTime = LocalDateTime.of(date, time);
 
-        controller.updateOrder(selected.getOrderNumber(), guests, orderDateTime);
+
+        // --- Added: determine Subscriber vs Guest details ---
+        Integer subscriberId = null;
+        String email = null;
+        String phoneNumber = null;
+
+        if (subscriberRadio.isSelected()) {
+            // Subscriber: require subscriber ID
+            String idText = txtSubscriberId.getText().trim();
+            if (idText.isEmpty()) {
+                showError("Please enter Subscriber ID");
+                return;
+            }
+            try {
+                subscriberId = Integer.parseInt(idText);
+            } catch (NumberFormatException e) {
+                showError("Subscriber ID must be a number");
+                return;
+            }
+        } else {
+            // Guest: require email + phone number
+            email = txtEmail.getText().trim();
+            phoneNumber = txtPhoneNumber.getText().trim();
+
+            if (email.isEmpty() || phoneNumber.isEmpty()) {
+                showError("Please enter Email and Phone Number");
+                return;
+            }
+        }
+/// //////////////
+
+        controller.updateOrder(
+                selected.getOrderNumber(),
+                guests,
+                orderDateTime,
+                subscriberId,
+                email,
+                phoneNumber
+        );
+
     }
 
     // called from BistroClientController when server returns list

@@ -1,5 +1,6 @@
 package com.andreibel.client.Order;
 
+import com.andreibel.client.util.ScreenTransfer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -59,9 +60,74 @@ public class OrderFormGUIController {
     }
 
 
+    @FXML
     public void onOrderNowButtonClicked(ActionEvent event) {
 
+        // reading data from the form
+        int guests;
+        try {
+            guests = Integer.parseInt(numberOfPeopleField.getText().trim());
+        } catch (NumberFormatException e) {
+            showError("Please enter a valid number of people");
+            return;
+        }
+
+        LocalDate date = datePicker.getValue();
+        if (date == null) {
+            showError("Please select a date");
+            return;
+        }
+
+        String timeStr = timeCombo.getValue();
+        if (timeStr == null) {
+            showError("Please select a time");
+            return;
+        }
+
+        LocalDateTime orderDateTime =
+                LocalDateTime.of(date, LocalTime.parse(timeStr));
+
+
+
+
+
+        Integer subscriberId = null;
+        String email = null;
+        String phoneNumber = null;
+
+        if (subscriberRadio.isSelected()) {
+            // Subscriber selected
+            String idText = subscriberIdField.getText().trim();
+            if (idText.isEmpty()) {
+                showError("Please enter Subscriber ID");
+                return;
+            }
+            subscriberId = Integer.parseInt(idText);
+        } else {
+            // Guest selected
+            email = emailField.getText().trim();
+            phoneNumber = phoneField.getText().trim();
+
+            if (email.isEmpty() || phoneNumber.isEmpty()) {
+                showError("Please enter Email and Phone Number");
+                return;
+            }
+        }
+
+        // --------------------------------------------------
+        // calling Controller / Client
+        // --------------------------------------------------
+
+        controller.updateOrder(
+                selected.getOrderNumber(),
+                guests,
+                orderDateTime,
+                subscriberId,
+                email,
+                phoneNumber
+        );
     }
+
 
     private void clearForm() {
 
@@ -84,24 +150,12 @@ public class OrderFormGUIController {
         txtFieldEmail.setStyle(null);
     }
     @FXML
-    void onGoBackButtonClick(ActionEvent event) {
+    void onGoBackButtonClick(ActionEvent event) throws IOException {
         clearForm();
-
-
-        try {
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main/MainFormGUIController.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Error loading previous screen");
-        }
+        ScreenTransfer.switchScreen(
+                event,
+                "/Main/MainFormGUIController.fxml",
+                "MainFormGUIController"
+            );
     }
 }
