@@ -35,11 +35,11 @@ public class BistroClientController {
         }
 
         switch (response.getType()) {
-            case GET_ORDER_RESPONSE -> {
-                @SuppressWarnings("unchecked")
-                List<OrderResponse> orders = (List<OrderResponse>) response.getData();
-                //Platform.runLater(() -> guiController.setOrdersToGUI(orders));
-            }
+//            case GET_ORDER_RESPONSE -> {
+//                @SuppressWarnings("unchecked")
+//                List<OrderResponse> orders = (List<OrderResponse>) response.getData();
+//                //Platform.runLater(() -> guiController.setOrdersToGUI(orders));
+//            }
 
             case UPDATE_ORDER_RESPONSE -> {
                 OrderResponse updated = (OrderResponse) response.getData();
@@ -63,7 +63,7 @@ public class BistroClientController {
             showError("Client not connected");
             return;
         }
-        client.send(new Message(APICallType.GET_ORDERS, null));
+        //client.send(new Message(APICallType.GET_ORDERS, null));
     }
 
     public void updateOrder(int orderNumber, int numberOfPeople, LocalDateTime date) {
@@ -71,8 +71,8 @@ public class BistroClientController {
             showError("Client not connected");
             return;
         }
-        OrderRequest req = new OrderRequest(orderNumber, numberOfPeople, date);
-        client.send(new Message(APICallType.UPDATE_ORDER, req));
+        //OrderRequest req = new OrderRequest(orderNumber, numberOfPeople, date);
+        //client.send(new Message(APICallType.UPDATE_ORDER, req));
     }
 
     // ----- error handling -----
