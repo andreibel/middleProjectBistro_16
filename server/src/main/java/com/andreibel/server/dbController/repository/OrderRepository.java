@@ -1,10 +1,10 @@
 package com.andreibel.server.dbController.repository;
 
-import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.entity.Order;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,8 +53,7 @@ public class OrderRepository {
         String sql = "SELECT * FROM bistro.`order`;";
         List<Order> orders = new ArrayList<>();
 
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 orders.add(mapRelToOrder(rs));
@@ -93,27 +92,6 @@ public class OrderRepository {
         }
     }
 
-    /**
-     * Updates number of guests and reservation time for an existing order.
-     *
-     * @throws SQLException if the order does not exist
-     */
-    public void update(OrderRequest order) throws SQLException {
-        String sql = "UPDATE bistro.`order` SET "
-                + Order.NUMBER_OF_GUESTS + " = ?, "
-                + Order.ORDER_DATE_TIME + " = ? "
-                + "WHERE " + Order.CONFIRMATION_CODE + " = ?;";
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, order.getNumberOfGuests());
-            stmt.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
-            stmt.setString(3, order.getConformationCode().toString());
-
-            if (stmt.executeUpdate() == 0) {
-                throw new SQLException("Order not found: " + order.getConformationCode());
-            }
-        }
-    }
 
     /**
      * Finds orders that overlap a 2-hour reservation window.
@@ -125,12 +103,7 @@ public class OrderRepository {
         Timestamp start = Timestamp.valueOf(date);
         Timestamp end = Timestamp.valueOf(date.plusHours(2));
 
-        String sql = "SELECT * FROM bistro.`order` o "
-                + "WHERE o." + Order.ORDER_CANCELLED + " = 0 "
-                + "AND o." + Order.ORDER_COMPLETED + " = 0 "
-                + "AND o." + Order.ORDER_DATE_TIME + " < ? "
-                + "AND DATE_ADD(o." + Order.ORDER_DATE_TIME + ", INTERVAL 2 HOUR) > ? "
-                + "ORDER BY o." + Order.ORDER_DATE_TIME + " ASC;";
+        String sql = "SELECT * FROM bistro.`order` o " + "WHERE o." + Order.ORDER_CANCELLED + " = 0 " + "AND o." + Order.ORDER_COMPLETED + " = 0 " + "AND o." + Order.ORDER_DATE_TIME + " < ? " + "AND DATE_ADD(o." + Order.ORDER_DATE_TIME + ", INTERVAL 2 HOUR) > ? " + "ORDER BY o." + Order.ORDER_DATE_TIME + " ASC;";
 
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
@@ -172,16 +145,9 @@ public class OrderRepository {
      * @return stored order
      */
     public Order save(Order newOrder) throws SQLException {
-        String sql = "INSERT INTO bistro.`order` ("
-                + Order.NUMBER_OF_GUESTS + ","
-                + Order.CONFIRMATION_CODE + ","
-                + Order.ORDER_DATE_TIME + ","
-                + Order.SUBSCRIBER_ID + ","
-                + Order.EMAIL + ","
-                + Order.PHONE_NUMBER + ") VALUES (?,?,?,?,?,?);";
+        String sql = "INSERT INTO bistro.`order` (" + Order.NUMBER_OF_GUESTS + "," + Order.CONFIRMATION_CODE + "," + Order.ORDER_DATE_TIME + "," + Order.SUBSCRIBER_ID + "," + Order.EMAIL + "," + Order.PHONE_NUMBER + ") VALUES (?,?,?,?,?,?);";
 
-        try (PreparedStatement stmt =
-                     tx.currentConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             stmt.setInt(1, newOrder.getNumberOfGuests());
             stmt.setString(2, newOrder.getConformationCode().toString());
@@ -214,11 +180,58 @@ public class OrderRepository {
      * @return number of deleted rows
      */
     public int deleteByConformationCode(UUID conformationCode) throws SQLException {
-        String sql = "DELETE FROM bistro.`order` WHERE " + Order.CONFIRMATION_CODE + " = ?;";
+        String sql = "UPDATE bistro.`order` " + "SET " + Order.ORDER_CANCELLED + " = 1 " + "WHERE " + Order.CONFIRMATION_CODE + " = ?;";
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, conformationCode.toString());
             return stmt.executeUpdate();
         }
+    }
+
+    public int setArrived(UUID conformationCode) throws SQLException {
+        String sql =
+                "UPDATE bistro.`Order` " + "SET " + Order.ORDER_ARRIVED + " = 1 " + "WHERE " + Order.CONFIRMATION_CODE + " = ?;";
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            return stmt.executeUpdate();
+        }
+    }
+
+    public void completeOrder(UUID conformationCode) throws SQLException {
+        String sql = "UPDATE bistro.`order` " + "SET " + Order.ORDER_COMPLETED + " = 1 " + "WHERE " + Order.CONFIRMATION_CODE + " = ?;";
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            stmt.executeUpdate();
+        }
+
+    }
+
+
+    public List<Order> findAllDateOrders(LocalDate date) throws SQLException {
+        String sql = """
+        SELECT *
+        FROM bistro.`order`
+        WHERE orderDateTime >= ?
+          AND orderDateTime <  ?
+          AND orderCancelled = 0
+        """;
+
+        List<Order> orders = new ArrayList<>();
+
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+
+            ps.setTimestamp(1, Timestamp.valueOf(date.atStartOfDay()));
+            ps.setTimestamp(2, Timestamp.valueOf(date.plusDays(1).atStartOfDay()));
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                orders.add(mapRelToOrder(rs));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        return orders;
     }
 }

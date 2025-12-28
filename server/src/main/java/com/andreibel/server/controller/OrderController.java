@@ -54,7 +54,9 @@ public class OrderController {
     public Message createOrder(Message message) {
         return new Message(
                 CREATE_ORDER_RESPONSE,
-                orderService.createOrder((OrderRequest) message.getData())
+                orderService.createOrder(
+                        (OrderRequest) message.getData()
+                )
         );
     }
 
@@ -87,19 +89,6 @@ public class OrderController {
     }
 
     /**
-     * Updates an existing order.
-     *
-     * @param message request message containing updated {@link OrderRequest} data
-     * @return response message containing the updated order
-     */
-    public Message updateOrder(Message message) {
-        return new Message(
-                UPDATE_ORDER_RESPONSE,
-                orderService.updateOrder((OrderRequest) message.getData())
-        );
-    }
-
-    /**
      * Deletes an order by its confirmation code.
      *
      * @param message request message containing {@link OrderRequest}
@@ -107,10 +96,29 @@ public class OrderController {
      * @return response message indicating successful deletion
      */
     public Message deleteOrder(Message message) {
-        orderService.deleteOrder((OrderRequest) message.getData());
         return new Message(
                 DELETE_ORDER_RESPONSE,
-                "Order deleted!"
+                orderService.deleteOrder(
+                        ((OrderRequest) message.getData()).getConformationCode()
+                )
+        );
+    }
+
+    public Message updateArrives(Message message) {
+        return new Message(
+                ORDER_ARRIVED_RESPONSE,
+                orderService.orderArrives(
+                        ((OrderRequest)message.getData()).getConformationCode()
+                )
+        );
+    }
+
+    public Message closeOrder(Message message) {
+        return new Message(
+                COMPLETE_ORDER_RESPONSE,
+                orderService.completeOrder(
+                        ((OrderRequest)message.getData()).getConformationCode()
+                )
         );
     }
 }

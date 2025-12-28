@@ -31,7 +31,7 @@ public class OrderMapper {
      * @return {@link Order} entity.
      */
     public static Order mapNewOrderRequestToOrder(OrderRequest order) {
-        return Order.builder().orderNumber(-1).conformationCode(UUID.randomUUID()).numberOfGuests(order.getNumberOfGuests()).orderDateTime(order.getOrderDateTime()).placedOrderDateTime(LocalDateTime.now()).subscriberId(order.getSubscriberId()).email(order.getEmail()).phoneNumber(order.getPhoneNumber()).orderCompleted(false).orderCancelled(false).orderPaid(false).build();
+        return Order.builder().orderNumber(-1).conformationCode(UUID.randomUUID()).numberOfGuests(order.getNumberOfGuests()).orderDateTime(order.getOrderDateTime()).placedOrderDateTime(LocalDateTime.now()).subscriberId(order.getSubscriberId()).email(order.getEmail()).phoneNumber(order.getPhoneNumber()).orderCompleted(false).orderCancelled(false).orderArrive(false).build();
     }
 
     /**

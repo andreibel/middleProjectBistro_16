@@ -1,6 +1,7 @@
 package com.andreibel.server;
 
 import com.andreibel.server.controller.Serve;
+import com.andreibel.server.services.OrderService;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -8,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public class BistroServer extends Application {
 
@@ -31,8 +33,12 @@ public class BistroServer extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();
+
         sv.setGUIController(fxmlLoader.getController());
         sv.listen();
+
+
+
         Scene scene = new Scene(load, 320, 240);
         stage.setTitle("Server");
         stage.setScene(scene);

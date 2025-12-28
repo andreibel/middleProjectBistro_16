@@ -127,4 +127,20 @@ public class SubscriberRepository {
         }
         return subscribers;
     }
+
+
+    public void updateBySubID(SubscriberRequest data) {
+        String sql = "UPDATE bistro.subscriber " +
+                "SET " + Subscriber.NAME + " = ? , " + Subscriber.PHONE_NUMBER + " = ?, " + Subscriber.EMAIL + " = ?" +
+                "WHERE " + Subscriber.SUBSCRIBER_ID + " = ?;";
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, data.getName());
+            stmt.setString(2, data.getPhoneNumber());
+            stmt.setString(3, data.getEmail());
+            stmt.setInt(4, data.getSubscriberId());
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
