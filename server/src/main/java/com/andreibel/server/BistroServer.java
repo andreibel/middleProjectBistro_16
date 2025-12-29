@@ -1,8 +1,6 @@
 package com.andreibel.server;
 
 import com.andreibel.server.controller.Serve;
-import com.andreibel.server.services.OrderClosingScheduler;
-import com.andreibel.server.services.OrderTimeoutScheduler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -20,10 +18,10 @@ public class BistroServer extends Application {
 
 
     public void startScheduler() {
-        OrderTimeoutScheduler scheduler = OrderTimeoutScheduler.getInstance();
-        scheduler.start();
-        OrderClosingScheduler closingScheduler = OrderClosingScheduler.getInstance();
-        closingScheduler.start();
+//        OrderTimeoutScheduler scheduler = OrderTimeoutScheduler.getInstance();
+//        scheduler.start();
+//        OrderClosingScheduler closingScheduler = OrderClosingScheduler.getInstance();
+//        closingScheduler.start();
     }
 
     @Override

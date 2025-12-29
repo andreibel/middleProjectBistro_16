@@ -38,9 +38,11 @@ public enum APICallType {
 
     // worker-related calls client -> server
     LOGIN_WORKER,
+    WORKER_CREATE,
 
     // worker-related calls server -> client
     LOGIN_WORKER_RESPONSE,
+    WORKER_CREATE_RESPONSE,
 
     ERROR
 }
