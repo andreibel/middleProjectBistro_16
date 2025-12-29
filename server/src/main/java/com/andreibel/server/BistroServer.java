@@ -17,6 +17,13 @@ public class BistroServer extends Application {
     public static String DB_PASSWORD = "";
 
 
+    public void startScheduler() {
+//        OrderTimeoutScheduler scheduler = OrderTimeoutScheduler.getInstance();
+//        scheduler.start();
+//        OrderClosingScheduler closingScheduler = OrderClosingScheduler.getInstance();
+//        closingScheduler.start();
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -31,14 +38,13 @@ public class BistroServer extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();
+        startScheduler();
         sv.setGUIController(fxmlLoader.getController());
         sv.listen();
+
         Scene scene = new Scene(load, 320, 240);
         stage.setTitle("Server");
         stage.setScene(scene);
         stage.show();
-
-
-
     }
 }

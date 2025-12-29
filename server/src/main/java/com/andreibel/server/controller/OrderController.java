@@ -4,21 +4,25 @@ import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
+import java.time.LocalTime;
+import java.util.List;
+
 import static com.andreibel.message.APICallType.*;
 
 /**
- * Controller responsible for handling order-related requests.
+ * Controller responsible for handling order-related API requests.
  *
  * <p>
- * This class acts as the entry point between incoming {@link Message} objects
- * and the {@link OrderService}. It converts request messages into service calls
- * and wraps service responses back into response messages.
+ * Acts as a thin routing layer between incoming {@link Message} objects
+ * and the {@link OrderService}. Each method extracts request data,
+ * delegates the business logic to the service layer, and wraps the result
+ * in a response {@link Message}.
  * </p>
  *
  * <p>
- * Implemented as a Singleton to ensure a single controller instance
- * throughout the application lifecycle.
+ * Implemented as a Singleton to ensure a single controller instance.
  * </p>
+ *
  * @author Andrei Beloziyorove
  */
 public class OrderController {
@@ -34,50 +38,58 @@ public class OrderController {
     }
 
     /**
-     * Returns the single instance of {@code OrderController}.
-     *
-     * @return singleton instance of OrderController
+     * @return singleton instance of {@link OrderController}
      */
     public static OrderController getInstance() {
-        if (instance == null) {
-            instance = new OrderController();
-        }
+        if (instance == null) instance = new OrderController();
         return instance;
     }
 
     /**
-     * Creates a new order.
+     * Handles a request to create a new order.
+     * <p>the relevant fields in the {@link OrderRequest} object are:
+     * <li>{@code numberOfGuests}</li>
+     * <li>{@code orderDateTime}</li>
+     * <li>{@code subscriberId Optional}</li>
+     * <li>{@code email Optional}</li>
+     * <li>{@code phoneNumber Optional}</li>
+     * all other fields are null or ignored
+     * </p>
      *
-     * @param message request message containing {@link OrderRequest} data
+     * @param message request message containing {@link OrderRequest}
      * @return response message containing the created order
      */
     public Message createOrder(Message message) {
         return new Message(
                 CREATE_ORDER_RESPONSE,
-                orderService.createOrder((OrderRequest) message.getData())
-        );
-    }
-
-    /**
-     * Retrieves a single order by its confirmation code.
-     *
-     * @param message request message containing {@link OrderRequest}
-     *                with the confirmation code
-     * @return response message containing the requested order
-     */
-    public Message getOrder(Message message) {
-        return new Message(
-                GET_ONE_ORDER_RESPONSE,
-                orderService.getOrderByConformationCode(
+                orderService.createOrder(
                         (OrderRequest) message.getData()
                 )
         );
     }
 
     /**
-     * Retrieves all orders in the system.
+     * Handles a request to retrieve a single order by confirmation code.
+     * <p>the relevant fields in the {@link OrderRequest} object are:
+     * <li>{@code conformationCode}</li>
+     * all other fields are null or ignored
+     * </p>
+     * @param message request message containing {@link OrderRequest}
+     * @return response message containing the requested order
+     */
+    public Message getOrder(Message message) {
+        return new Message(
+                GET_ONE_ORDER_RESPONSE,
+                orderService.getOrderByConformationCode(
+                      (  (OrderRequest) message.getData()).getConformationCode()
+                )
+        );
+    }
+
+    /**
+     * Handles a request to retrieve all orders.
      *
-     * @return response message containing a list of all orders
+     * @return response message containing all orders
      */
     public Message getAllOrders() {
         return new Message(
@@ -87,30 +99,80 @@ public class OrderController {
     }
 
     /**
-     * Updates an existing order.
-     *
-     * @param message request message containing updated {@link OrderRequest} data
-     * @return response message containing the updated order
+     * Handles a request to cancel (delete) an order by confirmation code.
+     * <p>the relevant fields in the {@link OrderRequest} object are:
+     * <li>{@code conformationCode}</li>
+     * all other fields are null or ignored
+     * </p>
+     * @param message request message containing {@link OrderRequest}
+     * @return response message containing the cancelled order
      */
-    public Message updateOrder(Message message) {
+    public Message deleteOrder(Message message) {
         return new Message(
-                UPDATE_ORDER_RESPONSE,
-                orderService.updateOrder((OrderRequest) message.getData())
+                DELETE_ORDER_RESPONSE,
+                orderService.deleteOrder(
+                        ((OrderRequest) message.getData()).getConformationCode()
+                )
         );
     }
 
     /**
-     * Deletes an order by its confirmation code.
-     *
+     * Handles a request to mark an order as arrived (check-in).
+     * <p>the relevant fields in the {@link OrderRequest} object are:
+     * <li>{@code conformationCode}</li>
+     * all other fields are null or ignored
+     * </p>
      * @param message request message containing {@link OrderRequest}
-     *                with the confirmation code
-     * @return response message indicating successful deletion
+     * @return response message containing the updated order
      */
-    public Message deleteOrder(Message message) {
-        orderService.deleteOrder((OrderRequest) message.getData());
+    public Message updateArrives(Message message) {
         return new Message(
-                DELETE_ORDER_RESPONSE,
-                "Order deleted!"
+                ORDER_ARRIVED_RESPONSE,
+                orderService.orderArrives(
+                        ((OrderRequest) message.getData()).getConformationCode()
+                )
+        );
+    }
+
+    /**
+     * Handles a request to complete (close) an order.
+     * <p>the relevant fields in the {@link OrderRequest} object are:
+     * <li>{@code conformationCode}</li>
+     *  all other fields are null or ignored
+     * </p>
+     * @param message request message containing {@link OrderRequest}
+     * @return response message containing the updated order
+     */
+    public Message closeOrder(Message message) {
+        return new Message(
+                COMPLETE_ORDER_RESPONSE,
+                orderService.completeOrder(
+                        ((OrderRequest) message.getData()).getConformationCode()
+                )
+        );
+    }
+
+    /**
+     * Handles a request to retrieve all available reservation start times
+     * for a given date and number of guests.
+     * <p>the relevant fields in the {@link OrderRequest} object are:
+     * <li>{@code localDateTime} ant start of the day</li>
+     * <li>{@code numberOfGuests}</li>
+     * all other fields are null or ignored
+     * </p>
+     * @param message request message containing {@link OrderRequest}
+     * @return response message containing a list of available times
+     */
+    public Message getAllAvailableTime(Message message) {
+        OrderRequest data = (OrderRequest) message.getData();
+        List<LocalTime> allAvailableTimeInDate = orderService.getAllAvailableTimeInDate(
+                data.getOrderDateTime().toLocalDate(),
+                data.getNumberOfGuests()
+        );
+        allAvailableTimeInDate.forEach(System.out::println);
+        return new Message(
+                GET_ALL_TIMES_IN_DATE_RESPONSE,
+                allAvailableTimeInDate
         );
     }
 }

@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class OrderRequest implements Serializable {
     private UUID ConformationCode;
-    private int numberOfGuests;
+    private Integer numberOfGuests;
     private LocalDateTime orderDateTime;
     private Integer subscriberId; // optional
     private String email; // optional
