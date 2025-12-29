@@ -21,6 +21,7 @@ public enum APICallType {
     CREATE_ORDER_RESPONSE,
     ORDER_ARRIVED_RESPONSE,
     COMPLETE_ORDER_RESPONSE,
+    GET_ALL_TIMES_IN_DATE_RESPONSE,
 
     // subscriber-related calls client -> server
     GET_ALL_SUBSCRIBERS,

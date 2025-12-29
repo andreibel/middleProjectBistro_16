@@ -5,9 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-import java.sql.Time;
 import java.sql.Date;
+import java.sql.Time;
 
 /**
  * <h1>OpenTime entity class.</h1>

@@ -1,7 +1,7 @@
 package com.andreibel.server;
 
 import com.andreibel.server.controller.Serve;
-import com.andreibel.server.services.OrderService;
+import com.andreibel.server.services.OrderClosingScheduler;
 import com.andreibel.server.services.OrderTimeoutScheduler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +10,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.time.LocalDate;
 
 public class BistroServer extends Application {
 
@@ -23,6 +22,8 @@ public class BistroServer extends Application {
     public void startScheduler() {
         OrderTimeoutScheduler scheduler = OrderTimeoutScheduler.getInstance();
         scheduler.start();
+        OrderClosingScheduler closingScheduler = OrderClosingScheduler.getInstance();
+        closingScheduler.start();
     }
 
     @Override
@@ -43,15 +44,9 @@ public class BistroServer extends Application {
         sv.setGUIController(fxmlLoader.getController());
         sv.listen();
 
-        OrderService orderService = OrderService.getInstance();
-        orderService.getAllAvailableTimeInDate(LocalDate.of(2025,12,28), 2).forEach(System.out::println);
-
         Scene scene = new Scene(load, 320, 240);
         stage.setTitle("Server");
         stage.setScene(scene);
         stage.show();
-
-
-
     }
 }

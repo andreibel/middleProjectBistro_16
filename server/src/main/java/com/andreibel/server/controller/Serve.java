@@ -114,7 +114,7 @@ public class Serve extends AbstractServer {
                 case DELETE_ORDER -> orderController.deleteOrder(message);
                 case ORDER_ARRIVED -> orderController.updateArrives(message);
                 case COMPLETE_ORDER -> orderController.closeOrder(message);
-
+                case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
                 // workers calls
                 case LOGIN_WORKER -> null; // TODO: implement login for workers
 

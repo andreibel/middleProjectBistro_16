@@ -121,4 +121,14 @@ public class OrderController {
                 )
         );
     }
+    public Message getAllAvailableTime(Message message) {
+        OrderRequest data = (OrderRequest) message.getData();
+        return new Message(
+                GET_ALL_TIMES_IN_DATE_RESPONSE,
+                orderService.getAllAvailableTimeInDate(
+                       data.getOrderDateTime().toLocalDate(),
+                       data.getNumberOfGuests()
+                )
+        );
+    }
 }

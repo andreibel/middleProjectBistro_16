@@ -2,7 +2,6 @@ package com.andreibel.server.services;
 
 import com.andreibel.message.DTO.SubscriberRequest;
 import com.andreibel.message.DTO.SubscriberResponse;
-import com.andreibel.message.Message;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.SubscriberRepository;
