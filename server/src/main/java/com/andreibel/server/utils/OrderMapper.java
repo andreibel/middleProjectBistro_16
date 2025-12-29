@@ -22,7 +22,16 @@ public class OrderMapper {
      * @return {@link OrderResponse} DTO.
      */
     public static OrderResponse mapOrderToOrderResponse(Order order) {
-        return new OrderResponse(order.getOrderNumber(), order.getNumberOfGuests(), order.getConformationCode(), order.getSubscriberId(), order.getEmail(), order.getPhoneNumber(), order.getOrderDateTime(), order.getPlacedOrderDateTime());
+        return new OrderResponse(
+                order.getOrderNumber(),
+                order.getNumberOfGuests(),
+                order.getConformationCode(),
+                order.getSubscriberId(),
+                order.getEmail(),
+                order.getPhoneNumber(),
+                order.getOrderDateTime(),
+                order.getPlacedOrderDateTime()
+        );
     }
 
     /**
@@ -31,7 +40,19 @@ public class OrderMapper {
      * @return {@link Order} entity.
      */
     public static Order mapNewOrderRequestToOrder(OrderRequest order) {
-        return Order.builder().orderNumber(-1).conformationCode(UUID.randomUUID()).numberOfGuests(order.getNumberOfGuests()).orderDateTime(order.getOrderDateTime()).placedOrderDateTime(LocalDateTime.now()).subscriberId(order.getSubscriberId()).email(order.getEmail()).phoneNumber(order.getPhoneNumber()).orderCompleted(false).orderCancelled(false).orderArrive(false).build();
+        return Order.builder()
+                .orderNumber(-1)
+                .conformationCode(UUID.randomUUID())
+                .numberOfGuests(order.getNumberOfGuests())
+                .orderDateTime(order.getOrderDateTime())
+                .placedOrderDateTime(LocalDateTime.now())
+                .subscriberId(order.getSubscriberId())
+                .email(order.getEmail())
+                .phoneNumber(order.getPhoneNumber())
+                .orderCompleted(false)
+                .orderCancelled(false)
+                .orderArrive(false)
+                .build();
     }
 
     /**
@@ -58,7 +79,14 @@ public class OrderMapper {
      * @throws SQLException if the result set is invalid.
      */
     public static Order mapRelToOrder(ResultSet rs) throws SQLException {
-        return Order.builder().orderNumber(rs.getInt(Order.ORDER_NUMBER)).numberOfGuests(rs.getInt(Order.NUMBER_OF_GUESTS)).conformationCode(UUID.fromString(rs.getString(Order.CONFIRMATION_CODE))).subscriberId(rs.getInt(Order.SUBSCRIBER_ID)).orderDateTime(rs.getTimestamp(Order.ORDER_DATE_TIME).toLocalDateTime()).placedOrderDateTime(rs.getTimestamp(Order.PLACED_ORDER_DATE_TIME).toLocalDateTime()).build();
+        return Order.builder()
+                .orderNumber(rs.getInt(Order.ORDER_NUMBER))
+                .numberOfGuests(rs.getInt(Order.NUMBER_OF_GUESTS))
+                .conformationCode(UUID.fromString(rs.getString(Order.CONFIRMATION_CODE)))
+                .subscriberId(rs.getInt(Order.SUBSCRIBER_ID))
+                .orderDateTime(rs.getTimestamp(Order.ORDER_DATE_TIME).toLocalDateTime())
+                .placedOrderDateTime(rs.getTimestamp(Order.PLACED_ORDER_DATE_TIME).toLocalDateTime())
+                .build();
     }
 }
 

@@ -145,13 +145,13 @@ public class OrderService {
      * to {@link OrderResponse}.
      * </p>
      *
-     * @param data request containing {@code conformationCode}
+     * @param conformationCode request containing {@code conformationCode}
      * @return matching order as DTO (may represent {@code null} if mapping permits)
      */
-    public OrderResponse getOrderByConformationCode(OrderRequest data) {
+    public OrderResponse getOrderByConformationCode(UUID conformationCode) {
         return tx.inTransaction(() ->
                 OrderMapper.mapOrderToOrderResponse(
-                        orderRepository.findByConformationCode(data.getConformationCode())
+                        orderRepository.findByConformationCode(conformationCode)
                 )
         );
     }
