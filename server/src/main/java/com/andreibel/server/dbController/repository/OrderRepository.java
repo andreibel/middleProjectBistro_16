@@ -148,7 +148,6 @@ public class OrderRepository {
         String sql = "INSERT INTO bistro.`order` (" + Order.NUMBER_OF_GUESTS + "," + Order.CONFIRMATION_CODE + "," + Order.ORDER_DATE_TIME + "," + Order.SUBSCRIBER_ID + "," + Order.EMAIL + "," + Order.PHONE_NUMBER + ") VALUES (?,?,?,?,?,?);";
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
             stmt.setInt(1, newOrder.getNumberOfGuests());
             stmt.setString(2, newOrder.getConformationCode().toString());
             stmt.setTimestamp(3, Timestamp.valueOf(newOrder.getOrderDateTime()));
@@ -233,5 +232,24 @@ public class OrderRepository {
         }
 
         return orders;
+    }
+
+    public int cancelLateOrders(int graceMinutes) throws SQLException {
+        String sql = """
+        UPDATE bistro.`order`
+        SET orderCancelled = 1
+        WHERE orderCancelled = 0
+          AND orderCompleted = 0
+          AND orderArrive = 0
+          AND orderDateTime < ?
+        """;
+
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
+
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+            ps.executeUpdate();
+        }
+        return 1;
     }
 }

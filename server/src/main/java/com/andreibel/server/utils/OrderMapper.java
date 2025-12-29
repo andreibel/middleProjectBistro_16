@@ -42,6 +42,7 @@ public class OrderMapper {
     public static Order mapOrderRequestToOrder(OrderRequest order) {
         return Order.builder()
                 .orderNumber(-1)
+                .conformationCode(UUID.randomUUID())
                 .numberOfGuests(order.getNumberOfGuests())
                 .orderDateTime(order.getOrderDateTime())
                 .subscriberId(order.getSubscriberId())

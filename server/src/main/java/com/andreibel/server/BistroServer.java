@@ -2,6 +2,7 @@ package com.andreibel.server;
 
 import com.andreibel.server.controller.Serve;
 import com.andreibel.server.services.OrderService;
+import com.andreibel.server.services.OrderTimeoutScheduler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,6 +20,11 @@ public class BistroServer extends Application {
     public static String DB_PASSWORD = "";
 
 
+    public void startScheduler() {
+        OrderTimeoutScheduler scheduler = OrderTimeoutScheduler.getInstance();
+        scheduler.start();
+    }
+
     @Override
     public void start(Stage stage) throws IOException {
 
@@ -33,11 +39,12 @@ public class BistroServer extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();
-
+        startScheduler();
         sv.setGUIController(fxmlLoader.getController());
         sv.listen();
 
-
+        OrderService orderService = OrderService.getInstance();
+        orderService.getAllAvailableTimeInDate(LocalDate.of(2025,12,28), 2).forEach(System.out::println);
 
         Scene scene = new Scene(load, 320, 240);
         stage.setTitle("Server");
