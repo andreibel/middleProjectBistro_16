@@ -35,6 +35,7 @@ import java.sql.SQLException;
  * The connection is removed from the {@link ThreadLocal} after completion,
  * ensuring no leaks between requests.
  * </p>
+ *
  * @author andrei beloziorove
  */
 public class TransactionManager {
@@ -104,9 +105,8 @@ public class TransactionManager {
      * </p>
      *
      * @param work the SQL work to execute
-     * @param <T> return type
+     * @param <T>  return type
      * @return result produced by the SQL work
-     *
      * @throws RuntimeException if the transaction fails
      */
     public <T> T inTransaction(SqlWork<T> work) {
@@ -128,22 +128,15 @@ public class TransactionManager {
                 return result;
 
             } catch (SQLException e) {
-                try {
-                    con.rollback();
-                } catch (SQLException ignored) {
-                }
-                throw new RuntimeException("Failed to execute transaction", e);
-
+                con.rollback();
+                return null;
             } finally {
                 txConn.remove();
-                try {
-                    con.setAutoCommit(oldAutoCommit);
-                } catch (SQLException ignored) {
-                }
+                con.setAutoCommit(oldAutoCommit);
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Failed to manage transaction", e);
+            return null;
         }
     }
 }

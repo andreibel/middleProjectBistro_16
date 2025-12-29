@@ -1,7 +1,6 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.Message;
-import com.andreibel.server.controller.BistroServerGUIController;
 import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
@@ -110,11 +109,12 @@ public class Serve extends AbstractServer {
             Message response = switch (message.getType()) {
                 // orders calls
                 case GET_ALL_ORDERS -> orderController.getAllOrders();
-                case UPDATE_ORDER -> orderController.updateOrder(message);
                 case CREATE_ORDER -> orderController.createOrder(message);
                 case GET_ONE_ORDER -> orderController.getOrder(message);
                 case DELETE_ORDER -> orderController.deleteOrder(message);
-
+                case ORDER_ARRIVED -> orderController.updateArrives(message);
+                case COMPLETE_ORDER -> orderController.closeOrder(message);
+                case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
                 // workers calls
                 case LOGIN_WORKER -> null; // TODO: implement login for workers
 
@@ -123,7 +123,7 @@ public class Serve extends AbstractServer {
                 case GET_ONE_SUBSCRIBER -> subscriberController.getSub(message);
                 case GET_SUBSCRIBER_ORDERS -> subscriberController.getSubOrders(message);
                 case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
-
+                case UPDATE_SUBSCRIBER -> subscriberController.updateSub(message);
                 // unknown / unsupported
                 default -> null;
             };

@@ -101,4 +101,13 @@ public class SubscriberController {
                 )
         );
     }
+
+    public Message updateSub(Message message) {
+        return new Message(
+                UPDATE_SUBSCRIBER_RESPONSE,
+                subscriberService.updateSub((SubscriberRequest)message.getData())
+        );
+    }
+
+
 }

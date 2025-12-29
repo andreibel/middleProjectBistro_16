@@ -29,7 +29,7 @@ public class SubscriberService {
     }
 
     public SubscriberResponse createSubscriber(SubscriberRequest subscriberRequest) {
-        return tx.inTransaction( () -> {
+        return tx.inTransaction(() -> {
             Subscriber sub = subscriberRepository.addSubscriber(subscriberRequest);
             return SubscriberMapper.mapSubscriberToSubscriberResponse(sub);
         });
@@ -48,10 +48,10 @@ public class SubscriberService {
                     Subscriber subscriber;
                     if (data.getPhoneNumber() != null)
                         subscriber = subscriberRepository.getSubscriberByPhone(data.getPhoneNumber());
-                    else if(data.getEmail() != null)
+                    else if (data.getEmail() != null)
                         subscriber = subscriberRepository.getSubscriberByEmail(data.getEmail());
                     else
-                        subscriber =  subscriberRepository.getSubscriberById(data.getSubscriberId());
+                        subscriber = subscriberRepository.getSubscriberById(data.getSubscriberId());
                     return SubscriberMapper.mapSubscriberToSubscriberResponse(subscriber);
                 }
         );
@@ -67,6 +67,14 @@ public class SubscriberService {
                             .toList()
             );
             return subscriber;
+        });
+    }
+
+
+    public SubscriberResponse updateSub(SubscriberRequest data) {
+        return tx.inTransaction( () -> {
+            subscriberRepository.updateBySubID(data);
+            return getSubscriber(data);
         });
     }
 }
