@@ -1,5 +1,8 @@
 package com.andreibel.client.Worker;
 
+import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.Client.IServerResponseListener;
+import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -12,7 +15,7 @@ import javafx.scene.control.Label;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SubscriberReportsFormGUIController {
+public class SubscriberReportsFormGUIController implements IServerResponseListener {
     @FXML
     private Label lblTitle;
     @FXML
@@ -30,13 +33,21 @@ public class SubscriberReportsFormGUIController {
     @FXML
     private Button btnGoBack;
 
+    private BistroClientController controller;
+
     @FXML
-    public void initialize() {
+    private void initialize() {
+        controller = BistroClientController.getInstance();
+        controller.addListener(this);
         initiateSubscriberOrdersBarChart();
         initiateSubscriberWaitingBarChart();
     }
-
-    public void onGoBackButtonClicked(ActionEvent event) {
+    @Override
+    public void onServerResponse(Message message) {
+        
+    }
+    @FXML
+    private void onGoBackButtonClicked(ActionEvent event) {
 
     }
     private void initiateSubscriberOrdersBarChart(){

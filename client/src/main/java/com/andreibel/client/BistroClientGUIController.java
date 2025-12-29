@@ -1,14 +1,15 @@
 package com.andreibel.client;
 
 import com.andreibel.client.Client.BistroClientController;
-import javafx.collections.ObservableList;
+import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import com.andreibel.client.Order.OrderFormGUIController;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -131,39 +132,39 @@ public class BistroClientGUIController {
         String email = null;
         String phoneNumber = null;
 
-        if (subscriberRadio.isSelected()) {
-            // Subscriber: require subscriber ID
-            String idText = txtSubscriberId.getText().trim();
-            if (idText.isEmpty()) {
-                showError("Please enter Subscriber ID");
-                return;
-            }
-            try {
-                subscriberId = Integer.parseInt(idText);
-            } catch (NumberFormatException e) {
-                showError("Subscriber ID must be a number");
-                return;
-            }
-        } else {
-            // Guest: require email + phone number
-            email = txtEmail.getText().trim();
-            phoneNumber = txtPhoneNumber.getText().trim();
-
-            if (email.isEmpty() || phoneNumber.isEmpty()) {
-                showError("Please enter Email and Phone Number");
-                return;
-            }
-        }
+//        if (subscriberRadio.isSelected()) {
+//            // Subscriber: require subscriber ID
+//            String idText = txtSubscriberId.getText().trim();
+//            if (idText.isEmpty()) {
+//                showError("Please enter Subscriber ID");
+//                return;
+//            }
+//            try {
+//                subscriberId = Integer.parseInt(idText);
+//            } catch (NumberFormatException e) {
+//                showError("Subscriber ID must be a number");
+//                return;
+//            }
+//        } else {
+//            // Guest: require email + phone number
+//            email = txtEmail.getText().trim();
+//            phoneNumber = txtPhoneNumber.getText().trim();
+//
+//            if (email.isEmpty() || phoneNumber.isEmpty()) {
+//                showError("Please enter Email and Phone Number");
+//                return;
+//            }
+//        }
 /// //////////////
 
-        controller.updateOrder(
-                selected.getOrderNumber(),
-                guests,
-                orderDateTime,
-                subscriberId,
-                email,
-                phoneNumber
-        );
+//        controller.requestOrder(
+//                selected.getOrderNumber(),
+//                guests,
+//                orderDateTime,
+//                subscriberId,
+//                email,
+//                phoneNumber
+//        );
 
     }
 

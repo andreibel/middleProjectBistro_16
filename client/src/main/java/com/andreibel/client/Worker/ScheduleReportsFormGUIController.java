@@ -1,6 +1,8 @@
 package com.andreibel.client.Worker;
 
-import javafx.beans.value.ObservableValue;
+import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.Client.IServerResponseListener;
+import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -14,7 +16,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ScheduleReportsFormGUIController {
+public class ScheduleReportsFormGUIController implements IServerResponseListener {
     @FXML
     private Label lblTitle;
     @FXML
@@ -35,16 +37,25 @@ public class ScheduleReportsFormGUIController {
     @FXML
     private Button btnGoBack;
 
+    private BistroClientController controller;
+
     @FXML
     private void initialize() {
+        controller = BistroClientController.getInstance();
+        controller.addListener(this);
         initiateArrivalsDeparturesLineChart();
         initiateLeavesDelaysBarChart();
         addChartsDataForTest();
     }
 
-    public void onGoBackButtonClicked(ActionEvent event) {}
+    @Override
+    public void onServerResponse(Message message) {
 
-    public void onComboBoxTrackValueSelected(ActionEvent event) {
+    }
+    @FXML
+    private void onGoBackButtonClicked(ActionEvent event) {}
+    @FXML
+    private void onComboBoxTrackValueSelected(ActionEvent event) {
         int trackedDay = comboBoxTrack.getValue();
     }
 

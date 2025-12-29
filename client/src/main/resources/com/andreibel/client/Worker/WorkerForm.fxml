@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerFormGUIController">
+<AnchorPane prefHeight="444.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerFormGUIController">
 
     <children>
 
@@ -18,28 +18,42 @@
         </Label>
 
         <!-- Register Subscriber -->
-        <Button fx:id="btnRegister" layoutX="209.0" layoutY="103.0" onAction="#onRegisterButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Register New Subscriber">
+        <Button fx:id="btnRegister" layoutX="209.0" layoutY="94.0" onAction="#onRegisterButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #009688; -fx-text-fill: white; -fx-font-size: 14px;" text="Register New Subscriber">
             <tooltip>
                 <Tooltip text="Register a new subscriber and provide them with exclusive benefits." wrapText="true" />
             </tooltip>
         </Button>
 
         <!-- Subscribers Report -->
-        <Button fx:id="btnSubscribersReport" layoutX="209.0" layoutY="178.0" onAction="#onSubscribersReportButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="View Subscribers Report">
+        <Button fx:id="btnSubscribersReport" layoutX="209.0" layoutY="151.0" onAction="#onSubscribersReportButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #1976D2; -fx-text-fill: white; -fx-font-size: 14px;" text="View Subscribers Report">
             <tooltip>
                 <Tooltip text="View detailed information and statistics about subscribers." wrapText="true" />
             </tooltip>
         </Button>
 
+        <!-- View Current Dining -->
+        <Button fx:id="btnViewCurrentDining" layoutX="209.0" layoutY="212.0" mnemonicParsing="false" onAction="#onViewCurrentDiningButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #3F51B5; -fx-text-fill: white; -fx-font-size: 14px;" text="View Current Dining in Restaurant" textAlignment="CENTER" wrapText="true">
+            <tooltip>
+                <Tooltip text="See all current customers dining in the restaurant." wrapText="true" />
+            </tooltip>
+        </Button>
+
+        <!-- Register Worker -->
+        <Button fx:id="btnRegisterWorker" layoutX="209.0" layoutY="270.0" mnemonicParsing="false" onAction="#onRegisterWorkerButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #F57C00; -fx-text-fill: white; -fx-font-size: 14px;" text="Register New Worker">
+            <tooltip>
+                <Tooltip text="Add a new worker and define their role in the system." wrapText="true" />
+            </tooltip>
+        </Button>
+
         <!-- Schedules Report -->
-        <Button fx:id="btnSchedulesReport" layoutX="209.0" layoutY="261.0" onAction="#onSchedulesReportButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px;" text="View Schedules Report">
+        <Button fx:id="btnSchedulesReport" layoutX="209.0" layoutY="324.0" onAction="#onSchedulesReportButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #FFA000; -fx-text-fill: white; -fx-font-size: 14px;" text="View Schedules Report">
             <tooltip>
                 <Tooltip text="Review reservation schedules and table availability." wrapText="true" />
             </tooltip>
         </Button>
 
         <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="341.0" onAction="#onGoBackButtonClicked" prefHeight="45.0" prefWidth="103.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="385.0" onAction="#onGoBackButtonClicked" prefHeight="45.0" prefWidth="103.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
 
     </children>
 </AnchorPane>

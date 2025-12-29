@@ -1,5 +1,8 @@
 package com.andreibel.client.Table;
 
+import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.Client.IServerResponseListener;
+import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -7,7 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-public class GetTableFormGUIController {
+public class GetTableFormGUIController implements IServerResponseListener{
 
     @FXML
     private Label lblSubscriberInfo;
@@ -29,11 +32,24 @@ public class GetTableFormGUIController {
     private Button btnConfrimArrival;
     @FXML
     private Button btnGoBack;
+    @FXML
+    private Button btnLostMyCode;
+
+    BistroClientController controller;
 
     @FXML
-    public void initialize() {}
+    private void initialize() {
+        controller = BistroClientController.getInstance();
+        controller.addListener(this);
+    }
 
-    public void onButtonConfirmArrivalClicked(ActionEvent event) {}
-    public void onButtonGoBackClicked(ActionEvent event) {}
+    @Override
+    public void onServerResponse(Message message) {
+
+    }
+    @FXML
+    private void onButtonConfirmArrivalClicked(ActionEvent event) {}
+    @FXML
+    private void onButtonGoBackClicked(ActionEvent event) {}
 
 }

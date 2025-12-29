@@ -1,10 +1,13 @@
 package com.andreibel.client.Client;
 
+import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.Message;
 import com.lloseng.ocsf.client.AbstractClient;
+import lombok.Setter;
 
 import java.io.IOException;
 
+@Setter
 public class BistroClient extends AbstractClient {
 
     private BistroClientController controller;
@@ -13,20 +16,19 @@ public class BistroClient extends AbstractClient {
         super(host, port);
     }
 
-    public void setController(BistroClientController controller) {
-        this.controller = controller;
-    }
-
     @Override
     protected void handleMessageFromServer(Object msg) {
         if (controller == null) {
             return;
         }
-
         if (msg instanceof Message m) {
-            controller.handleServerResponse(m);
+            try {
+                controller.handleServerResponse(m);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
-            controller.showError("Unknown message from server: " + msg);
+            BistroUtilities.showMessage("Error", "Unknown message from server: " + msg);
         }
     }
 
@@ -35,7 +37,7 @@ public class BistroClient extends AbstractClient {
             sendToServer(msg);
         } catch (IOException e) {
             if (controller != null) {
-                controller.showError("Failed to send to server: " + e.getMessage());
+                BistroUtilities.showMessage("Error", "Failed to send to server: " + e.getMessage());
             }
         }
     }
@@ -45,7 +47,7 @@ public class BistroClient extends AbstractClient {
             openConnection();
         } catch (IOException e) {
             if (controller != null) {
-                controller.showError("Failed to connect to server: " + e.getMessage());
+                BistroUtilities.showMessage("Error", "Failed to connect to server: " + e.getMessage());
             }
         }
     }

@@ -1,92 +1,113 @@
 package com.andreibel.client.Main;
 
-import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Parent;
-import javafx.stage.Stage;
-import com.andreibel.client.util.ScreenTransfer;
 
 import java.io.IOException;
 
+/**
+ * GUI controller for the main application screen.
+ *
+ * <p>This controller serves as the central navigation hub of the Bistro client
+ * application. It allows users to navigate to different forms such as order
+ * creation, table arrival, order cancellation, subscriber login, and worker
+ * login.</p>
+ *
+ * <p>The controller initializes the {@link CustomerStateManager} to ensure
+ * customer-related state is available throughout the application lifecycle.</p>
+ *
+ * <p>All navigation between screens is handled via
+ * {@link BistroUtilities#switchScreen(Node, String, String)}, which
+ * manages scene transitions and scene caching.</p>
+ */
 public class MainFormGUIController {
 
+    /**
+     * Initializes the main form controller after the FXML has been loaded.
+     *
+     * <p>This method ensures that the {@link CustomerStateManager} singleton
+     * instance is created and ready for use.</p>
+     */
     @FXML
-    private Label lblMainTitle;
-    @FXML
-    private Label lblHoverDetails;
-    @FXML
-    private Button btnOrder;
-    @FXML
-    private Button btnArrived;
-    @FXML
-    private Button btnCancel;
-    @FXML
-    private Button btnSubscriber;
-    @FXML
-    private Button btnWorker;
-    private BistroClientController controller;
-
-    @FXML
-    public void initialize() {
+    private void initialize() {
+        CustomerStateManager.getInstance();
     }
 
-    public void setController(BistroClientController controller) {
-        this.controller = controller;
-    }
-
+    /**
+     * Navigates to the order creation form.
+     *
+     * @param event the action event triggered by clicking the order button
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @FXML
-    public void onOrderButtonClicked(ActionEvent event) throws IOException {
-        ScreenTransfer.switchScreen(
-                event,
+    private void onOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node)event.getSource(),
                 "/Order/OrderForm.fxml",
-                "OrderFromGUIController"
+                "Bistro - Create your Order"
         );
     }
 
-
+    /**
+     * Navigates to the table arrival form.
+     *
+     * @param event the action event triggered by clicking the arrived button
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @FXML
-    public void onArrivedButtonClicked(ActionEvent event) throws IOException {
-        ScreenTransfer.switchScreen(
-            event,
-            "/Table/GetTableForm.fxml",
-            "GetTableForm"
-    );
-}
+    private void onArrivedButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node)event.getSource(),
+                "/Table/GetTableForm.fxml",
+                "Bistro - Get Table"
+        );
+    }
 
-
-@FXML
-    public void onCancelButtonClicked(ActionEvent event) throws IOException {
-    ScreenTransfer.switchScreen(
-            event,
-            "/Order/CancelOrderForm.fxml",
-            "CancelOrderForm"
-    );
-}
-
+    /**
+     * Navigates to the order cancellation form.
+     *
+     * @param event the action event triggered by clicking the cancel button
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @FXML
-    public void onSubscriberButtonClicked(ActionEvent event) throws IOException {
-        ScreenTransfer.switchScreen(
-                event,
+    private void onCancelButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node)event.getSource(),
+                "/Order/CancelOrderForm.fxml",
+                "Bistro - Cancel Order"
+        );
+    }
+
+    /**
+     * Navigates to the subscriber login form.
+     *
+     * @param event the action event triggered by clicking the subscriber button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onSubscriberButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node)event.getSource(),
                 "/Subscriber/SubscriberLoginForm.fxml",
-                "Subscriber Login"
-        );
-    }
-    @FXML
-    public void onWorkerButtonClicked(ActionEvent event) throws IOException {
-        ScreenTransfer.switchScreen(
-                event,
-                "/Worker/WorkerLoginForm.fxml",
-                "Worker Login"
+                "Bistro - Subscriber Login"
         );
     }
 
+    /**
+     * Navigates to the worker login form.
+     *
+     * @param event the action event triggered by clicking the worker button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onWorkerButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node)event.getSource(),
+                "/Worker/WorkerLoginForm.fxml",
+                "Bistro - Worker Login"
+        );
+    }
 }
