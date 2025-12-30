@@ -20,3 +20,17 @@ public class OrderRequest implements Serializable {
     private String phoneNumber; // optional
 
 }
+// -- CREATE_ORDER --
+// numberOfGuests
+// orderDateTime
+// optional subscriberId
+// optional email or phoneNumber
+
+// -- ORDER_ARRIVED --
+// ConformationCode
+//      - or -
+// optional subscriberId
+
+// -- GET_ALL_TIMES_IN_DATE --
+// orderDateTime
+// numberOfGuests
