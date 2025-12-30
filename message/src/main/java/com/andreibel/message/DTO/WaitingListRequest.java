@@ -15,7 +15,6 @@ import java.util.UUID;
 public class WaitingListRequest implements Serializable {
     private UUID ConformationCode;
     private Integer numberOfGuests;
-    private Integer orderNumber;
     private Integer subscriberId; // optional
     private String email; // optional
     private String phoneNumber; // optional
