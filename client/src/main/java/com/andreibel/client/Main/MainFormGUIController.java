@@ -2,6 +2,9 @@ package com.andreibel.client.Main;
 
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.client.util.WorkerStateManager;
+import com.andreibel.message.DTO.SubscriberResponse;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -33,7 +36,7 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
-        CustomerStateManager.getInstance();
+        WorkerStateManager.getInstance().setManager(true);
     }
 
     /**
@@ -47,7 +50,7 @@ public class MainFormGUIController {
         BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Order/OrderForm.fxml",
-                "Bistro - Create your Order"
+                "Bistro Restaurant - Create your Order"
         );
     }
 
@@ -62,7 +65,7 @@ public class MainFormGUIController {
         BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Table/GetTableForm.fxml",
-                "Bistro - Get Table"
+                "Bistro Restaurant - Confirm Arrival"
         );
     }
 
@@ -77,7 +80,7 @@ public class MainFormGUIController {
         BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Order/CancelOrderForm.fxml",
-                "Bistro - Cancel Order"
+                "Bistro Restaurant - Cancel Order"
         );
     }
 
@@ -89,10 +92,13 @@ public class MainFormGUIController {
      */
     @FXML
     private void onSubscriberButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen(
+        if (CustomerStateManager.hasSubscriberLoggedIn())
+            BistroUtilities.switchScreen((Node)event.getSource(), "/Subscriber/SubscriberZoneForm.fxml", "Bistro Restaurant - Subscriber Area");
+        else
+            BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Subscriber/SubscriberLoginForm.fxml",
-                "Bistro - Subscriber Login"
+                "Bistro Restaurant - Subscriber Login"
         );
     }
 
@@ -104,10 +110,13 @@ public class MainFormGUIController {
      */
     @FXML
     private void onWorkerButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen(
+        if (WorkerStateManager.hasWorkerLoggedIn())
+            BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
+        else
+            BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Worker/WorkerLoginForm.fxml",
-                "Bistro - Worker Login"
+                "Bistro Restaurant - Worker Login"
         );
     }
 }

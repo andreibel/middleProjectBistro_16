@@ -5,56 +5,82 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * A global application state manager used to store and share
- * user-related state across different GUI controllers.
+ * Singleton class that manages the global subscriber state for the client application.
  *
- * <p>This class follows the Singleton pattern and provides a single
- * shared instance throughout the client application.</p>
+ * <p>This class provides a central location to store and share subscriber-related
+ * information across different GUI controllers (FXML forms) without passing data
+ * explicitly between screens.</p>
  *
- * <p>Its main responsibility is to keep track of the current subscriber
- * state after login or identification, allowing different screens
- * (FXML controllers) to access subscriber information without
- * passing it explicitly between forms.</p>
- *
- * <p>Typical usage examples:</p>
+ * <p>The main responsibilities of this class include:</p>
  * <ul>
- *     <li>Checking whether the current user is a subscriber</li>
- *     <li>Accessing subscriber details (ID, name, status, etc.)</li>
- *     <li>Conditionally enabling or disabling GUI features</li>
+ *     <li>Storing the current subscriber information after login or identification</li>
+ *     <li>Tracking whether the subscriber has arrived at a table</li>
+ *     <li>Storing the confirmation code associated with the subscriber's active order</li>
+ *     <li>Providing a single shared instance to all GUI controllers via the
+ *     {@link #getInstance()} method</li>
  * </ul>
  *
- * <p>This class does not perform any server communication and is purely
- * client-side state storage.</p>
+ * <p>This class does not perform any server communication; it purely stores
+ * client-side state.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * CustomerStateManager state = CustomerStateManager.getInstance();
+ * if (state.getSubscriber() != null) {
+ *     // subscriber is logged in
+ *     String name = state.getSubscriber().getName();
+ * }
+ * </pre>
  */
 @Getter
 @Setter
 public class CustomerStateManager {
 
     /**
-     * The single instance of the StateManager.
+     * The singleton instance of {@link CustomerStateManager}.
      */
-    private static CustomerStateManager customerStateManager;
+    private static CustomerStateManager instance;
 
     /**
-     * Holds the subscriber information received from the server,
-     * or {@code null} if the user is not a subscriber.
+     * The subscriber information received from the server, or {@code null} if no subscriber is logged in.
      */
     private SubscriberResponse subscriber;
 
     /**
-     * Private constructor to prevent external instantiation.
+     * Indicates whether the subscriber has arrived at a table.
+     */
+    private boolean arrivedToTable = false;
+
+    /**
+     * The confirmation code associated with the subscriber's current order, or {@code null} if none.
+     */
+    private Integer confirmationCode = null;
+
+    /**
+     * Private constructor to prevent instantiation from outside the class.
      */
     private CustomerStateManager() {}
 
     /**
-     * Returns the singleton instance of the StateManager.
+     * Returns the shared singleton instance of {@link CustomerStateManager}.
      *
-     * @return the shared StateManager instance
+     * <p>If the instance does not yet exist, it is created.</p>
+     *
+     * @return the singleton {@link CustomerStateManager} instance
      */
     public static CustomerStateManager getInstance() {
-        if (customerStateManager == null) {
-            customerStateManager = new CustomerStateManager();
+        if (instance == null) {
+            instance = new CustomerStateManager();
         }
-        return customerStateManager;
+        return instance;
+    }
+
+    /**
+     * Checks whether a subscriber has logged in (i.e., whether the singleton instance exists).
+     *
+     * @return {@code true} if a subscriber has logged in, {@code false} otherwise
+     */
+    public static boolean hasSubscriberLoggedIn() {
+        return instance.getSubscriber() != null;
     }
 }

@@ -2,19 +2,26 @@ package com.andreibel.client.Worker;
 
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
+import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+//TODO: work on onServerResponse, initialize and combobox event
 
 public class ScheduleReportsFormGUIController implements IServerResponseListener {
     @FXML
@@ -37,6 +44,9 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
     @FXML
     private Button btnGoBack;
 
+    @FXML
+    private AnchorPane rootPane;
+
     private BistroClientController controller;
 
     @FXML
@@ -45,6 +55,19 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         controller.addListener(this);
         initiateArrivalsDeparturesLineChart();
         initiateLeavesDelaysBarChart();
+
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            onSceneShown();
+                        });
+                    }
+                });
+            }
+        });
+        onSceneShown();
         addChartsDataForTest();
     }
 
@@ -53,7 +76,10 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
 
     }
     @FXML
-    private void onGoBackButtonClicked(ActionEvent event) {}
+    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        clearReport();
+        BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
+    }
     @FXML
     private void onComboBoxTrackValueSelected(ActionEvent event) {
         int trackedDay = comboBoxTrack.getValue();
@@ -85,6 +111,15 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         xDayAxis.setLabel("Day of Month");
         yPeopleAxis.setLabel("Number of People");
         yPeopleAxis.setAutoRanging(true);
+    }
+
+    private void onSceneShown() {
+        controller.requestScheduleReportForCurrentMonth();
+    }
+
+    private void clearReport(){
+        lineChartArrivalsDepartures.getData().clear();
+        barChartLatesDelays.getData().clear();
     }
 
     //For Testing Purpose REMOVE BEFORE FINAL PRODUCT

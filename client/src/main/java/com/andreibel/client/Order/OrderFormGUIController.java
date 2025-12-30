@@ -5,15 +5,22 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.Message;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
-
+//TODO: Finish onServerResponse
 class WizardLocation {
     public static final int PART1_NUM_OF_PEOPLE_AND_DATE = 1;
     public static final int PART2_TIME = 2;
@@ -72,13 +79,29 @@ public class OrderFormGUIController implements IServerResponseListener {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
         adjustFormToWizardSetup();
+        setDatePicker();
+        Platform.runLater(() -> btnOrderNow.requestFocus());
     }
 
     @Override
-    public void onServerResponse(Message message){
-        if (message.getType() != APICallType.CREATE_ORDER_RESPONSE)
-            return;
-        BistroUtilities.showMessage("Order", "Your order has been successfully created!");
+    public void onServerResponse(Message message) throws IOException {
+        //NEED TO HANDLE ERRORS RESPONSE
+        if (message.getType() == APICallType.CREATE_ORDER_RESPONSE){
+            clearForm();
+            BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Your order has been successfully created!");
+            BistroUtilities.switchScreen(btnOrderNow,"/Main/MainForm.fxml", "Bistro Restaurant");
+        }
+
+        else if (message.getType() == APICallType.GET_ALL_TIMES_IN_DATE_RESPONSE){
+            setAvailableTimesForComboBox(message);
+            if (comboBoxTime.getItems().isEmpty()){
+                Platform.runLater(() -> {
+                    comboBoxTime.setPromptText("No times available");  // safe now
+                });
+            }
+            comboBoxTime.setPromptText("Select available times");
+            comboBoxTime.setDisable(false);
+        }
     }
     @FXML
     private void onRadioUserTypeChanged(ActionEvent event) {
@@ -86,72 +109,47 @@ public class OrderFormGUIController implements IServerResponseListener {
     }
     @FXML
     private void onOrderNowButtonClicked(ActionEvent event) {
-        if ((wizardLocation == WizardLocation.PART2_USER_TYPE && CustomerStateManager.getInstance() != null && CustomerStateManager.getInstance().getSubscriber() != null) || wizardLocation == WizardLocation.PART3_USER_TYPE){
-            wizardLocation = WizardLocation.PART1_NUM_OF_PEOPLE_AND_DATE;
-            controller.requestOrder(Integer.parseInt(txtFieldNumberOfPeople.getText()), datePickerOrder.getValue().atStartOfDay(), Integer.parseInt(txtFieldSubscriberId.getText()), txtFieldPhoneNumber.getText(), txtFieldEmail.getText());
-            //need to add time in the OrderRequest in Message API..
+        if (wizardLocation == WizardLocation.PART1_NUM_OF_PEOPLE_AND_DATE) {
+            if (txtFieldNumberOfPeople.getText().isEmpty()){
+                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter the number of people who are ordering");
+                return;
+            }
+            if (datePickerOrder.getValue() == null){
+                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter the date you wish to order");
+            }
+            if (!BistroUtilities.isNumeric(txtFieldNumberOfPeople.getText())){
+                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter a valid number of people");
+                return;
+            }
+            controller.requestAvailableTimes(new OrderRequest(null, Integer.parseInt(txtFieldNumberOfPeople.getText()), datePickerOrder.getValue().atStartOfDay(), null, null, null));
+        }
+        else if (wizardLocation == WizardLocation.PART2_TIME && CustomerStateManager.getInstance().getSubscriber() != null) {
+            if (comboBoxTime.getValue() == null){
+                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter the time you wish to order");
+                return;
+            }
+        }
+        else if (isOrderCreationDone()){
+            controller.requestOrder(
+                    Integer.parseInt(txtFieldNumberOfPeople.getText()),
+                    LocalDateTime.of(
+                            datePickerOrder.getValue(),
+                            LocalTime.parse(comboBoxTime.getValue())
+                    ),
+                    fillSubscriberIDDetails(),
+                    txtFieldEmail.getText(),
+                    txtFieldPhoneNumber.getText()
+            );
+            setWizardLocation(WizardLocation.PART1_NUM_OF_PEOPLE_AND_DATE);
             return;
         }
-        //Validate Each of the wizard setups checking input
-        ++wizardLocation;
+        setWizardLocation(wizardLocation + 1);
         adjustFormToWizardSetup();
-//        // reading data from the form
-//        int guests;
-//        try {
-//            guests = Integer.parseInt(txtFieldNumberOfPeople.getText().trim());
-//        } catch (NumberFormatException e) {
-//            BistroUtilities.showMessage("Error","Please enter a valid number of people");
-//            return;
-//        }
-//
-//        LocalDate date = datePickerOrder.getValue();
-//        if (date == null) {
-//            BistroUtilities.showMessage("Error","Please select a date");
-//            return;
-//        }
-//
-//        String timeStr = comboBoxTime.getValue();
-//        if (timeStr == null) {
-//            BistroUtilities.showMessage("Error","Please select a time");
-//            return;
-//        }
-//
-//        LocalDateTime orderDateTime =
-//                LocalDateTime.of(date, LocalTime.parse(timeStr));
-//
-//
-//        Integer subscriberId = null;
-//        String email = null;
-//        String phoneNumber = null;
-//
-//        if (radioSubscriber.isSelected()) {
-//            // Subscriber selected
-//            String idText = txtFieldSubscriberId.getText().trim();
-//            if (idText.isEmpty()) {
-//                BistroUtilities.showMessage("Error","Please enter Subscriber ID");
-//                return;
-//            }
-//            subscriberId = Integer.parseInt(idText);
-//        } else {
-//            // Guest selected
-//            email = txtFieldEmail.getText().trim();
-//            phoneNumber = txtFieldPhoneNumber.getText().trim();
-//
-//            if (!BistroUtilities.isValidEmail(email)) {
-//
-//            }
-//            if (!BistroUtilities.isValidPhoneNumber(phoneNumber)) {}
-//        }
-//
-//        // --------------------------------------------------
-//        // calling Controller / Client
-//        // --------------------------------------------------
-//        //Calling controller.createOrder...
     }
 
     @FXML
     private void onPreviousButtonClicked(ActionEvent event) {
-        --wizardLocation;
+        setWizardLocation(wizardLocation - 1);
         adjustFormToWizardSetup();
     }
 
@@ -163,7 +161,7 @@ public class OrderFormGUIController implements IServerResponseListener {
         BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Main/MainForm.fxml",
-                "Bistro"
+                "Bistro Restaurant"
         );
     }
     @FXML
@@ -195,14 +193,13 @@ public class OrderFormGUIController implements IServerResponseListener {
     }
 
     private void clearForm() {
-        txtFieldEmail.setText("");
-        txtFieldPhoneNumber.setText("");
-        txtFieldNumberOfPeople.setText("");
-        txtFieldSubscriberId.setText("");
+        txtFieldEmail.clear();
+        txtFieldPhoneNumber.clear();
+        txtFieldNumberOfPeople.clear();
+        txtFieldSubscriberId.clear();
         datePickerOrder.setValue(null);
-        comboBoxTime.getSelectionModel().clearSelection();
+        comboBoxTime.getItems().clear();
         radioGuest.setSelected(true);
-        txtFieldEmail.setStyle(null);
     }
 
     private void adjustFormToWizardSetup() {
@@ -218,6 +215,7 @@ public class OrderFormGUIController implements IServerResponseListener {
                 btnPrevious.setVisible(false);
                 lblTime.setVisible(false);
                 comboBoxTime.setVisible(false);
+                comboBoxTime.getItems().clear();
                 lblWhoAmI.setVisible(false);
                 lblOR.setVisible(false);
                 radioGuest.setVisible(false);
@@ -261,6 +259,7 @@ public class OrderFormGUIController implements IServerResponseListener {
                 btnPrevious.setVisible(true);
                 lblTime.setVisible(true);
                 comboBoxTime.setVisible(true);
+                comboBoxTime.setDisable(true);
                 break;
             case WizardLocation.PART3_USER_TYPE:
                     lblWizardTitle.setText("Part 3 / 3 - Who will this order be placed for?");
@@ -274,5 +273,66 @@ public class OrderFormGUIController implements IServerResponseListener {
                     radioSubscriber.setVisible(true);
                     adjustElementsBasedOnUserType(null);
         }
+    }
+
+    private boolean isOrderCreationDone(){
+        if ((wizardLocation == WizardLocation.PART2_USER_TYPE && CustomerStateManager.getInstance().getSubscriber() != null)) return true;
+        else {
+            if (radioGuest.isSelected()){
+                if (txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
+                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter either email or phone number");
+                    return false;
+                }
+                if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
+                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid email address");
+                    return false;
+                }
+                if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
+                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid phone number");
+                    return false;
+                }
+            }
+            else if (radioSubscriber.isSelected()){
+                if (txtFieldSubscriberId.getText().isEmpty()){
+                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a subscriber id");
+                    return false;
+                }
+                if (!BistroUtilities.isNumeric(txtFieldSubscriberId.getText())){
+                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid subscriber id");
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    private void setWizardLocation(int location){
+        wizardLocation = location;
+    }
+
+    private void setAvailableTimesForComboBox(Message message){
+        List<LocalTime> availableTimes = (List<LocalTime>) message.getData();
+        for (LocalTime time : availableTimes) {
+            comboBoxTime.getItems().add(time.toString());
+        }
+    }
+
+    private Integer fillSubscriberIDDetails(){
+        return ((radioSubscriber.isSelected() || CustomerStateManager.getInstance().getSubscriber() != null) && !txtFieldSubscriberId.getText().isEmpty()) ? Integer.parseInt(txtFieldSubscriberId.getText()) : null;
+    }
+
+    private void setDatePicker(){
+        datePickerOrder.setEditable(false);
+        datePickerOrder.setPromptText("Select Order Date");
+        datePickerOrder.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+
+                if (empty || date.isBefore(LocalDate.now())) {
+                    setDisable(true);
+                }
+            }
+        });
     }
 }

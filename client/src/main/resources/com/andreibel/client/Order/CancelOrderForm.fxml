@@ -24,7 +24,7 @@
       </Label>
 
       <!-- Order Number TextField -->
-      <TextField fx:id="txtFieldOrderNumber" layoutX="170.0" layoutY="100.0" prefHeight="28.0" prefWidth="180.0" promptText="Enter your confrimation code ..." />
+      <TextField fx:id="txtFieldConfirmationCode" layoutX="170.0" layoutY="100.0" prefHeight="28.0" prefWidth="180.0" promptText="Enter your confrimation code ..." />
 
       <!-- Cancel Order Button -->
       <Button fx:id="btnCancelOrder" layoutX="140.0" layoutY="150.0" mnemonicParsing="false" onAction="#onCancelOrderButtonClicked" prefHeight="38.0" prefWidth="120.0" style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 14px;" text="Cancel My Order">

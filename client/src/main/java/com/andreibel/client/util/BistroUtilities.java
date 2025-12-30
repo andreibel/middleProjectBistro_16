@@ -72,31 +72,27 @@ public final class BistroUtilities {
         stage.show();
     }
 
-//    public static void switchScreen(ActionEvent event, String fxmlPath, String title)
-//            throws IOException {
-//
-//        // Load the new FXML
-//        FXMLLoader loader = new FXMLLoader(BistroUtilities.class.getResource("/com/andreibel/client" + fxmlPath));
-//        Parent root = loader.load();
-//
-//        // Get the current stage from the event source
-//        Stage stage = (Stage) ((Node) event.getSource())
-//                .getScene()
-//                .getWindow();
-//
-//        // Set new scene and title
-//        if (!sceneManager.containsKey(getFXMLName(fxmlPath))){
-//
-//        }
-//        Scene scene = new Scene(root);
-//        stage.setScene(scene);
-//        stage.setTitle(title);
-//        stage.show();
-//    }
+    /**
+     * Adds a {@link Scene} to the scene cache using the base FXML file name as the key.
+     *
+     * <p>This method allows scenes to be manually registered in the scene manager,
+     * enabling reuse of already created scenes without reloading their associated
+     * FXML files.</p>
+     *
+     * <p>The scene is stored using the FXML file name (without the ".fxml" extension)
+     * extracted from the provided path.</p>
+     *
+     * @param scene    the {@link Scene} instance to store in the scene cache
+     * @param fxmlPath the relative path to the FXML file associated with the scene
+     *                 (e.g. {@code "/Order/OrderForm.fxml"})
+     */
+    public static void addToSceneManager(Scene scene, String fxmlPath) {
+        sceneManager.put(getFXMLName(fxmlPath), scene);
+    }
 
     // Regex pattern for a valid phone number
     private static final Pattern PHONE_PATTERN = Pattern.compile(
-            "^\\+?\\d{1,3}?[- .]?\\(?\\d{1,4}?\\)?[- .]?\\d{1,4}[- .]?\\d{1,9}$"
+            "^(?:\\+?\\d{1,3}?[- .]?\\(?\\d{1,4}?\\)?[- .]?\\d{1,4}[- .]?\\d{1,9})?$"
     );
 
     /**
@@ -125,7 +121,7 @@ public final class BistroUtilities {
     }
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+            "^(?:[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+)?$\n"
     );
 
     /**

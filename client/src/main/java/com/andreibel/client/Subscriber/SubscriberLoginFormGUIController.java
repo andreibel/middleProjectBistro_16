@@ -9,10 +9,13 @@ import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+
+//TODO: Finish onServerResponse
 
 public class SubscriberLoginFormGUIController implements IServerResponseListener {
 
@@ -29,6 +32,7 @@ public class SubscriberLoginFormGUIController implements IServerResponseListener
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
+        txtFieldSubscriberId.clear();
     }
 
     @Override
@@ -37,18 +41,34 @@ public class SubscriberLoginFormGUIController implements IServerResponseListener
             return;
         //NEED TO ADD NEW APICallType SUBSCRIBER_LOGIN_ERROR
         else if (message.getType() == APICallType.ERROR){
-            BistroUtilities.showMessage("Login Error", "Either the username or password is incorrect.");
+            BistroUtilities.showMessage("Bistro Restaurant - Login Error", "Either the username or password is incorrect.");
             return;
         }
+        txtFieldSubscriberId.clear();
         CustomerStateManager.getInstance().setSubscriber(((SubscriberResponse)message.getData()));
-        BistroUtilities.switchScreen(btnLogin, "/Subscriber/SubscriberZoneForm.fxml", "Bistro - Subscriber Zone");
+        BistroUtilities.switchScreen(btnLogin, "/Subscriber/SubscriberZoneForm.fxml", "Bistro Restaurant - Subscriber Zone");
     }
 
     @FXML
     private void onLoginButtonClicked(ActionEvent event) {
+        if (txtFieldSubscriberId.getText().isEmpty()) {
+            BistroUtilities.showMessage("Bistro Restaurant - Login Error", "Please enter a valid username.");
+            return;
+        }
+        if (!BistroUtilities.isNumeric(txtFieldSubscriberId.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant - Login Error", "Please enter a valid username.");
+            return;
+        }
         controller.requestSubscriberLogin(Integer.parseInt(txtFieldSubscriberId.getText()));
     }
     @FXML
-    private void onGoBackButtonClicked(ActionEvent event) {}
+    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        txtFieldSubscriberId.clear();
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Main/MainForm.fxml",
+                "Bistro Restaurant"
+        );
+    }
 
 }

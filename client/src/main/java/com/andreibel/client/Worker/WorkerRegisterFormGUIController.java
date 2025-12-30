@@ -2,6 +2,7 @@ package com.andreibel.client.Worker;
 
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
+import com.andreibel.message.APICallType;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -32,7 +33,6 @@ public class WorkerRegisterFormGUIController implements IServerResponseListener 
 
     @Override
     public void onServerResponse(Message message) {
-
     }
     @FXML
     private void onButtonRegisterWorkerClicked(ActionEvent event) {

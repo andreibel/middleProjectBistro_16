@@ -3,11 +3,13 @@ package com.andreibel.client.Client;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.SubscriberRequest;
 import com.andreibel.message.DTO.WorkerAuth;
 import com.andreibel.message.DTO.WorkerNewRequest;
 import com.andreibel.message.Message;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,43 +46,24 @@ public class BistroClientController {
             BistroUtilities.showMessage("Error","Empty response from server");
             return;
         }
+        //Only one GUI Controller will invoke onServerResponse method
         for (IServerResponseListener listener : listeners)
             listener.onServerResponse(response);
-//        switch (response.getType()) {
-//            case GET_ALL_ORDERS_RESPONSE -> {
-//                @SuppressWarnings("unchecked")
-//                List<OrderResponse> orders = (List<OrderResponse>) response.getData();
-//                //Platform.runLater(() -> guiController.setOrdersToGUI(orders));
-//            }
-//
-//            case UPDATE_ORDER_RESPONSE -> {
-//                OrderResponse updated = (OrderResponse) response.getData();
-//                //Platform.runLater(() -> guiController.refreshSingleOrder(updated));
-//            }
-//
-//            case ERROR -> {
-//                String msg = response.getData() != null ?
-//                        response.getData().toString() : "Unknown error";
-//                BistroUtilities.showMessage("Error",msg);
-//            }
-//
-//            default -> BistroUtilities.showMessage("Error","Unhandled response type: " + response.getType());
-//
-        //Only one GUI Controller will complete onServerResponse the others will terminate at the start of the method
     }
 
 
 
-    //=======================order Request==========================
+    //=======================Order Request==========================
 
     public void requestOrders() {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.GET_ALL_ORDERS, null));
     }
-
-//    public void updateOrderStatus(int){
-//        if (!isClientAvailable()) return;
-//    }
+    //NEED TO CHANGE ORDER REQUEST AND ADD A FIELD FOR STATUS
+    public void requestUpdateOrderStatus(OrderRequest req) {
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.UPDATE_ORDER, req));
+    }
     public  void requestOrder(int numberOfPeople, LocalDateTime date, Integer subscriberId, String email, String phoneNumber) {
         if (!isClientAvailable()) return;
         OrderRequest req = new OrderRequest(
@@ -94,20 +77,45 @@ public class BistroClientController {
         client.send(new Message(APICallType.CREATE_ORDER, req));
     }
 
+    public void requestAvailableTimes(OrderRequest req) {
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.GET_ALL_TIMES_IN_DATE, req));
+    }
+
     public void requestOrderCancel(int confirmationCode){
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.DELETE_ORDER, confirmationCode));
     }
 
     //=======================Subscriber Request==========================
-    public void requestSubscriberLogin(int subscriberId) {
+    public void requestSubscriberLogin(Integer subscriberId) {
         if (!isClientAvailable()) return;
-        //Need to add in the APICallType LOGIN_SUBSCRIBER
-        //client.send(new Message(APICallType.LOGIN_SUBSCRIBER, subscriberId));
+        //client.send(new Message(APICallType.SUBSCRIBER_LOGIN, subscriberId));
     }
     public void requestAllSubscriberOrders(int subscriberId) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.GET_SUBSCRIBER_ORDERS, subscriberId));
+    }
+
+    public void requestSubscriberUpdateDetails(SubscriberRequest req){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.UPDATE_SUBSCRIBER, req));
+    }
+
+    //=======================Table Request==========================
+    public void requestArrivalConfirmation(OrderRequest req) {
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.ORDER_ARRIVED, req));
+    }
+
+    public void requestGetTable(Integer confirmationCode, Integer subscriberId) {
+        if (!isClientAvailable()) return;
+        //client.send(new Message(APICallType.GET_TABLE, ...)
+    }
+
+    public void requestLostConfirmationCode(String email, String phoneNumber) {
+        if (!isClientAvailable()) return;
+        //client.send(new Message(APICallType.LOST_CNFRM_CODE, new OrderRequest(null, null, null, null, email, phoneNumber)));
     }
 
     //=======================Worker Request==========================
@@ -117,10 +125,24 @@ public class BistroClientController {
         client.send(new Message(APICallType.LOGIN_WORKER, new WorkerAuth(username, password)));
     }
 
+    public void requestRegisterNewSubscriber(SubscriberRequest req) {
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.CREATE_SUBSCRIBER, req));
+    }
+
+    public void requestSubscribersReport(){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.GET_ALL_SUBSCRIBERS, null));
+    }
+
+    public void requestScheduleReportForCurrentMonth(){
+        if (!isClientAvailable()) return;
+        //client.send(new Message(APICallType.SCHEDULE_REPORT_REQUEST, LocalDate.now()));
+    }
 
     private boolean isClientAvailable() {
         if (client == null || !client.isConnected()) {
-            BistroUtilities.showMessage("Error","Client not connected");
+            BistroUtilities.showMessage("Bistro Restaurant - Client Error","Client not connected");
             return false;
         }
         return true;

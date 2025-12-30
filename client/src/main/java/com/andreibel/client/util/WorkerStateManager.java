@@ -4,48 +4,70 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Manages the application-wide state of the currently logged-in worker.
+ * Singleton class that manages the global worker state for the client application.
  *
- * <p>This class follows the <b>Singleton</b> design pattern and provides a
- * centralized place to store and access worker-related session information,
- * such as the worker's name and managerial privileges.</p>
+ * <p>This class provides a central location to store and share worker-related
+ * information across different GUI controllers (FXML forms) without passing
+ * data explicitly between screens.</p>
  *
- * <p>The state stored in this manager represents the worker who is currently
- * authenticated in the client application and should be accessed via
- * {@link #getInstance()}.</p>
+ * <p>The main responsibilities of this class include:</p>
+ * <ul>
+ *     <li>Storing the worker's name</li>
+ *     <li>Tracking whether the worker is a manager</li>
+ *     <li>Providing a single shared instance accessible via {@link #getInstance()}</li>
+ * </ul>
+ *
+ * <p>This class does not perform any server communication; it purely stores
+ * client-side state.</p>
+ *
+ * <p>Example usage:</p>
+ * <pre>
+ * WorkerStateManager state = WorkerStateManager.getInstance();
+ * state.setWorkerName("John Doe");
+ * if (state.isManager()) {
+ *     // Show manager-only controls
+ * }
+ * </pre>
  */
 @Getter
 @Setter
 public class WorkerStateManager {
 
     /**
-     * The full name of the currently logged-in worker.
-     */
-    private String workerName;
-
-    /**
-     * Indicates whether the current worker has manager privileges.
-     * {@code true} if the worker is a manager; {@code false} otherwise.
-     */
-    private boolean isManager;
-
-    /**
-     * The singleton instance of {@code WorkerStateManager}.
+     * The single instance of {@link WorkerStateManager}.
      */
     private static WorkerStateManager instance;
 
     /**
-     * Returns the singleton instance of {@code WorkerStateManager}.
-     * <p>
-     * If the instance does not yet exist, it is created lazily.
-     * </p>
+     * The name of the currently logged-in worker.
+     */
+    private String workerName;
+
+    /**
+     * Whether the currently logged-in worker is a manager.
+     */
+    private boolean isManager;
+
+    /**
+     * Returns the singleton instance of {@link WorkerStateManager}.
      *
-     * @return the singleton {@code WorkerStateManager} instance
+     * <p>If the instance does not exist yet, it is created.</p>
+     *
+     * @return the shared WorkerStateManager instance
      */
     public static WorkerStateManager getInstance() {
         if (instance == null) {
             instance = new WorkerStateManager();
         }
         return instance;
+    }
+
+    /**
+     * Checks if a worker has logged in.
+     *
+     * @return {@code true} if a worker has logged in, {@code false} otherwise
+     */
+    public static boolean hasWorkerLoggedIn() {
+        return instance != null;
     }
 }
