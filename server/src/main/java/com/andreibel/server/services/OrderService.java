@@ -16,8 +16,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-
-/**
+ /**
  * Application service responsible for managing restaurant orders and computing availability.
  *
  * <p>
@@ -131,7 +130,7 @@ public class OrderService {
      */
     public OrderResponse createOrder(OrderRequest request) {
         return tx.inTransaction(() -> {
-            Order newOrder = OrderMapper.mapOrderRequestToOrder(request);
+            Order newOrder = OrderMapper.mapNewOrderRequestToOrder(request);
             return OrderMapper.mapOrderToOrderResponse(orderRepository.save(newOrder));
         });
     }

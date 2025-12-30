@@ -13,6 +13,7 @@ public enum APICallType {
     COMPLETE_ORDER,
     GET_ALL_TIMES_IN_DATE,
     // order-related calls server -> client
+
     // already authenticated in the server the behavior
     GET_ALL_ORDERS_RESPONSE,
     GET_ONE_ORDER_RESPONSE,
@@ -22,6 +23,16 @@ public enum APICallType {
     ORDER_ARRIVED_RESPONSE,
     COMPLETE_ORDER_RESPONSE,
     GET_ALL_TIMES_IN_DATE_RESPONSE,
+    GET_ALL_ORDERS_ERROR,
+    GET_ONE_ORDER_ERROR,
+    UPDATE_ORDER_ERROR,
+    DELETE_ORDER_ERROR,
+    CREATE_ORDER_ERROR,
+    ORDER_ARRIVED_ERROR,
+    COMPLETE_ORDER_ERROR,
+    GET_ALL_TIMES_IN_DATE_ERROR,
+
+
 
     // subscriber-related calls client -> server
     GET_ALL_SUBSCRIBERS,
@@ -35,6 +46,11 @@ public enum APICallType {
     GET_SUBSCRIBER_ORDERS_RESPONSE,
     CREATE_SUBSCRIBER_RESPONSE,
     UPDATE_SUBSCRIBER_RESPONSE,
+    GET_ALL_SUBSCRIBERS_ERROR,
+    GET_ONE_SUBSCRIBER_ERROR,
+    GET_SUBSCRIBER_ORDERS_ERROR,
+    CREATE_SUBSCRIBER_ERROR,
+    UPDATE_SUBSCRIBER_ERROR,
 
     // worker-related calls client -> server
     LOGIN_WORKER,
