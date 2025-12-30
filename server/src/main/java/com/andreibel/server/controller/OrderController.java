@@ -1,11 +1,13 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.UUID;
 
 import static com.andreibel.message.APICallType.*;
 
@@ -60,12 +62,9 @@ public class OrderController {
      * @return response message containing the created order
      */
     public Message createOrder(Message message) {
-        return new Message(
-                CREATE_ORDER_RESPONSE,
-                orderService.createOrder(
-                        (OrderRequest) message.getData()
-                )
-        );
+        OrderResponse newOrder = orderService.createOrder((OrderRequest) message.getData());
+        if (newOrder == null) return new Message(CREATE_ORDER_ERROR, null);
+        return new Message(CREATE_ORDER_RESPONSE, newOrder);
     }
 
     /**
@@ -74,16 +73,14 @@ public class OrderController {
      * <li>{@code conformationCode}</li>
      * all other fields are null or ignored
      * </p>
+     *
      * @param message request message containing {@link OrderRequest}
      * @return response message containing the requested order
      */
     public Message getOrder(Message message) {
-        return new Message(
-                GET_ONE_ORDER_RESPONSE,
-                orderService.getOrderByConformationCode(
-                      (  (OrderRequest) message.getData()).getConformationCode()
-                )
-        );
+        OrderResponse orderResponse = orderService.getOrderByConformationCode((UUID) message.getData());
+        if (orderResponse == null) return new Message(GET_ONE_ORDER_ERROR, null);
+        return new Message(GET_ONE_ORDER_RESPONSE, orderResponse);
     }
 
     /**
@@ -91,11 +88,10 @@ public class OrderController {
      *
      * @return response message containing all orders
      */
-    public Message getAllOrders() {
-        return new Message(
-                GET_ALL_ORDERS_RESPONSE,
-                orderService.getAllOrders()
-        );
+    public Message getAllOrdersBySubscriber() {
+        List<OrderResponse> orders = orderService.getAllOrders();
+        if (orders == null) return new Message(GET_ALL_ORDERS_SUB_ERROR, null);
+        return new Message(GET_ALL_ORDERS_SUB_RESPONSE, orders);
     }
 
     /**
@@ -104,16 +100,14 @@ public class OrderController {
      * <li>{@code conformationCode}</li>
      * all other fields are null or ignored
      * </p>
+     *
      * @param message request message containing {@link OrderRequest}
      * @return response message containing the cancelled order
      */
     public Message deleteOrder(Message message) {
-        return new Message(
-                DELETE_ORDER_RESPONSE,
-                orderService.deleteOrder(
-                        ((OrderRequest) message.getData()).getConformationCode()
-                )
-        );
+        OrderResponse orderResponse = orderService.deleteOrder((UUID)message.getData());
+        if (orderResponse == null) return new Message(DELETE_ORDER_ERROR, null);
+        return new Message(DELETE_ORDER_RESPONSE, orderResponse);
     }
 
     /**
@@ -122,28 +116,28 @@ public class OrderController {
      * <li>{@code conformationCode}</li>
      * all other fields are null or ignored
      * </p>
+     *
      * @param message request message containing {@link OrderRequest}
      * @return response message containing the updated order
      */
     public Message updateArrives(Message message) {
-        return new Message(
-                ORDER_ARRIVED_RESPONSE,
-                orderService.orderArrives(
-                        ((OrderRequest) message.getData()).getConformationCode()
-                )
-        );
+        OrderResponse orderResponse = orderService.orderArrives((UUID)message.getData());
+        if (orderResponse == null) return new Message(ORDER_ARRIVED_ERROR, null);
+        return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 
     /**
      * Handles a request to complete (close) an order.
      * <p>the relevant fields in the {@link OrderRequest} object are:
      * <li>{@code conformationCode}</li>
-     *  all other fields are null or ignored
+     * all other fields are null or ignored
      * </p>
+     *
      * @param message request message containing {@link OrderRequest}
      * @return response message containing the updated order
      */
     public Message closeOrder(Message message) {
+
         return new Message(
                 COMPLETE_ORDER_RESPONSE,
                 orderService.completeOrder(
@@ -160,6 +154,7 @@ public class OrderController {
      * <li>{@code numberOfGuests}</li>
      * all other fields are null or ignored
      * </p>
+     *
      * @param message request message containing {@link OrderRequest}
      * @return response message containing a list of available times
      */

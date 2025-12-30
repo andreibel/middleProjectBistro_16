@@ -83,12 +83,11 @@ public class OrderRepository {
     public List<Order> findAll() throws SQLException {
         String sql = """
                 SELECT *
-                FROM bistro.`Order`;
+                FROM bistro.`Order`
+                WHERE subscriberId IS NOT NULL;
                 """;
         List<Order> orders = new ArrayList<>();
-
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 orders.add(mapRelToOrder(rs));
             }

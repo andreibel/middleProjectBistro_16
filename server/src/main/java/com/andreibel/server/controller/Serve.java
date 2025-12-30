@@ -109,25 +109,33 @@ public class Serve extends AbstractServer {
             }
 
             Message response = switch (message.getType()) {
-                // orders calls
-                case GET_ALL_ORDERS -> orderController.getAllOrders();
-                case CREATE_ORDER -> orderController.createOrder(message);
-                case GET_ONE_ORDER -> orderController.getOrder(message);
+                case CREATE_ORDER -> orderController.createOrder(message); // done
                 case DELETE_ORDER -> orderController.deleteOrder(message);
+                case GET_ALL_ORDERS_SUB -> orderController.getAllOrdersBySubscriber();
+                case GET_ONE_ORDER -> orderController.getOrder(message);
                 case ORDER_ARRIVED -> orderController.updateArrives(message);
+                case ORDER_LOST_CONFORMATION_CODE -> null;
                 case COMPLETE_ORDER -> orderController.closeOrder(message);
-                case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
-                // workers calls
-                case LOGIN_WORKER -> workerController.login(message);
-                case WORKER_CREATE -> workerController.createWorker(message);
-
-                // subscribers calls
-                case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();
-                case GET_ONE_SUBSCRIBER -> subscriberController.getSub(message);
-                case GET_SUBSCRIBER_ORDERS -> subscriberController.getSubOrders(message);
-                case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
-                case UPDATE_SUBSCRIBER -> subscriberController.updateSub(message);
-                // unknown / unsupported
+                case GET_ALL_TIMES_IN_DATE -> null;
+                case GET_ALL_SUBSCRIBERS -> null;
+                case SUBSCRIBER_LOGIN -> null;
+                case GET_SUBSCRIBER_ORDERS -> null;
+                case UPDATE_SUBSCRIBER -> null;
+                case WORKER_LOGIN -> null;
+                case WORKER_CREATE -> null;
+                case CREATE_SUBSCRIBER -> null;
+                case ADD_SPECIAL_DAY -> null;
+                case CHANGE_BISTRO_TIME -> null;
+                case GET_ALL_TABLES -> null;
+                case EDIT_BISTRO_LAYOUT -> null;
+                case SCHEDULES_REPORT -> null;
+                case SUBSCRIBER_REPORT -> null;
+                case GET_WAITING_LIST -> null;
+                case GET_ALL_ACTIVE_ORDER -> null;
+                case GET_ALL_ARRIVED_AND_NOT_COMPLETE -> null;
+                case ADD_TO_WAITING_LIST -> null;
+                case REMOVE_FROM_WAITING_LIST -> null;
+                case ARRIVE_WAITING_LIST -> null;
                 default -> null;
             };
 

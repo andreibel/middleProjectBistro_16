@@ -11,25 +11,25 @@ public enum APICallType {
      * |  $$$$$$/| $$      |  $$$$$$$|  $$$$$$$| $$
      *  \______/ |__/       \_______/ \_______/|__/
      */
-    CREATE_ORDER, // OrderRequest
-    CREATE_ORDER_RESPONSE, // OrderResponse
-    CREATE_ORDER_ERROR,
+    CREATE_ORDER, // OrderRequest // done✅
+    CREATE_ORDER_RESPONSE, // OrderResponse✅
+    CREATE_ORDER_ERROR,//✅
 
-    DELETE_ORDER, // UUID
-    DELETE_ORDER_RESPONSE, // no required
-    DELETE_ORDER_ERROR,
+    DELETE_ORDER, // UUID✅
+    DELETE_ORDER_RESPONSE, // no required✅
+    DELETE_ORDER_ERROR,//✅
 
-    GET_ALL_ORDERS_SUB, // no required
-    GET_ALL_ORDERS_SUB_RESPONSE, // List<OrderResponse>
-    GET_ALL_ORDERS_SUB_ERROR,
+    GET_ALL_ORDERS_SUB, // no required ✅
+    GET_ALL_ORDERS_SUB_RESPONSE, // List<OrderResponse>✅
+    GET_ALL_ORDERS_SUB_ERROR,//✅
 
-    GET_ONE_ORDER, // UUID
-    GET_ONE_ORDER_RESPONSE, // OrderResponse
-    GET_ONE_ORDER_ERROR,
+    GET_ONE_ORDER, // UUID✅
+    GET_ONE_ORDER_RESPONSE, // OrderResponse✅
+    GET_ONE_ORDER_ERROR, // ✅
 
-    ORDER_ARRIVED, // OrderRequest
-    ORDER_ARRIVED_RESPONSE, // OrderResponse
-    ORDER_ARRIVED_WAITING_RESPONSE, // WaitingResponse
+    ORDER_ARRIVED, // OrderRequest✅
+    ORDER_ARRIVED_RESPONSE, // OrderResponse✅
+    ORDER_ARRIVED_WAITING_RESPONSE, // WaitingResponse✅
     ORDER_ARRIVED_ERROR,
 
     ORDER_LOST_CONFORMATION_CODE, // OrderRequest
@@ -37,7 +37,7 @@ public enum APICallType {
     ORDER_LOST_CONFORMATION_CODE_ERROR,
 
     COMPLETE_ORDER, // UUID,
-    COMPLETE_ORDER_RESPONSE, // RecipeFile
+    COMPLETE_ORDER_RESPONSE, // File
     COMPLETE_ORDER_ERROR,
 
     GET_ALL_TIMES_IN_DATE, // OrderRequest

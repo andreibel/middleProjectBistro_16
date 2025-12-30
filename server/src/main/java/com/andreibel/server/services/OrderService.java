@@ -10,7 +10,11 @@ import com.andreibel.server.entity.OpenTime;
 import com.andreibel.server.entity.Order;
 import com.andreibel.server.entity.Table;
 import com.andreibel.server.utils.OrderMapper;
+import com.andreibel.server.utils.SimpleInvoicePdf;
 
+import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -195,6 +199,7 @@ public class OrderService {
      * @return updated order as DTO (arrived state)
      */
     public OrderResponse orderArrives(UUID conformationCode) {
+        //TODO: add logic of arriving to bistro but not palace now available,
         return tx.inTransaction(() -> {
             orderRepository.setArrived(conformationCode);
             Order order = orderRepository.findByConformationCode(conformationCode);
@@ -217,10 +222,34 @@ public class OrderService {
      * @return updated order as DTO (completed state)
      */
     public OrderResponse completeOrder(UUID conformationCode) {
-        return tx.inTransaction(() -> {
+        OrderResponse orderResponse = tx.inTransaction(() -> {
             orderRepository.completeOrder(conformationCode);
             return OrderMapper.mapOrderToOrderResponse(orderRepository.findByConformationCode(conformationCode));
         });
+        var data = new SimpleInvoicePdf.InvoiceData(
+                "INV-2025-0007",
+                orderResponse.getConformationCode().toString(),
+                "Bistro",
+                "Haifa, Israel",
+                "Friend",
+                orderResponse.getPhoneNumber(),
+                orderResponse.getEmail(),
+                orderResponse.getNumberOfGuests(),
+                new BigDecimal("120.00"),
+                orderResponse.getSubscriberId() != null
+        );
+        try {
+            Path pdf = SimpleInvoicePdf.generate(
+                    Paths.get("templates/invoice.html"),
+                    Paths.get(System.getProperty("user.home"), "Documents", "BistroInvoices", "INV-2025-0007.pdf"),
+                    Paths.get("fonts/NotoSansHebrew-Regular.ttf"),
+                    data
+            );
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return orderResponse;
     }
 
     /**
