@@ -36,13 +36,9 @@ public class OrderFormGUIController implements IServerResponseListener {
     @FXML
     private TextField txtFieldNumberOfPeople;
     @FXML
-    private RadioButton radioGuest;
-    @FXML
     private Label lblEmail;
     @FXML
     private Label lblPhoneNumber;
-    @FXML
-    private Label lblWhoAmI;
     @FXML
     private Label lblNumberOfPeople;
     @FXML
@@ -50,15 +46,9 @@ public class OrderFormGUIController implements IServerResponseListener {
     @FXML
     private Label lblTime;
     @FXML
-    private Label lblSubscriberId;
-    @FXML
     private Label lblWizardTitle;
     @FXML
     private Label lblOR;
-    @FXML
-    private RadioButton radioSubscriber;
-    @FXML
-    private TextField txtFieldSubscriberId;
     @FXML
     private TextField txtFieldEmail;
     @FXML
@@ -98,14 +88,11 @@ public class OrderFormGUIController implements IServerResponseListener {
                 Platform.runLater(() -> {
                     comboBoxTime.setPromptText("No times available");  // safe now
                 });
+                return;
             }
             comboBoxTime.setPromptText("Select available times");
             comboBoxTime.setDisable(false);
         }
-    }
-    @FXML
-    private void onRadioUserTypeChanged(ActionEvent event) {
-        adjustElementsBasedOnUserType(event);
     }
     @FXML
     private void onOrderNowButtonClicked(ActionEvent event) {
@@ -123,7 +110,7 @@ public class OrderFormGUIController implements IServerResponseListener {
             }
             controller.requestAvailableTimes(new OrderRequest(null, Integer.parseInt(txtFieldNumberOfPeople.getText()), datePickerOrder.getValue().atStartOfDay(), null, null, null));
         }
-        else if (wizardLocation == WizardLocation.PART2_TIME && CustomerStateManager.getInstance().getSubscriber() != null) {
+        else if ((wizardLocation == WizardLocation.PART2_TIME && CustomerStateManager.getInstance().getSubscriber() != null) || wizardLocation == WizardLocation.PART2_TIME) {
             if (comboBoxTime.getValue() == null){
                 BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter the time you wish to order");
                 return;
@@ -164,42 +151,13 @@ public class OrderFormGUIController implements IServerResponseListener {
                 "Bistro Restaurant"
         );
     }
-    @FXML
-    private void adjustElementsBasedOnUserType(ActionEvent event) {
-        if(radioSubscriber.isSelected()){
-            lblSubscriberId.setVisible(true);
-            txtFieldSubscriberId.setVisible(true);
-            txtFieldSubscriberId.setManaged(true);
-            lblOR.setVisible(false);
-            lblEmail.setVisible(false);
-            txtFieldEmail.setVisible(false);
-            txtFieldEmail.setManaged(false);
-            lblPhoneNumber.setVisible(false);
-            txtFieldPhoneNumber.setVisible(false);
-            txtFieldPhoneNumber.setManaged(false);
-        }
-        else{
-            lblSubscriberId.setVisible(false);
-            txtFieldSubscriberId.setVisible(false);
-            txtFieldSubscriberId.setManaged(false);
-            lblOR.setVisible(true);
-            lblEmail.setVisible(true);
-            txtFieldEmail.setVisible(true);
-            txtFieldEmail.setManaged(true);
-            lblPhoneNumber.setVisible(true);
-            txtFieldPhoneNumber.setVisible(true);
-            txtFieldPhoneNumber.setManaged(true);
-        }
-    }
 
     private void clearForm() {
         txtFieldEmail.clear();
         txtFieldPhoneNumber.clear();
         txtFieldNumberOfPeople.clear();
-        txtFieldSubscriberId.clear();
         datePickerOrder.setValue(null);
         comboBoxTime.getItems().clear();
-        radioGuest.setSelected(true);
     }
 
     private void adjustFormToWizardSetup() {
@@ -216,16 +174,11 @@ public class OrderFormGUIController implements IServerResponseListener {
                 lblTime.setVisible(false);
                 comboBoxTime.setVisible(false);
                 comboBoxTime.getItems().clear();
-                lblWhoAmI.setVisible(false);
                 lblOR.setVisible(false);
-                radioGuest.setVisible(false);
-                radioSubscriber.setVisible(false);
                 lblPhoneNumber.setVisible(false);
                 txtFieldPhoneNumber.setVisible(false);
                 lblEmail.setVisible(false);
                 txtFieldEmail.setVisible(false);
-                lblSubscriberId.setVisible(false);
-                txtFieldSubscriberId.setVisible(false);
 
                 lblDate.setVisible(true);
                 datePickerOrder.setVisible(true);
@@ -248,13 +201,8 @@ public class OrderFormGUIController implements IServerResponseListener {
                 lblPhoneNumber.setVisible(false);
                 txtFieldPhoneNumber.setVisible(false);
                 lblOR.setVisible(false);
-                radioGuest.setVisible(false);
-                radioSubscriber.setVisible(false);
-                lblWhoAmI.setVisible(false);
                 lblEmail.setVisible(false);
                 txtFieldEmail.setVisible(false);
-                lblSubscriberId.setVisible(false);
-                txtFieldSubscriberId.setVisible(false);
 
                 btnPrevious.setVisible(true);
                 lblTime.setVisible(true);
@@ -267,40 +215,29 @@ public class OrderFormGUIController implements IServerResponseListener {
                     comboBoxTime.setVisible(false);
 
                     btnOrderNow.setText("Order Now");
-                    lblWhoAmI.setVisible(true);
                     lblOR.setVisible(true);
-                    radioGuest.setVisible(true);
-                    radioSubscriber.setVisible(true);
-                    adjustElementsBasedOnUserType(null);
+                    lblPhoneNumber.setVisible(true);
+                    txtFieldPhoneNumber.setVisible(true);
+                    lblOR.setVisible(true);
+                    lblEmail.setVisible(true);
+                    txtFieldEmail.setVisible(true);
         }
     }
 
     private boolean isOrderCreationDone(){
         if ((wizardLocation == WizardLocation.PART2_USER_TYPE && CustomerStateManager.getInstance().getSubscriber() != null)) return true;
         else {
-            if (radioGuest.isSelected()){
-                if (txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
-                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter either email or phone number");
-                    return false;
-                }
-                if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
-                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid email address");
-                    return false;
-                }
-                if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
-                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid phone number");
-                    return false;
-                }
+            if (txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
+                BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter either email or phone number");
+                return false;
             }
-            else if (radioSubscriber.isSelected()){
-                if (txtFieldSubscriberId.getText().isEmpty()){
-                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a subscriber id");
-                    return false;
-                }
-                if (!BistroUtilities.isNumeric(txtFieldSubscriberId.getText())){
-                    BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid subscriber id");
-                    return false;
-                }
+            if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
+                BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid email address");
+                return false;
+            }
+            if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
+                BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid phone number");
+                return false;
             }
             return true;
         }
@@ -318,7 +255,7 @@ public class OrderFormGUIController implements IServerResponseListener {
     }
 
     private Integer fillSubscriberIDDetails(){
-        return ((radioSubscriber.isSelected() || CustomerStateManager.getInstance().getSubscriber() != null) && !txtFieldSubscriberId.getText().isEmpty()) ? Integer.parseInt(txtFieldSubscriberId.getText()) : null;
+        return (CustomerStateManager.getInstance().getSubscriber() != null)  ? (Integer)CustomerStateManager.getInstance().getSubscriber().getSubscriberId() : null;
     }
 
     private void setDatePicker(){

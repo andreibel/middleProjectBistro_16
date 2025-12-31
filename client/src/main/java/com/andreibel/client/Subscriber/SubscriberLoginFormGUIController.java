@@ -46,7 +46,7 @@ public class SubscriberLoginFormGUIController implements IServerResponseListener
         }
         txtFieldSubscriberId.clear();
         CustomerStateManager.getInstance().setSubscriber(((SubscriberResponse)message.getData()));
-        BistroUtilities.switchScreen(btnLogin, "/Subscriber/SubscriberZoneForm.fxml", "Bistro Restaurant - Subscriber Zone");
+        BistroUtilities.switchScreen(btnLogin, "/Main/MainForm.fxml", "Bistro Restaurant");
     }
 
     @FXML

@@ -64,7 +64,7 @@ public class BistroClientController {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.UPDATE_ORDER, req));
     }
-    public  void requestOrder(int numberOfPeople, LocalDateTime date, Integer subscriberId, String email, String phoneNumber) {
+    public void requestOrder(int numberOfPeople, LocalDateTime date, Integer subscriberId, String email, String phoneNumber) {
         if (!isClientAvailable()) return;
         OrderRequest req = new OrderRequest(
                 null,

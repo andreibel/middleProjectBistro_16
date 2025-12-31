@@ -13,8 +13,7 @@ import java.io.IOException;
  * GUI controller for the subscriber zone screen.
  *
  * <p>This controller represents the main menu for a logged-in subscriber.
- * It provides navigation options such as viewing order history, creating a new
- * order, confirming arrival to get a table, editing subscriber information,
+ * It provides navigation options such as viewing order history, editing subscriber information,
  * and returning to the main screen.</p>
  *
  * <p>The controller personalizes the UI by displaying the subscriber's name,
@@ -53,38 +52,8 @@ public class SubscriberZoneFormGUIController {
     private void onButtonOrderHistoryClicked(ActionEvent event) throws IOException {
         BistroUtilities.switchScreen(
                 (Node)event.getSource(),
-                "/Subscriber/OrderListForm.fxml",
+                "/Subscriber/SubscriberOrderListForm.fxml",
                 "Bistro Restaurant - Orders History"
-        );
-    }
-
-    /**
-     * Navigates to the order creation screen.
-     *
-     * @param event the action event triggered by clicking the order now button
-     * @throws IOException if the FXML file cannot be loaded
-     */
-    @FXML
-    private void onButtonOrderNowClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen(
-                (Node)event.getSource(),
-                "/Order/OrderForm.fxml",
-                "Bistro Restaurant - Create Order"
-        );
-    }
-
-    /**
-     * Navigates to the table arrival confirmation screen.
-     *
-     * @param event the action event triggered by clicking the get table button
-     * @throws IOException if the FXML file cannot be loaded
-     */
-    @FXML
-    private void onButtonGetTableClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen(
-                (Node)event.getSource(),
-                "/Table/GetTableForm.fxml",
-                "Bistro Restaurant - Confirm Arrival"
         );
     }
 

@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="352.0" prefWidth="581.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Subscriber.SubscriberZoneFormGUIController">
+<AnchorPane prefHeight="301.0" prefWidth="581.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Subscriber.SubscriberZoneFormGUIController">
 
     <children>
 
@@ -18,29 +18,15 @@
         </Label>
 
         <!-- View Order History -->
-        <Button fx:id="btnOrderHistory" layoutX="204.0" layoutY="176.0" mnemonicParsing="false" onAction="#onButtonOrderHistoryClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="View my last orders">
+        <Button fx:id="btnOrderHistory" layoutX="204.0" layoutY="80.0" mnemonicParsing="false" onAction="#onButtonOrderHistoryClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="View my last orders">
             <tooltip>
                 <Tooltip text="View your previous orders and their details." wrapText="true" />
             </tooltip>
         </Button>
 
-        <!-- Get Table / Arrival -->
-        <Button fx:id="btnGetTable" layoutX="204.0" layoutY="125.0" mnemonicParsing="false" onAction="#onButtonGetTableClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px;" text="I have arrived for my order">
-            <tooltip>
-                <Tooltip text="Confirm your arrival so we can prepare your table." wrapText="true" />
-            </tooltip>
-        </Button>
-
-        <!-- Order Now -->
-        <Button fx:id="btnOrderNow" layoutX="204.0" layoutY="74.0" mnemonicParsing="false" onAction="#onButtonOrderNowClicked" prefHeight="40.0" prefWidth="174.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Order Now">
-            <tooltip>
-                <Tooltip text="Place a new order using your subscriber benefits." wrapText="true" />
-            </tooltip>
-        </Button>
-
         <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="298.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="40.0" prefWidth="112.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
-      <Button fx:id="btnEditInfo" layoutX="204.0" layoutY="232.0" mnemonicParsing="false" onAction="#onButtonEditInfoClicked" prefHeight="40.0" prefWidth="174.0" text="Edit my Information" />
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="242.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="40.0" prefWidth="112.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+      <Button fx:id="btnEditInfo" layoutX="204.0" layoutY="136.0" mnemonicParsing="false" onAction="#onButtonEditInfoClicked" prefHeight="40.0" prefWidth="174.0" text="Edit my Information" />
 
     </children>
 </AnchorPane>

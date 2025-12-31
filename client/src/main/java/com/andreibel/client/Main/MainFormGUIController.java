@@ -8,6 +8,8 @@ import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
@@ -28,6 +30,10 @@ import java.io.IOException;
  */
 public class MainFormGUIController {
 
+    @FXML
+    private AnchorPane rootPane;
+    @FXML
+    private Button btnSubscriber;
     /**
      * Initializes the main form controller after the FXML has been loaded.
      *
@@ -36,7 +42,20 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
+        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
         WorkerStateManager.getInstance().setManager(true);
+
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            onSceneShown();
+                        });
+                    }
+                });
+            }
+        });
     }
 
     /**
@@ -92,7 +111,7 @@ public class MainFormGUIController {
      */
     @FXML
     private void onSubscriberButtonClicked(ActionEvent event) throws IOException {
-        if (CustomerStateManager.hasSubscriberLoggedIn())
+        if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
             BistroUtilities.switchScreen((Node)event.getSource(), "/Subscriber/SubscriberZoneForm.fxml", "Bistro Restaurant - Subscriber Area");
         else
             BistroUtilities.switchScreen(
@@ -118,5 +137,24 @@ public class MainFormGUIController {
                 "/Worker/WorkerLoginForm.fxml",
                 "Bistro Restaurant - Worker Login"
         );
+    }
+    /**
+     * Handles the "No Order" button click event.
+     *
+     * <p>When invoked, this method switches the current scene to the
+     * "Dine-In without Order" form, allowing guests to be seated
+     * without placing an order in advance.</p>
+     *
+     * @param event the action event triggered by clicking the button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onNoOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node) event.getSource(), "/Order/NoOrderForm.fxml", "Bistro Restaurant - Dine-In without Order");
+    }
+
+    private void onSceneShown() {
+        if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
+            btnSubscriber.setText("Subscriber Area");
     }
 }
