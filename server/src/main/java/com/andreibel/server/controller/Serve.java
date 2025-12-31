@@ -45,6 +45,7 @@ public class Serve extends AbstractServer {
     /** Controller responsible for subscriber-related operations. */
     SubscriberController subscriberController;
 
+    WorkerController workerController;
     /**
      * GUI controller reference (optional).
      * Used to update UI on client connect/disconnect/exception events.
@@ -64,6 +65,7 @@ public class Serve extends AbstractServer {
         super(port);
         orderController = OrderController.getInstance();
         subscriberController = SubscriberController.getInstance();
+        workerController = WorkerController.getInstance();
     }
 
     /**
@@ -116,7 +118,8 @@ public class Serve extends AbstractServer {
                 case COMPLETE_ORDER -> orderController.closeOrder(message);
                 case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
                 // workers calls
-                case LOGIN_WORKER -> null; // TODO: implement login for workers
+                case LOGIN_WORKER -> workerController.login(message);
+                case WORKER_CREATE -> workerController.createWorker(message);
 
                 // subscribers calls
                 case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();

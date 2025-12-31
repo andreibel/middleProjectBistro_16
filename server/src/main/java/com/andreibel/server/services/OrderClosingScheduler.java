@@ -79,12 +79,7 @@ public class OrderClosingScheduler {
     private void scanAndNotify() {
 
         tx.inTransaction(() -> {
-            List<Order> due = orderRepository.findOrdersDueToClose(LocalDateTime.now());
-            for (Order o : due) {
-                System.out.println("[CLOSE] Order #" + o.getOrderNumber()
-                        + " started at " + o.getOrderDateTime()
-                        + " -> should be closed now");
-            }
+            orderRepository.findOrdersDueToClose(LocalDateTime.now());
             return null;
         });
 

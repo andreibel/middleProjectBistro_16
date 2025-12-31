@@ -13,7 +13,7 @@ import java.util.UUID;
 import static com.andreibel.server.utils.OrderMapper.mapRelToOrder;
 
 
-/**
+ /**
  * <h1>JDBC repository for {@link Order} entities.</h1>
  *
  * <p>
@@ -391,7 +391,7 @@ public class OrderRepository {
     public int setArrived(UUID conformationCode) throws SQLException {
         String sql = """
                 UPDATE bistro.`Order`
-                SET orderArrive = 1
+                SET orderArrive = 1, orderArriveDateTime = NOW()
                 WHERE conformationCode = ?;
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
@@ -425,7 +425,7 @@ public class OrderRepository {
     public void completeOrder(UUID conformationCode) throws SQLException {
         String sql = """
                 UPDATE bistro.`Order`
-                SET orderCancelled = 1
+                SET orderCompleted = 1
                 WHERE conformationCode = ?;
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
@@ -527,7 +527,7 @@ public class OrderRepository {
                 WHERE orderCancelled = 0
                   AND orderCompleted = 0
                   AND orderArrive = 0
-                  AND orderDateTime < ?
+                  AND orderArriveDateTime < ?
                 """;
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
         try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
@@ -570,23 +570,18 @@ public class OrderRepository {
      * @param now reference "current time" used to compute {@code now - 2h}
      * @return list of orders due to close
      */
-    public List<Order> findOrdersDueToClose(LocalDateTime now) throws SQLException {
+    public void findOrdersDueToClose(LocalDateTime now) throws SQLException {
         String sql = """
-                SELECT *
-                FROM bistro.`Order`
+                UPDATE bistro.`Order`
+                SET orderCompleted = 1
                 WHERE orderCancelled = 0
-                  AND orderCompleted = 0
                   AND orderArrive = 1
                   AND orderDateTime <= ?
                 """;
         LocalDateTime cutoff = now.minusHours(2);
-        List<Order> out = new ArrayList<>();
         try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(cutoff));
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) out.add(mapRelToOrder(rs));
-            }
+            ps.executeUpdate();
         }
-        return out;
     }
 }

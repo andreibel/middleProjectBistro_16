@@ -4,6 +4,9 @@ import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
+import java.time.LocalTime;
+import java.util.List;
+
 import static com.andreibel.message.APICallType.*;
 
 /**
@@ -162,12 +165,14 @@ public class OrderController {
      */
     public Message getAllAvailableTime(Message message) {
         OrderRequest data = (OrderRequest) message.getData();
+        List<LocalTime> allAvailableTimeInDate = orderService.getAllAvailableTimeInDate(
+                data.getOrderDateTime().toLocalDate(),
+                data.getNumberOfGuests()
+        );
+        allAvailableTimeInDate.forEach(System.out::println);
         return new Message(
                 GET_ALL_TIMES_IN_DATE_RESPONSE,
-                orderService.getAllAvailableTimeInDate(
-                        data.getOrderDateTime().toLocalDate(),
-                        data.getNumberOfGuests()
-                )
+                allAvailableTimeInDate
         );
     }
 }

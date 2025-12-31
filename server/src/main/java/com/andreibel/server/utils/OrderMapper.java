@@ -83,9 +83,15 @@ public class OrderMapper {
                 .orderNumber(rs.getInt(Order.ORDER_NUMBER))
                 .numberOfGuests(rs.getInt(Order.NUMBER_OF_GUESTS))
                 .conformationCode(UUID.fromString(rs.getString(Order.CONFIRMATION_CODE)))
-                .subscriberId(rs.getInt(Order.SUBSCRIBER_ID))
                 .orderDateTime(rs.getTimestamp(Order.ORDER_DATE_TIME).toLocalDateTime())
                 .placedOrderDateTime(rs.getTimestamp(Order.PLACED_ORDER_DATE_TIME).toLocalDateTime())
+                .orderArriveDateTime(rs.getTimestamp(Order.ORDER_ARRIVE_DATE_TIME).toLocalDateTime())
+                .orderCancelled(rs.getBoolean(Order.ORDER_CANCELLED))
+                .orderArrive(rs.getBoolean(Order.ORDER_ARRIVED))
+                .orderCompleted(rs.getBoolean(Order.ORDER_COMPLETED))
+                .subscriberId(rs.getInt(Order.SUBSCRIBER_ID))
+                .email(rs.getString(Order.EMAIL))
+                .phoneNumber(rs.getString(Order.PHONE_NUMBER))
                 .build();
     }
 }

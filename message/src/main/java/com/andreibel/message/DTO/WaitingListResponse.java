@@ -9,18 +9,18 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 @Builder
-public class OrderResponse implements Serializable {
+public class WaitingListResponse implements Serializable {
+    private int waitingNumber;
     private Integer numberOfGuests;
+    private LocalDateTime waitingDateTime;
+    private boolean isCurrentlyWaiting;
     private UUID conformationCode;
+    private Integer orderNumber;
     private Integer subscriberId; // optional
     private String email; // optional
-    private String phoneNumber; // optionals
-    private LocalDateTime orderDateTime;
-    private LocalDateTime placedOrderDateTime;
+    private String phoneNumber; // optional
 }
-
