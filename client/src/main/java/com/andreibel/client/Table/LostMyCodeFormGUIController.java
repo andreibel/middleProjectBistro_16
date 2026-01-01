@@ -43,22 +43,26 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
 
     @Override
     public void onServerResponse(Message message) {
-//        if (message.getType() != APICallType.LOST_CNFRM_CODE_RESPONSE)
-//            return;
-        clearForm();
-        BistroUtilities.showMessage("Lost My Code", "We've sent you the confrimation code to your email/phone number, please check");
+        if (message.getData() == APICallType.ORDER_LOST_CONFORMATION_CODE_RESPONSE){
+            clearForm();
+            BistroUtilities.showMessage("Bistro Restaurant", "We've sent you the confirmation code to your email/phone number, please check");
+        }
+        else if (message.getData() == APICallType.ORDER_LOST_CONFORMATION_CODE_ERROR){
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, we're unable to send you the confirmation code, please try again later");
+        }
+
     }
     @FXML
     private void onButtonRetrieveCodeClicked(ActionEvent event) {
         if(txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
-            BistroUtilities.showMessage("Bistro Restaurant - Lost My Code", "Please enter either  email address or phone number");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter either email address or phone number");
         }
         else{
             if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
-                BistroUtilities.showMessage("Bistro Restaurant - Lost My Code", "Please enter valid email address");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid email address");
             }
             else if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
-                BistroUtilities.showMessage("Bistro Restaurant - Lost My Code", "Please enter valid phone number");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid phone number");
             }
             else {
                 controller.requestLostConfirmationCode(txtFieldEmail.getText(), txtFieldPhoneNumber.getText());

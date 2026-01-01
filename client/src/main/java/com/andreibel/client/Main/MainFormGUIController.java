@@ -3,6 +3,7 @@ package com.andreibel.client.Main;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.client.util.WorkerStateManager;
+import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.SubscriberResponse;
 import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
@@ -42,7 +43,7 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
-        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
+        //CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
         WorkerStateManager.getInstance().setManager(true);
 
         rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {

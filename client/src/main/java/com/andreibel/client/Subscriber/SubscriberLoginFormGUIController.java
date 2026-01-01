@@ -37,26 +37,23 @@ public class SubscriberLoginFormGUIController implements IServerResponseListener
 
     @Override
     public void onServerResponse(Message message) throws IOException {
-        if (message.getType() != APICallType.GET_ONE_SUBSCRIBER_RESPONSE)
-            return;
-        //NEED TO ADD NEW APICallType SUBSCRIBER_LOGIN_ERROR
-        else if (message.getType() == APICallType.ERROR){
-            BistroUtilities.showMessage("Bistro Restaurant - Login Error", "Either the username or password is incorrect.");
-            return;
+        if (message.getType() == APICallType.SUBSCRIBER_LOGIN_RESPONSE){
+            txtFieldSubscriberId.clear();
+            CustomerStateManager.getInstance().setSubscriber(((SubscriberResponse)message.getData()));
+            BistroUtilities.switchScreen(btnLogin, "/Main/MainForm.fxml", "Bistro Restaurant");
         }
-        txtFieldSubscriberId.clear();
-        CustomerStateManager.getInstance().setSubscriber(((SubscriberResponse)message.getData()));
-        BistroUtilities.switchScreen(btnLogin, "/Main/MainForm.fxml", "Bistro Restaurant");
+        else if (message.getType() == APICallType.SUBSCRIBER_LOGIN_ERROR)
+            BistroUtilities.showMessage("Bistro Restaurant", "Either the username or password is incorrect.");
     }
 
     @FXML
     private void onLoginButtonClicked(ActionEvent event) {
         if (txtFieldSubscriberId.getText().isEmpty()) {
-            BistroUtilities.showMessage("Bistro Restaurant - Login Error", "Please enter a valid username.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid username.");
             return;
         }
         if (!BistroUtilities.isNumeric(txtFieldSubscriberId.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant - Login Error", "Please enter a valid username.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid username.");
             return;
         }
         controller.requestSubscriberLogin(Integer.parseInt(txtFieldSubscriberId.getText()));

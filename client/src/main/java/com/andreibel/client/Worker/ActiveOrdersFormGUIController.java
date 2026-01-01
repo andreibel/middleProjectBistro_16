@@ -7,8 +7,6 @@ import javafx.fxml.Initializable;
 
 public class ActiveOrdersFormGUIController implements IServerResponseListener {
 
-
-
     @FXML
     public void initialize() {
 

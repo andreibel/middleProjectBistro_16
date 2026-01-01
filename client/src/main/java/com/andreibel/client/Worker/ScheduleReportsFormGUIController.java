@@ -3,7 +3,10 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.SchedulesReportResponse;
 import com.andreibel.message.Message;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,10 +21,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
-//TODO: work on onServerResponse, initialize and combobox event
+//TODO: work on onServerResponse, initialize and combobox event and need to get the opening and closing time and the interval
 
 public class ScheduleReportsFormGUIController implements IServerResponseListener {
     @FXML
@@ -47,14 +53,18 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
     @FXML
     private AnchorPane rootPane;
 
+    private Map<LocalDate, Map<LocalTime, Integer>> customerArriveDeparture;
+    private Map<LocalDate,Integer> customerLate;
+    private Map<LocalDate,Integer> customerDelay;
     private BistroClientController controller;
 
     @FXML
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-        initiateArrivalsDeparturesLineChart();
-        initiateLeavesDelaysBarChart();
+        lblTitle.setText("Subscribers Report for Month: " + getCurrentMonth());
+        onSceneShown();
+
 
         rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
             if (newScene != null) {
@@ -73,7 +83,19 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
 
     @Override
     public void onServerResponse(Message message) {
-
+        if (message.getType() == APICallType.SCHEDULES_REPORT_RESPONSE) {
+            customerArriveDeparture = ((SchedulesReportResponse)message.getData()).getCustomerArriveDeparture();
+            customerLate = ((SchedulesReportResponse)message.getData()).getCustomerLate();
+            customerDelay = ((SchedulesReportResponse)message.getData()).getCustomerDelay();
+            Platform.runLater(() -> {
+                initiateArrivalsDeparturesLineChart();
+                initiateLeavesDelaysBarChart();
+                putDataInCharts();
+            });
+        }
+        else if (message.getType() == APICallType.SCHEDULES_REPORT_ERROR) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to get the report.");
+        }
     }
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
@@ -82,6 +104,7 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
     }
     @FXML
     private void onComboBoxTrackValueSelected(ActionEvent event) {
+
         int trackedDay = comboBoxTrack.getValue();
     }
 
@@ -113,13 +136,23 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         yPeopleAxis.setAutoRanging(true);
     }
 
+    private void putDataInCharts(){
+
+    }
+
     private void onSceneShown() {
-        controller.requestScheduleReportForCurrentMonth();
+        controller.requestSchedulesReport();
     }
 
     private void clearReport(){
         lineChartArrivalsDepartures.getData().clear();
         barChartLatesDelays.getData().clear();
+    }
+
+    public static String getCurrentMonth() {
+        return LocalDate.now()
+                .getMonth()
+                .getDisplayName(TextStyle.FULL, Locale.getDefault());
     }
 
     //For Testing Purpose REMOVE BEFORE FINAL PRODUCT

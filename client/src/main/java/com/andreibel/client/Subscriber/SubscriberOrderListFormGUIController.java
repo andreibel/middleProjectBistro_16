@@ -64,24 +64,23 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
 
     }
 
-    //NEED TO ADD ERROR APICallType
     @Override
     @SuppressWarnings("unchecked")
     public void onServerResponse(Message message) {
-        if (message.getType() != APICallType.GET_SUBSCRIBER_ORDERS_RESPONSE)
-            return;
-//        if (message.getType() != APICallType.GET_SUBSCRIBER_ORDERS_ERROR)
-//            return;
-        Platform.runLater(() -> {
-            orderHistoryList.clear();
-            List<OrderResponse> subscriberOrders = (List<OrderResponse>) message.getData();
-            for (OrderResponse orderResponse : subscriberOrders) {
-                orderHistoryList.add(new OrderHistory(
-                        orderResponse.getOrderDateTime().toString(),
-                        orderResponse.getNumberOfGuests()
-                ));
-            }
-        });
+        if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_RESPONSE){
+            Platform.runLater(() -> {
+                orderHistoryList.clear();
+                List<OrderResponse> subscriberOrders = (List<OrderResponse>) message.getData();
+                for (OrderResponse orderResponse : subscriberOrders) {
+                    orderHistoryList.add(new OrderHistory(
+                            orderResponse.getOrderDateTime().toString(),
+                            orderResponse.getNumberOfGuests()
+                    ));
+                }
+            });
+        }
+        else if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_ERROR)
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to retrieve history orders");
     }
 
     @FXML

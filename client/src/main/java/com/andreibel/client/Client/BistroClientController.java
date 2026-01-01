@@ -2,10 +2,7 @@ package com.andreibel.client.Client;
 
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.OrderRequest;
-import com.andreibel.message.DTO.SubscriberRequest;
-import com.andreibel.message.DTO.WorkerAuth;
-import com.andreibel.message.DTO.WorkerNewRequest;
+import com.andreibel.message.DTO.*;
 import com.andreibel.message.Message;
 
 import java.io.IOException;
@@ -55,14 +52,10 @@ public class BistroClientController {
 
     //=======================Order Request==========================
 
-    public void requestOrders() {
-        if (!isClientAvailable()) return;
-        client.send(new Message(APICallType.GET_ALL_ORDERS, null));
-    }
     //NEED TO CHANGE ORDER REQUEST AND ADD A FIELD FOR STATUS
-    public void requestUpdateOrderStatus(OrderRequest req) {
+    public void requestCompleteOrder(UUID confirmationCode) {
         if (!isClientAvailable()) return;
-        client.send(new Message(APICallType.UPDATE_ORDER, req));
+        client.send(new Message(APICallType.COMPLETE_ORDER, confirmationCode));
     }
     public void requestOrder(int numberOfPeople, LocalDateTime date, Integer subscriberId, String email, String phoneNumber) {
         if (!isClientAvailable()) return;
@@ -108,21 +101,21 @@ public class BistroClientController {
         client.send(new Message(APICallType.ORDER_ARRIVED, req));
     }
 
-    public void requestGetTable(Integer confirmationCode, Integer subscriberId) {
+    public void requestDiningWithoutOrder(WaitingListRequest req) {
         if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType.GET_TABLE, ...)
+        client.send(new Message(APICallType.ADD_TO_WAITING_LIST, req));
     }
 
     public void requestLostConfirmationCode(String email, String phoneNumber) {
         if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType.LOST_CNFRM_CODE, new OrderRequest(null, null, null, null, email, phoneNumber)));
+        client.send(new Message(APICallType.ORDER_LOST_CONFORMATION_CODE, new OrderRequest(null, null, null, null, email, phoneNumber)));
     }
 
     //=======================Worker Request==========================
 
     public void requestWorkerLogin(String username, String password){
         if (!isClientAvailable()) return;
-        client.send(new Message(APICallType.LOGIN_WORKER, new WorkerAuth(username, password)));
+        client.send(new Message(APICallType.WORKER_LOGIN, new WorkerAuth(username, password)));
     }
 
     public void requestRegisterNewSubscriber(SubscriberRequest req) {
@@ -130,14 +123,19 @@ public class BistroClientController {
         client.send(new Message(APICallType.CREATE_SUBSCRIBER, req));
     }
 
-    public void requestSubscribersReport(){
+    public void requestRegisterNewWorker(WorkerNewRequest req){
         if (!isClientAvailable()) return;
-        client.send(new Message(APICallType.GET_ALL_SUBSCRIBERS, null));
+        client.send(new Message(APICallType.WORKER_CREATE, req));
     }
 
-    public void requestScheduleReportForCurrentMonth(){
+    public void requestSchedulesReport(){
         if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType.SCHEDULE_REPORT_REQUEST, LocalDate.now()));
+        client.send(new Message(APICallType.SCHEDULES_REPORT, null));
+    }
+
+    public void requestSubscribersReport(){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.SUBSCRIBER_REPORT, null));
     }
 
     private boolean isClientAvailable() {

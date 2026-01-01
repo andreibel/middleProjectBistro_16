@@ -52,28 +52,37 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
     }
 
     /**
-     * Handles server responses related to order cancellation.
+     * Handles server responses related to order cancellation requests.
      *
-     * <p>This method ignores all messages except
-     * {@link APICallType#DELETE_ORDER_RESPONSE}.</p>
+     * <p>This method processes only messages related to order cancellation,
+     * specifically {@link APICallType#DELETE_ORDER_RESPONSE} and
+     * {@link APICallType#DELETE_ORDER_ERROR}. All other message types are ignored.</p>
      *
-     * <p>On successful cancellation, the confirmation code field is cleared
-     * and a success message is displayed.</p>
+     * <p>If the cancellation is successful, the confirmation code input field
+     * is cleared and a success message is displayed to the user.</p>
+     *
+     * <p>If the cancellation fails due to a server-side error, an error message
+     * is shown informing the user that the order could not be canceled.</p>
      *
      * @param message the message received from the server
      */
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() != APICallType.DELETE_ORDER_RESPONSE) {
-            return;
+        if (message.getType() == APICallType.DELETE_ORDER_RESPONSE) {
+            txtFieldConfirmationCode.clear();
+            BistroUtilities.showMessage(
+                    "Bistro Restaurant - Order Cancellation",
+                    "Your order has been successfully canceled."
+            );
         }
-        //DELETE_ORDER_ERROR
-        txtFieldConfirmationCode.clear();
-        BistroUtilities.showMessage(
-                "Bistro Restaurant - Order Cancellation",
-                "Your order has been successfully canceled."
-        );
+        else if (message.getType() == APICallType.DELETE_ORDER_ERROR) {
+            BistroUtilities.showMessage(
+                    "Bistro Restaurant - Cancellation Failed",
+                    "Due to a server error, your order could not be canceled. Please contact the staff for assistance."
+            );
+        }
     }
+
 
     /**
      * Sends an order cancellation request to the server.

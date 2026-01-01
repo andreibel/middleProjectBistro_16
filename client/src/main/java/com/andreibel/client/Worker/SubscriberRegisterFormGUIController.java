@@ -43,42 +43,44 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
         controller.addListener(this);
         clearForm();
     }
-    //NEED TO ADD CREATE_SUBSCRIBER_ERROR APICallType
+
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() != APICallType.CREATE_SUBSCRIBER_RESPONSE)
-            return;
-//        if (message.getType() != APICallType.CREATE_SUBSCRIBER_ERROR)
-//            return;
-        BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Successfully registered new subscriber!");
+        if (message.getType() == APICallType.CREATE_SUBSCRIBER_RESPONSE){
+            clearForm();
+            BistroUtilities.showMessage("Bistro Restaurant", "Successfully registered new subscriber!");
+        }
+        else if (message.getType() == APICallType.CREATE_SUBSCRIBER_ERROR){
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to register new subscriber.");
+        }
     }
 
     @FXML
     private void onRegisterButtonClicked(ActionEvent event) {
         if (txtFieldName.getText().isEmpty()){
-            BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Please enter subscriber name.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter subscriber name.");
             return;
         }
         if (txtFieldEmail.getText().isEmpty()){
-            BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Please enter subscriber email.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter subscriber email.");
             return;
         }
         if (txtFieldPhoneNumber.getText().isEmpty()){
-            BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Please enter phone number.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter phone number.");
             return;
         }
 
         if (!BistroUtilities.isValidFullName(txtFieldName.getText())){
-            BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Please enter a valid subscriber name.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid subscriber name.");
             return;
         }
         if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
-            BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Please enter a valid subscriber email.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid subscriber email.");
             return;
         }
 
         if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
-            BistroUtilities.showMessage("Bistro Restaurant - Subscriber Registration", "Please enter a valid phone number.");
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid phone number.");
             return;
         }
         controller.requestRegisterNewSubscriber(new SubscriberRequest(null, txtFieldEmail.getText(), txtFieldName.getText(), txtFieldPhoneNumber.getText()));
@@ -93,6 +95,6 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
     private void clearForm(){
         txtFieldName.clear();
         txtFieldEmail.clear();
-        lblName.setText("");
+        txtFieldPhoneNumber.clear();
     }
 }

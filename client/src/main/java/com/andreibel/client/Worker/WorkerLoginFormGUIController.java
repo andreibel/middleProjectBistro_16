@@ -18,16 +18,16 @@ import java.io.IOException;
 /**
  * GUI controller for the worker login form.
  *
- * <p>This controller handles worker authentication by sending login requests
- * to the server and processing the corresponding responses.</p>
+ * <p>This controller is responsible for authenticating workers by sending
+ * login requests to the server and handling the corresponding responses.</p>
  *
- * <p>It registers itself as a listener to {@link BistroClientController} and
- * reacts only to {@link APICallType#LOGIN_WORKER_RESPONSE} messages, ensuring
- * that it handles only responses relevant to this form.</p>
+ * <p>The controller registers itself as a listener to
+ * {@link BistroClientController} and reacts only to worker-login-related
+ * responses.</p>
  *
- * <p>Upon successful login, the worker's session data (name and manager status)
- * is stored in {@link WorkerStateManager} for global access throughout the
- * application.</p>
+ * <p>Upon successful authentication, the worker's name and manager status
+ * are stored in {@link WorkerStateManager} to allow global access to the
+ * worker's session information throughout the application.</p>
  */
 public class WorkerLoginFormGUIController implements IServerResponseListener {
 
@@ -50,7 +50,7 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
     private Button btnLogin;
 
     /**
-     * Button used to return to the main form.
+     * Button used to navigate back to the main form.
      */
     @FXML
     private Button btnGoBack;
@@ -61,10 +61,10 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
     private BistroClientController controller;
 
     /**
-     * Initializes the controller after the FXML has been loaded.
+     * Initializes the worker login form controller after the FXML has been loaded.
      *
-     * <p>This method obtains the singleton instance of
-     * {@link BistroClientController} and registers this GUI controller
+     * <p>This method retrieves the singleton instance of
+     * {@link BistroClientController} and registers this controller
      * as a server response listener.</p>
      */
     @FXML
@@ -74,29 +74,44 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
     }
 
     /**
-     * Handles server responses related to worker login.
+     * Handles server responses related to worker login attempts.
      *
-     * <p>This method ignores all messages except
-     * {@link APICallType#LOGIN_WORKER_RESPONSE}.</p>
+     * <p>This method processes responses related to worker authentication,
+     * including successful login responses and login errors. All unrelated
+     * message types are ignored.</p>
      *
-     * <p>If the login fails or the worker does not exist, an error message
-     * is displayed. Otherwise, the worker's details are stored in
-     * {@link WorkerStateManager}.</p>
+     * <p>If the worker does not exist or the response data is {@code null},
+     * an informative error message is displayed to the user.</p>
+     *
+     * <p>On successful login, the worker's name and manager status are saved
+     * in {@link WorkerStateManager} for later use.</p>
+     *
+     * <p>If a server-side error occurs during login, an error message is
+     * displayed.</p>
      *
      * @param message the message received from the server
      */
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() != APICallType.LOGIN_WORKER_RESPONSE) {
-            return;
-        } else if (message.getData() == null) {
-            BistroUtilities.showMessage("Error", "Worker does not exist");
-            return;
-        }
+        if (message.getType() == APICallType.WORKER_LOGIN_RESPONSE) {
+            if (message.getData() == null) {
+                BistroUtilities.showMessage(
+                        "Bistro Restaurant",
+                        "Worker does not exist."
+                );
+                return;
+            }
 
-        WorkerResponse response = (WorkerResponse) message.getData();
-        WorkerStateManager.getInstance().setWorkerName(txtFieldStaffName.getText());
-        WorkerStateManager.getInstance().setManager(response.isManager());
+            WorkerResponse response = (WorkerResponse) message.getData();
+            WorkerStateManager.getInstance().setWorkerName(txtFieldStaffName.getText());
+            WorkerStateManager.getInstance().setManager(response.isManager());
+
+        } else if (message.getType() == APICallType.WORKER_LOGIN_ERROR) {
+            BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Due to a server error, login could not be completed."
+            );
+        }
     }
 
     /**
@@ -113,13 +128,17 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
     }
 
     /**
-     * Navigates back to the main form.
+     * Navigates back to the main application form.
      *
-     * @param event the action event triggered by clicking the back button
+     * @param event the action event triggered by clicking the go-back button
      * @throws IOException if the FXML file cannot be loaded
      */
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node)event.getSource(), "/Main/MainForm.fxml", "Bistro Restaurant");
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Main/MainForm.fxml",
+                "Bistro Restaurant"
+        );
     }
 }

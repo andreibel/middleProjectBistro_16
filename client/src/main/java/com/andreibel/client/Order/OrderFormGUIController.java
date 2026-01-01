@@ -75,13 +75,14 @@ public class OrderFormGUIController implements IServerResponseListener {
 
     @Override
     public void onServerResponse(Message message) throws IOException {
-        //NEED TO HANDLE ERRORS RESPONSE
         if (message.getType() == APICallType.CREATE_ORDER_RESPONSE){
             clearForm();
-            BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Your order has been successfully created!");
+            BistroUtilities.showMessage("Bistro Restaurant", "Your order has been successfully created!");
             BistroUtilities.switchScreen(btnOrderNow,"/Main/MainForm.fxml", "Bistro Restaurant");
         }
-
+        else if (message.getType() == APICallType.CREATE_ORDER_ERROR){
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to create the order!");
+        }
         else if (message.getType() == APICallType.GET_ALL_TIMES_IN_DATE_RESPONSE){
             setAvailableTimesForComboBox(message);
             if (comboBoxTime.getItems().isEmpty()){
@@ -98,14 +99,14 @@ public class OrderFormGUIController implements IServerResponseListener {
     private void onOrderNowButtonClicked(ActionEvent event) {
         if (wizardLocation == WizardLocation.PART1_NUM_OF_PEOPLE_AND_DATE) {
             if (txtFieldNumberOfPeople.getText().isEmpty()){
-                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter the number of people who are ordering");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter the number of people who are ordering");
                 return;
             }
             if (datePickerOrder.getValue() == null){
-                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter the date you wish to order");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter the date you wish to order");
             }
             if (!BistroUtilities.isNumeric(txtFieldNumberOfPeople.getText())){
-                BistroUtilities.showMessage("Bistro Restaurant - Create Order", "Please enter a valid number of people");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid number of people");
                 return;
             }
             controller.requestAvailableTimes(new OrderRequest(null, Integer.parseInt(txtFieldNumberOfPeople.getText()), datePickerOrder.getValue().atStartOfDay(), null, null, null));
@@ -228,15 +229,15 @@ public class OrderFormGUIController implements IServerResponseListener {
         if ((wizardLocation == WizardLocation.PART2_USER_TYPE && CustomerStateManager.getInstance().getSubscriber() != null)) return true;
         else {
             if (txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
-                BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter either email or phone number");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter either email or phone number");
                 return false;
             }
             if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
-                BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid email address");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid email address");
                 return false;
             }
             if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
-                BistroUtilities.showMessage("Bistro Restaurant - Order Failed", "Please enter a valid phone number");
+                BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid phone number");
                 return false;
             }
             return true;

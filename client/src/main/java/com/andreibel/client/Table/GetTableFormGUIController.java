@@ -59,49 +59,44 @@ public class GetTableFormGUIController implements IServerResponseListener{
 
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() != APICallType.ORDER_ARRIVED_RESPONSE)
-            return;
-        clearForm();
-        //request adding to waiting list IF NO TABLE IS AVAILABLE
-        //controller.requestGetTable(.....);
-
-        //ONLY IF HE GOT TO TABLE AND NOT ON WAITING LIST
-        CustomerStateManager.getInstance().setArrivedToTable(true);
-        CustomerStateManager.getInstance().setConfirmationCode(Integer.parseInt(txtFieldConfirmation.getText()));
+        if (message.getType() == APICallType.ORDER_ARRIVED_RESPONSE){
+            clearForm();
+            CustomerStateManager.getInstance().setArrivedToTable(true);
+            CustomerStateManager.getInstance().setConfirmationCode(Integer.parseInt(txtFieldConfirmation.getText()));
+            BistroUtilities.showMessage("Bistro Restaurant", "Thank you for confirming your arrival, please head to your table");
+        }
+        else if (message.getType() == APICallType.ORDER_ARRIVED_WAITING_RESPONSE)
+            BistroUtilities.showMessage("Bistro Restaurant", "Thank you for confirming your arrival, Unfortunately we currently don't have a table ready for you.\nYou'll be entering a waiting list and we'll let you know when your table is ready, we apologize for the inconvenience.");
+        else if (message.getType() == APICallType.ORDER_ARRIVED_ERROR)
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to confirm your arrival, please contact staff for help");
 
     }
 
     @FXML
     private void onButtonConfirmArrivalClicked(ActionEvent event)  {
-        if (radioBtnGuest.isSelected() && !txtFieldConfirmation.getText().isEmpty()) {
-            BistroUtilities.showMessage("Error", "Dear Guest, please enter confirmation code");
+        if (CustomerStateManager.getInstance().getSubscriber() == null && txtFieldConfirmation.getText().isEmpty()) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Dear Guest, please enter confirmation code");
             return;
         }
-        if (radioBtnSubscriber.isSelected() && !txtFieldSubscriberID.getText().isEmpty()) {
-            BistroUtilities.showMessage("Bistro Restaurant - Confirm Arrival Error", "Dear Subscriber, please enter confirmation code or subscriber ID");
-            return;
-        }
-
-        if (BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant - Confirm Error", "Please enter valid confirmation code");
+        if (CustomerStateManager.getInstance().getSubscriber() != null && (txtFieldSubscriberID.getText().isEmpty() || txtFieldConfirmation.getText().isEmpty())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Dear Subscriber, please enter confirmation code or subscriber ID");
             return;
         }
 
-        if (BistroUtilities.isNumeric(txtFieldSubscriberID.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant - Confirm Error", "Please enter valid subscriber ID");
+        if (!BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid confirmation code");
             return;
         }
-        //Need to add parameter for local date time (Maybe String) for arrival time
-        //controller.requestArrivalConfirmation(new OrderRequest(UUID.fromString(txtFieldConfirmation.getText()), ));
+
+        if (!BistroUtilities.isNumeric(txtFieldSubscriberID.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid subscriber ID");
+            return;
+        }
+        controller.requestArrivalConfirmation(new OrderRequest(UUID.fromString(txtFieldConfirmation.getText()), null, null, fillSubscriberIDDetails(), null, null));
     }
     @FXML
     private void onLostMyCodeButtonClicked(ActionEvent event) throws IOException {
         BistroUtilities.switchScreen((Node)event.getSource(), "/Table/LostMyCodeForm.fxml", "Bistro Restaurant - Lost My Code");
-    }
-
-    @FXML
-    private void onRadioUserTypeChanged(ActionEvent event) {
-        adjustFormBasedOnUserType();
     }
 
     @FXML
@@ -116,35 +111,22 @@ public class GetTableFormGUIController implements IServerResponseListener{
 
     private void clearForm() {
         adjustFormBasedOnUserType();
-        radioBtnGuest.setSelected(false);
-        radioBtnSubscriber.setSelected(false);
         txtFieldConfirmation.clear();
         txtFieldSubscriberID.clear();
     }
 
     private void adjustFormBasedOnUserType(){
         if (CustomerStateManager.getInstance().getSubscriber() != null) {
-            lblWhoAmI.setVisible(false);
-            radioBtnSubscriber.setVisible(false);
-            radioBtnGuest.setVisible(false);
             lblSubscriberInfo.setVisible(true);
             lblOR.setVisible(true);
             lblSubscriberID.setVisible(true);
             txtFieldSubscriberID.setVisible(true);
         }
         else{
-            if (radioBtnGuest.isSelected()) {
-                lblSubscriberInfo.setVisible(false);
-                lblOR.setVisible(false);
-                lblSubscriberID.setVisible(false);
-                txtFieldSubscriberID.setVisible(false);
-            }
-            else{
-                lblSubscriberInfo.setVisible(true);
-                lblOR.setVisible(true);
-                lblSubscriberID.setVisible(true);
-                txtFieldSubscriberID.setVisible(true);
-            }
+            lblSubscriberInfo.setVisible(false);
+            lblOR.setVisible(false);
+            lblSubscriberID.setVisible(false);
+            txtFieldSubscriberID.setVisible(false);
         }
 
     }

@@ -4,6 +4,9 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.WaitingListRequest;
+import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -64,12 +67,18 @@ public class NoOrderFormGUIController implements IServerResponseListener {
 
     @Override
     public void onServerResponse(Message message){
-
+        if (message.getType() == APICallType.ADD_TO_WAITING_LIST_RESPONSE) {
+            clearForm();
+            BistroUtilities.showMessage("Bistro Restaurant", "Successfully added to waiting list, Your confirmation code is: " + ((WaitingListResponse)message.getData()).getConformationCode() + ", we'll notify you when there's a table available for you.");
+        }
+        else if (message.getType() == APICallType.ADD_TO_WAITING_LIST_ERROR) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Due to a server error we were unable to add to waiting list, please try again.");
+        }
     }
 
     @FXML
     private void onSubmitButtonClicked(ActionEvent event) {
-
+        controller.requestDiningWithoutOrder(new WaitingListRequest(null, Integer.parseInt(txtFieldNumberOfPeople.getText()), fillSubscriberIDDetails(), txtFieldEmail.getText(), txtFieldPhoneNumber.getText()));
     }
 
     @FXML
@@ -92,7 +101,6 @@ public class NoOrderFormGUIController implements IServerResponseListener {
             txtFieldEmail.setVisible(false);
             txtFieldPhoneNumber.setVisible(false);
             btnSubmit.setLayoutX(buttonSubscriberLocation.getX());
-            btnSubmit.setLayoutY(buttonSubscriberLocation.getY());
         }
         else{
             lblOR.setVisible(true);
@@ -104,5 +112,9 @@ public class NoOrderFormGUIController implements IServerResponseListener {
             btnSubmit.setLayoutX(buttonGuestLocation.getX());
             btnSubmit.setLayoutY(buttonGuestLocation.getY());
         }
+    }
+
+    private Integer fillSubscriberIDDetails(){
+        return (CustomerStateManager.getInstance().getSubscriber() != null)  ? (Integer)CustomerStateManager.getInstance().getSubscriber().getSubscriberId() : null;
     }
 }

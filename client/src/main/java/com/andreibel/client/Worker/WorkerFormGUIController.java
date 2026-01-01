@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
@@ -17,22 +19,25 @@ public class WorkerFormGUIController {
     @FXML
     private Label lblTitle;
     @FXML
-    private Button btnRegister;
+    private VBox vBoxManager;
     @FXML
-    private Button btnSubscribersReport;
-    @FXML
-    private Button btnSchedulesReport;
-    @FXML
-    private Button btnViewCurrentDining;
-    @FXML
-    private Button btnRegisterWorker;
-    @FXML
-    private Button btnGoBack;
+    private AnchorPane rootPane;
 
     @FXML
     private void initialize() {
         lblTitle.setText("Hello " + WorkerStateManager.getInstance().getWorkerName() + ", select an option below to proceed.");
         adjustFormBasedOnWorkerType();
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            adjustFormBasedOnWorkerType();
+                        });
+                    }
+                });
+            }
+        });
     }
 
     @FXML
@@ -60,11 +65,29 @@ public class WorkerFormGUIController {
         BistroUtilities.switchScreen((Node)event.getSource(), "/Main/MainForm.fxml", "Bistro Restaurant");
     }
 
+    @FXML
+    private void onChangeRestaurantLayoutButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/EditRestaurantLayoutForm.fxml", "Bistro Restaurant - Change Layout of Restaurant");
+    }
+    @FXML
+    private void onViewCurrentWaitingButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/CurrentWaitingForm.fxml", "Bistro Restaurant - Current on Waiting List");
+    }
+
+    @FXML
+    private void onViewCurrentOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/ActiveOrdersForm.fxml", "Bistro Restaurant - Current Active Orders");
+    }
+
+    @FXML
+    private void onChangeBistroButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/ChangeBistroTimeForm.fxml", "Bistro Restaurant - Change Bistro Time / Add Special Event");
+    }
+
     private void adjustFormBasedOnWorkerType(){
-        if (!WorkerStateManager.getInstance().isManager()){
-            btnRegisterWorker.setVisible(false);
-            btnSchedulesReport.setVisible(false);
-        }
+        if (!WorkerStateManager.getInstance().isManager())
+            vBoxManager.setVisible(false);
+        else vBoxManager.setVisible(true);
     }
 
 }
