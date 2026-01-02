@@ -6,7 +6,6 @@ import com.andreibel.server.entity.Waiting;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 /**
@@ -64,7 +63,6 @@ public class WaitingListMapper {
                 .waitingDateTime(waiting.getWaitingDateTime())
                 .isCurrentlyWaiting(waiting.isCurrentlyWaiting())
                 .conformationCode(waiting.getConformationCode())
-                .waitingArriveDateTime(waiting.getWaitingArriveDateTime())
                 .orderNumber(waiting.getOrderNumber())
                 .subscriberId(waiting.getSubscriberId())
                 .email(waiting.getEmail())
@@ -85,7 +83,6 @@ public class WaitingListMapper {
     public static Waiting mapWaitingRequestToWaiting(WaitingListRequest request) {
         return Waiting.builder()
                 .numberOfGuests(request.getNumberOfGuests())
-                .orderNumber(request.getOrderNumber())
                 .conformationCode(UUID.randomUUID())
                 .subscriberId(request.getSubscriberId())
                 .email(request.getEmail())

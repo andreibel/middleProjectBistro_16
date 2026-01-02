@@ -11,6 +11,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static com.andreibel.server.utils.TUI.conf;
+import static com.andreibel.server.utils.TUI.startLog;
+
 public class BistroServer extends Application {
 
     public static String PORT = "8080";
@@ -35,8 +38,8 @@ public class BistroServer extends Application {
         DB_URL = params.getOrDefault("db_url", DB_URL);
         DB_USER = params.getOrDefault("db_user", "root");
         DB_PASSWORD = params.getOrDefault("db_password", "tikraetzeM4!");
-
-
+        conf(PORT, DB_URL, DB_USER, DB_PASSWORD);
+        startLog();
         FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();

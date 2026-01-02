@@ -6,6 +6,8 @@ import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
 
+import static com.andreibel.server.utils.TUI.serverInputLog;
+
 /**
  * OCSF-based server implementation for the Bistro system.
  *
@@ -107,23 +109,23 @@ public class Serve extends AbstractServer {
             if (!(msg instanceof Message message)) {
                 throw new IllegalArgumentException("Invalid message type");
             }
-
+            serverInputLog(message);
             Message response = switch (message.getType()) {
-                case CREATE_ORDER -> orderController.createOrder(message); // done
+                case CREATE_ORDER -> orderController.createOrder(message);
                 case DELETE_ORDER -> orderController.deleteOrder(message);
                 case GET_ALL_ORDERS_SUB -> orderController.getAllOrdersBySubscriber();
                 case GET_ONE_ORDER -> orderController.getOrder(message);
                 case ORDER_ARRIVED -> orderController.updateArrives(message);
-                case ORDER_LOST_CONFORMATION_CODE -> null;
+                case ORDER_LOST_CONFORMATION_CODE -> orderController.lostCode(message);
                 case COMPLETE_ORDER -> orderController.closeOrder(message);
-                case GET_ALL_TIMES_IN_DATE -> null;
-                case GET_ALL_SUBSCRIBERS -> null;
-                case SUBSCRIBER_LOGIN -> null;
-                case GET_SUBSCRIBER_ORDERS -> null;
-                case UPDATE_SUBSCRIBER -> null;
-                case WORKER_LOGIN -> null;
-                case WORKER_CREATE -> null;
-                case CREATE_SUBSCRIBER -> null;
+                case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
+                case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();
+                case SUBSCRIBER_LOGIN -> subscriberController.getSub(message);
+                case GET_SUBSCRIBER_ORDERS -> subscriberController.getSubOrders(message);
+                case UPDATE_SUBSCRIBER -> subscriberController.updateSub(message);
+                case WORKER_LOGIN -> workerController.login(message);
+                case WORKER_CREATE -> workerController.createWorker(message);
+                case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
                 case ADD_SPECIAL_DAY -> null;
                 case CHANGE_BISTRO_TIME -> null;
                 case GET_ALL_TABLES -> null;

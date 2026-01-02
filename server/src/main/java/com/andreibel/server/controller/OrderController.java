@@ -164,10 +164,14 @@ public class OrderController {
                 data.getOrderDateTime().toLocalDate(),
                 data.getNumberOfGuests()
         );
-        allAvailableTimeInDate.forEach(System.out::println);
-        return new Message(
-                GET_ALL_TIMES_IN_DATE_RESPONSE,
-                allAvailableTimeInDate
-        );
+        if (allAvailableTimeInDate == null || allAvailableTimeInDate.isEmpty())
+            return new Message(GET_ALL_TIMES_IN_DATE_ERROR, null);
+        return new Message(GET_ALL_TIMES_IN_DATE_RESPONSE, allAvailableTimeInDate);
+    }
+
+    public Message lostCode(Message message) {
+        OrderResponse data = orderService.lostConformCode(((OrderRequest) message.getData()));
+        if (data == null) return new Message(ORDER_LOST_CONFORMATION_CODE_ERROR, null);
+        return new Message(ORDER_LOST_CONFORMATION_CODE_RESPONSE, data);
     }
 }

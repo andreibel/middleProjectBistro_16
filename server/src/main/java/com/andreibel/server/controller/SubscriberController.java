@@ -1,8 +1,11 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.DTO.SubscriberRequest;
+import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.SubscriberService;
+
+import java.util.List;
 
 import static com.andreibel.message.APICallType.*;
 
@@ -19,6 +22,7 @@ import static com.andreibel.message.APICallType.*;
  * Implemented as a Singleton to ensure a single controller instance
  * throughout the application lifecycle.
  * </p>
+ *
  * @author Andrei Beloziyorove
  */
 public class SubscriberController {
@@ -51,10 +55,9 @@ public class SubscriberController {
      * @return response message containing all subscribers
      */
     public Message getAllSub() {
-        return new Message(
-                GET_ALL_SUBSCRIBERS_RESPONSE,
-                subscriberService.getAllSubscribers()
-        );
+        List<SubscriberResponse> orders = subscriberService.getAllSubscribers();
+        if (orders == null || orders.isEmpty()) return new Message(GET_ALL_SUBSCRIBERS_ERROR, null);
+        return new Message(GET_ALL_SUBSCRIBERS_RESPONSE, orders);
     }
 
     /**
@@ -64,12 +67,10 @@ public class SubscriberController {
      * @return response message containing the requested subscriber
      */
     public Message getSub(Message message) {
-        return new Message(
-                GET_ONE_SUBSCRIBER_RESPONSE,
-                subscriberService.getSubscriber(
-                        (SubscriberRequest) message.getData()
-                )
-        );
+        Integer subscriberId = (Integer) message.getData();
+        SubscriberResponse subscriber = subscriberService.getSubscriber(subscriberId);
+        if (subscriber == null) return new Message(SUBSCRIBER_LOGIN_ERROR, null);
+        return new Message(SUBSCRIBER_LOGIN_RESPONSE, subscriber);
     }
 
     /**
@@ -79,12 +80,10 @@ public class SubscriberController {
      * @return response message containing subscriber details and orders
      */
     public Message getSubOrders(Message message) {
-        return new Message(
-                GET_SUBSCRIBER_ORDERS_RESPONSE,
-                subscriberService.getSubscriberAndOrders(
-                        (SubscriberRequest) message.getData()
-                )
-        );
+        Integer subscriberId = (Integer) message.getData();
+        SubscriberResponse subscriber = subscriberService.getSubscriber(subscriberId);
+        if (message.getData() == null) return new Message(GET_SUBSCRIBER_ORDERS_ERROR, null);
+        return new Message(GET_SUBSCRIBER_ORDERS_RESPONSE, subscriber);
     }
 
     /**
@@ -94,19 +93,17 @@ public class SubscriberController {
      * @return response message containing the created subscriber
      */
     public Message createSub(Message message) {
-        return new Message(
-                CREATE_SUBSCRIBER_RESPONSE,
-                subscriberService.createSubscriber(
-                        (SubscriberRequest) message.getData()
-                )
-        );
+        SubscriberRequest subscriber = (SubscriberRequest) message.getData();
+        SubscriberResponse created = subscriberService.createSubscriber(subscriber);
+        if(created == null) return new Message(CREATE_SUBSCRIBER_ERROR, null);
+        return new Message(CREATE_SUBSCRIBER_RESPONSE, created);
     }
 
     public Message updateSub(Message message) {
-        return new Message(
-                UPDATE_SUBSCRIBER_RESPONSE,
-                subscriberService.updateSub((SubscriberRequest)message.getData())
-        );
+        SubscriberRequest data = (SubscriberRequest) message.getData();
+        SubscriberResponse updated = subscriberService.getSubscriber(data.getSubscriberId());
+        if (updated == null) return new Message(UPDATE_SUBSCRIBER_ERROR, null);
+        return new Message(UPDATE_SUBSCRIBER_RESPONSE, updated);
     }
 
 

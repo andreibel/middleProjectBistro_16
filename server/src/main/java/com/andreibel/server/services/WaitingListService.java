@@ -7,6 +7,7 @@ import com.andreibel.server.dbController.repository.WaitingListRepository;
 import com.andreibel.server.entity.Waiting;
 import com.andreibel.server.utils.WaitingListMapper;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

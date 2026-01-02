@@ -3,12 +3,14 @@ package com.andreibel.message.DTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
+@ToString()
 @NoArgsConstructor
 @AllArgsConstructor
 public class OrderRequest implements Serializable {
