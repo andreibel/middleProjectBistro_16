@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.andreibel.message.APICallType.*;
+import static com.andreibel.server.utils.TUI.UUID_sent;
 
 /**
  * Controller responsible for handling order-related API requests.
@@ -170,6 +171,11 @@ public class OrderController {
     }
 
     public Message lostCode(Message message) {
+        if (message.getData() instanceof String){
+            UUID_sent((String)message.getData());
+            return null;
+        }
+
         OrderResponse data = orderService.lostConformCode(((OrderRequest) message.getData()));
         if (data == null) return new Message(ORDER_LOST_CONFORMATION_CODE_ERROR, null);
         return new Message(ORDER_LOST_CONFORMATION_CODE_RESPONSE, data);

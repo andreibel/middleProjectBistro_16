@@ -50,6 +50,18 @@ public class TUI {
                 shorten(message.getData().toString(), 105)
         );
     }
+
+    public static void UUID_sent(String message) {
+        System.out.printf(
+                """
+       │ ┌───── sent conformation code  ─────┐                                                                                                             │
+       │ ├───────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+       │ │ %-145s │ │
+       │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+        """, shorten(message, 145)
+        );
+    }
+
     public static void serverOutputLog(Message message) {
 
         String ERROR_LINE = buildErrorLine105();
