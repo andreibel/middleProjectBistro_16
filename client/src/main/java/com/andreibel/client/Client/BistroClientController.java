@@ -70,7 +70,12 @@ public class BistroClientController {
         client.send(new Message(APICallType.CREATE_ORDER, req));
     }
 
-    public void requestAvailableTimes(OrderRequest req) {
+    public void requestAllOrdersForCustomer(OrderRequest req) {
+        if (!isClientAvailable()) return;
+        //client.send(new Message(APICallType.GET_ORDERS_FOR_CUSTUMER, req));
+    }
+
+    public void requestAvailableTimes(TimeGetterRequest req) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.GET_ALL_TIMES_IN_DATE, req));
     }
@@ -136,6 +141,16 @@ public class BistroClientController {
     public void requestSubscribersReport(){
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.SUBSCRIBER_REPORT, null));
+    }
+
+    public void requestAllSubscribersInfo(){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.GET_ALL_SUBSCRIBERS, null));
+    }
+
+    public void requestCurrentWaitingList(){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.GET_WAITING_LIST, null));
     }
 
     private boolean isClientAvailable() {

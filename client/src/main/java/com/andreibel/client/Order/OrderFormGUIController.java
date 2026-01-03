@@ -6,6 +6,7 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -109,7 +110,7 @@ public class OrderFormGUIController implements IServerResponseListener {
                 BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid number of people");
                 return;
             }
-            controller.requestAvailableTimes(new OrderRequest(null, Integer.parseInt(txtFieldNumberOfPeople.getText()), datePickerOrder.getValue().atStartOfDay(), null, null, null));
+            controller.requestAvailableTimes(new TimeGetterRequest(datePickerOrder.getValue(), Integer.parseInt(txtFieldNumberOfPeople.getText())));
         }
         else if ((wizardLocation == WizardLocation.PART2_TIME && CustomerStateManager.getInstance().getSubscriber() != null) || wizardLocation == WizardLocation.PART2_TIME) {
             if (comboBoxTime.getValue() == null){
