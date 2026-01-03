@@ -26,18 +26,8 @@ public class WorkerFormGUIController {
     @FXML
     private void initialize() {
         lblTitle.setText("Hello " + WorkerStateManager.getInstance().getWorkerName() + ", select an option below to proceed.");
+        adjustFormWhenSceneIsShown();
         adjustFormBasedOnWorkerType();
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            adjustFormBasedOnWorkerType();
-                        });
-                    }
-                });
-            }
-        });
     }
 
     @FXML
@@ -82,6 +72,20 @@ public class WorkerFormGUIController {
     @FXML
     private void onChangeBistroButtonClicked(ActionEvent event) throws IOException {
         BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/ChangeBistroTimeForm.fxml", "Bistro Restaurant - Change Bistro Time / Add Special Event");
+    }
+
+    private void adjustFormWhenSceneIsShown() {
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            adjustFormBasedOnWorkerType();
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private void adjustFormBasedOnWorkerType(){

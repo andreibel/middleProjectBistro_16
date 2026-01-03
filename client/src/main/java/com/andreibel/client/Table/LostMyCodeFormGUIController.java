@@ -78,27 +78,28 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     @FXML
     private void onButtonRetrieveCodeClicked(ActionEvent event) {
         if (isFetchingOrders) {
-            if(txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
+            if(CustomerStateManager.getInstance().getSubscriber() == null &&
+                    txtFieldEmail.getText().isEmpty() && txtFieldPhoneNumber.getText().isEmpty()){
                 BistroUtilities.showMessage("Bistro Restaurant", "Please enter either email address or phone number");
             }
             else{
-                if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
+                if (CustomerStateManager.getInstance().getSubscriber() == null && !BistroUtilities.isValidEmail(txtFieldEmail.getText())){
                     BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid email address");
                 }
-                else if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
+                else if (CustomerStateManager.getInstance().getSubscriber() == null && !BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
                     BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid phone number");
                 }
                 else {
                     controller.requestAllOrdersForCustomer(new OrderRequest(null, null, null,
                             fillSubscriberIDDetails(), txtFieldEmail.getText(), txtFieldPhoneNumber.getText()));
-                    clearForm();
-                    BistroUtilities.showMessage("Bistro Restaurant", "We've sent you the confirmation code to your email/phone number, please check");
                 }
             }
         }
         else{
             if (comboBoxOrders.getSelectionModel().getSelectedItem() != null){
                 controller.requestSendConfirmationCode(sendLogMessageToServer());
+                clearForm();
+                BistroUtilities.showMessage("Bistro Restaurant", "We've sent you the confirmation code to your email/phone number, please check");
             }
             else{
                 BistroUtilities.showMessage("Bistro Restaurant", "Please select an order");
@@ -143,6 +144,7 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     }
 
     private void clearForm() {
+        isFetchingOrders = true;
         txtFieldEmail.clear();
         txtFieldPhoneNumber.clear();
         comboBoxOrders.getItems().clear();

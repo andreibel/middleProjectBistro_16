@@ -61,18 +61,9 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
         controller = BistroClientController.getInstance();
         controller.addListener(this);
         lblTitle.setText("Subscribers Report for Month: " + getCurrentMonth());
-        onSceneShown();
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            onSceneShown();
-                        });
-                    }
-                });
-            }
-        });
+        requestSubscribersReportWhenSceneIsShown();
+        controller.requestSubscribersReport();
+
     }
 
     @Override
@@ -102,8 +93,18 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
         barChartSubscribersWaiting.getData().clear();
     }
 
-    private void onSceneShown() {
-        controller.requestSubscribersReport();
+    private void requestSubscribersReportWhenSceneIsShown() {
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            controller.requestSubscribersReport();
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private void putDataInCharts() {
@@ -146,6 +147,7 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
         yWaitingAxis.setLabel("Number of Subscribers Waiting");
         yWaitingAxis.setAutoRanging(true);
     }
+
 
     public static String getCurrentMonth() {
         return LocalDate.now()

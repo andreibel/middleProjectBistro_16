@@ -14,7 +14,7 @@
         <!-- Title -->
         <Label fx:id="lblTitle" layoutX="14.0" layoutY="21.0" prefHeight="50.0" prefWidth="560.0" text="If you lost your confirmation code, please enter either email or phone number, pick the order for the confirmation code  we'll send it to you:" wrapText="true">
             <font>
-                <Font size="19.0" />
+                <Font size="16.0" />
             </font>
         </Label>
 
@@ -35,10 +35,15 @@
       </Label>
       <TextField fx:id="txtFieldEmail" layoutX="244.0" layoutY="110.0" prefHeight="25.0" prefWidth="193.0" promptText="Enter your email here..." />
       <TextField fx:id="txtFieldPhoneNumber" layoutX="244.0" layoutY="153.0" prefHeight="25.0" prefWidth="193.0" promptText="Enter your phone number here..." />
-      <ComboBox layoutX="244.0" layoutY="198.0" prefHeight="25.0" prefWidth="193.0" promptText="Select your order" />
-      <Label fx:id="lblOrders" layoutX="135.0" layoutY="201.0" text="Select Order:">
+      <ComboBox fx:id="comboBoxOrders" disable="true" layoutX="244.0" layoutY="198.0" prefHeight="25.0" prefWidth="193.0" promptText="Select your order" />
+      <Label fx:id="lblOrders" disable="true" layoutX="135.0" layoutY="201.0" text="Select Order:">
          <font>
             <Font size="16.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblInfos" layoutX="135.0" layoutY="322.0" text="*Subscribers can retrieve orders without entering info, just click on Get Orders">
+         <font>
+            <Font size="14.0" />
          </font>
       </Label>
 

@@ -7,6 +7,8 @@ import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -15,17 +17,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class CurrentWaitingFormGUIController implements IServerResponseListener {
 
     @FXML
     private Label lblTitle;
+
     @FXML
     private TableView<WaitingListResponse> tblViewCurrentWaiting;
+
     @FXML
     private TableColumn<WaitingListResponse, String> colWaitingNumber;
     @FXML
@@ -38,53 +43,29 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
     private TableColumn<WaitingListResponse, String> colEmail;
     @FXML
     private TableColumn<WaitingListResponse, String> colPhoneNumber;
+
     @FXML
     private Button btnGoBack;
+
     private BistroClientController controller;
+    private ObservableList<WaitingListResponse> waitingList;
+
     @FXML
-    public void initialize() {
+    private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
+
+        waitingList = FXCollections.observableArrayList();
+        tblViewCurrentWaiting.setItems(waitingList);
+        tblViewCurrentWaiting.setEditable(false);
+
+        initializeTableColumns();
         lblTitle.setText("Current Waiting List for: " + getCurrentDate());
-        setTabView();
-        onSceneShown();
-        tblViewCurrentWaiting.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            onSceneShown();
-                        });
-                    }
-                });
-            }
-        });
+        requestWaitingListWhenSceneIsShown();
+        controller.requestCurrentWaitingList();
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.GET_WAITING_LIST_RESPONSE){
-            Platform.runLater(() -> {
-                List<WaitingListResponse> waitingList = (List<WaitingListResponse>) message.getData();
-                for (WaitingListResponse waitingListResponse : waitingList) {
-                    tblViewCurrentWaiting.getItems().add(waitingListResponse);
-                }
-            });
-        }
-        else if (message.getType() == APICallType.ADD_TO_WAITING_LIST_ERROR){
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, we're unable to fetch the current dating list");
-        }
-    }
-
-    @FXML
-    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        tblViewCurrentWaiting.getItems().clear();
-        BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
-    }
-
-    @FXML
-    private void setTabView(){
+    private void initializeTableColumns() {
         colWaitingNumber.setCellValueFactory(new PropertyValueFactory<>("waitingNumber"));
         colOrderNumber.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
         colNumberOfGuests.setCellValueFactory(new PropertyValueFactory<>("numberOfGuests"));
@@ -93,12 +74,57 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
         colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
     }
 
-    private void onSceneShown(){
-        controller.requestCurrentWaitingList();
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onServerResponse(Message message) {
+
+        if (message.getType() == APICallType.GET_WAITING_LIST_RESPONSE) {
+            Platform.runLater(() ->
+                    populateTable((List<WaitingListResponse>) message.getData())
+            );
+        }
+
+        else if (message.getType() == APICallType.ADD_TO_WAITING_LIST_ERROR) {
+            BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Due to server error, we're unable to fetch the current waiting list"
+            );
+        }
     }
 
-    private void getCurrentDate(){
-
+    private void populateTable(List<WaitingListResponse> data) {
+        waitingList.clear();
+        waitingList.addAll(data);
     }
 
+    private void requestWaitingListWhenSceneIsShown() {
+        tblViewCurrentWaiting.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event ->
+                                controller.requestCurrentWaitingList()
+                        );
+                    }
+                });
+            }
+        });
+    }
+
+    @FXML
+    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        controller.removeListener(this);
+        waitingList.clear();
+
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Worker/WorkerForm.fxml",
+                "Bistro Restaurant - Staff Area"
+        );
+    }
+
+    private String getCurrentDate() {
+        return LocalDate.now()
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
 }

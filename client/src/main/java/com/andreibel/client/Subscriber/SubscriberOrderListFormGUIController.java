@@ -13,32 +13,32 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-//TODO Finish onServerResponse
-
 public class SubscriberOrderListFormGUIController implements IServerResponseListener {
+
     @FXML
     private Label lblSubscriber;
+
     @FXML
     private TableView<OrderHistory> tblViewOrderHistory;
+
     @FXML
     private TableColumn<OrderHistory, Integer> colRowNumber;
+
     @FXML
     private TableColumn<OrderHistory, String> colOrderDateTime;
+
     @FXML
     private TableColumn<OrderHistory, Integer> colNumberOfPeople;
+
     private ObservableList<OrderHistory> orderHistoryList;
     private BistroClientController controller;
 
@@ -46,74 +46,106 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
+
         orderHistoryList = FXCollections.observableArrayList();
-        setTabView();
-        lblSubscriber.setText("Hi, " + CustomerStateManager.getInstance().getSubscriber().getName() + " here is your orders history:");
-        onSceneShown();
-        tblViewOrderHistory.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            onSceneShown();
-                        });
-                    }
-                });
-            }
-        });
+        tblViewOrderHistory.setItems(orderHistoryList);
+        tblViewOrderHistory.setEditable(false);
 
-    }
+        initializeTableColumns();
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_RESPONSE){
-            Platform.runLater(() -> {
-                orderHistoryList.clear();
-                List<OrderResponse> subscriberOrders = (List<OrderResponse>) message.getData();
-                for (OrderResponse orderResponse : subscriberOrders) {
-                    orderHistoryList.add(new OrderHistory(
-                            orderResponse.getOrderDateTime().toString(),
-                            orderResponse.getNumberOfGuests()
-                    ));
-                }
-            });
-        }
-        else if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_ERROR)
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to retrieve history orders");
-    }
+        lblSubscriber.setText(
+                "Hi, " +
+                        CustomerStateManager.getInstance().getSubscriber().getName() +
+                        ", here is your orders history:"
+        );
 
-    @FXML
-    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        tblViewOrderHistory.getItems().clear();
-        BistroUtilities.switchScreen((Node) event.getSource(), "/Subscriber/SubscriberZoneForm.fxml", "Bistro Restaurant - Subscriber Zone");
-    }
-
-    private void onSceneShown() {
+        requestOrdersWhenSceneIsShown();
         controller.requestAllSubscriberOrders(CustomerStateManager.getInstance().getSubscriber().getSubscriberId());
     }
 
-    @FXML
-    private void setTabView(){
+    private void initializeTableColumns() {
         colRowNumber.setCellValueFactory(new PropertyValueFactory<>("orderRowNumber"));
         colOrderDateTime.setCellValueFactory(new PropertyValueFactory<>("orderDateTime"));
         colNumberOfPeople.setCellValueFactory(new PropertyValueFactory<>("numberOfPeople"));
     }
 
-    public class OrderHistory {
-        private static int RowNumber = 0;
-        @Getter
-        private int orderRowNumber;
-        @Getter
-        private String orderDateTime;
-        @Getter
-        private int numberOfPeople;
+    @Override
+    @SuppressWarnings("unchecked")
+    public void onServerResponse(Message message) {
+        if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_RESPONSE) {
+            Platform.runLater(() -> populateTable((List<OrderResponse>) message.getData()));
+        }
 
-        public OrderHistory(String orderDateTime, int numberOfPeople) {
-            ++RowNumber;
+        if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_ERROR) {
+            Platform.runLater(() ->
+                    BistroUtilities.showMessage(
+                            "Bistro Restaurant",
+                            "Unable to retrieve order history due to server error."
+                    )
+            );
+        }
+    }
+
+    private void populateTable(List<OrderResponse> orders) {
+        orderHistoryList.clear();
+
+        int rowNumber = 1;
+        for (OrderResponse order : orders) {
+            orderHistoryList.add(
+                    new OrderHistory(
+                            rowNumber++,
+                            order.getOrderDateTime().toString(),
+                            order.getNumberOfGuests()
+                    )
+            );
+        }
+    }
+
+    private void requestOrdersWhenSceneIsShown() {
+        tblViewOrderHistory.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event ->
+                                controller.requestAllSubscriberOrders(
+                                        CustomerStateManager.getInstance()
+                                                .getSubscriber()
+                                                .getSubscriberId()
+                                )
+                        );
+                    }
+                });
+            }
+        });
+    }
+
+    @FXML
+    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        controller.removeListener(this);
+        orderHistoryList.clear();
+
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Subscriber/SubscriberZoneForm.fxml",
+                "Bistro Restaurant - Subscriber Zone"
+        );
+    }
+
+    public static class OrderHistory {
+
+        @Getter
+        private final int orderRowNumber;
+
+        @Getter
+        private final String orderDateTime;
+
+        @Getter
+        private final int numberOfPeople;
+
+        public OrderHistory(int orderRowNumber, String orderDateTime, int numberOfPeople) {
+            this.orderRowNumber = orderRowNumber;
             this.orderDateTime = orderDateTime;
             this.numberOfPeople = numberOfPeople;
-            this.orderRowNumber = RowNumber;
         }
     }
 }

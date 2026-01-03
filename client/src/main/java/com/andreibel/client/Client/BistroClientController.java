@@ -70,11 +70,6 @@ public class BistroClientController {
         client.send(new Message(APICallType.CREATE_ORDER, req));
     }
 
-    public void requestAllOrdersForCustomer(OrderRequest req) {
-        if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType.GET_ORDERS_FOR_CUSTUMER, req));
-    }
-
     public void requestAvailableTimes(TimeGetterRequest req) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.GET_ALL_TIMES_IN_DATE, req));
@@ -111,9 +106,9 @@ public class BistroClientController {
         client.send(new Message(APICallType.ADD_TO_WAITING_LIST, req));
     }
 
-    public void requestAllOrdersForCustomer(String email, String phoneNumber) {
+    public void requestAllOrdersForCustomer(OrderRequest req) {
         if (!isClientAvailable()) return;
-        client.send(new Message(APICallType.ORDER_LOST_CONFORMATION_CODE, new OrderRequest(null, null, null, null, email, phoneNumber)));
+        client.send(new Message(APICallType.ORDER_LOST_CONFORMATION_CODE, req));
     }
 
     public void requestSendConfirmationCode(String message) {
@@ -156,6 +151,16 @@ public class BistroClientController {
     public void requestCurrentWaitingList(){
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.GET_WAITING_LIST, null));
+    }
+
+    public void requestActiveOrders(){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.GET_ALL_ACTIVE_ORDER, null));
+    }
+
+    public void requestCurrentDining(){
+        if (!isClientAvailable()) return;
+        //client.send(new Message(APICallType))
     }
 
     private boolean isClientAvailable() {

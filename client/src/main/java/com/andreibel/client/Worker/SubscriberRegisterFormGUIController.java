@@ -12,6 +12,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
@@ -34,6 +35,8 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
     private Button btnRegister;
     @FXML
     private Button btnGoBack;
+    @FXML
+    private AnchorPane rootPane;
 
     private BistroClientController controller;
 

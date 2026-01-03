@@ -6,7 +6,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="364.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Table.GetTableFormGUIController">
+<AnchorPane prefHeight="305.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Table.GetTableFormGUIController">
 
     <children>
 
@@ -18,28 +18,20 @@
         </Label>
 
         <!-- Subscriber Info -->
-        <Label fx:id="lblSubscriberInfo" layoutX="132.0" layoutY="80.0" style="-fx-font-size: 14px;" text="Subscribers can authenticate with Tag Reader as well!" />
+        <Label fx:id="lblSubscriberInfo" layoutX="66.0" layoutY="82.0" style="-fx-font-size: 14px;" text="Subscribers can authenticate with Tag Reader as well and click on Confrim Arrival!" />
 
         <!-- Confirmation Code -->
         <Label layoutX="96.0" layoutY="128.0" style="-fx-font-size: 14px;" text="Confirmation Code:" />
 
         <TextField fx:id="txtFieldConfirmation" layoutX="214.0" layoutY="123.0" prefHeight="28.0" prefWidth="216.0" promptText="Enter your confirmation code here..." />
 
-        <!-- OR -->
-        <Label fx:id="lblOR" layoutX="304.0" layoutY="160.0" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="OR" />
-
-        <!-- Subscriber ID -->
-        <Label fx:id="lblSubscriberID" layoutX="128.0" layoutY="193.0" style="-fx-font-size: 14px;" text="Subscriber ID:" />
-
-        <TextField fx:id="txtFieldSubscriberID" layoutX="215.0" layoutY="188.0" prefHeight="28.0" prefWidth="216.0" promptText="Scan your tag or enter subscriber ID..." />
-
         <!-- Confirm Arrival -->
-        <Button fx:id="btnConfrimArrival" layoutX="238.0" layoutY="240.0" mnemonicParsing="false" onAction="#onButtonConfirmArrivalClicked" prefHeight="38.0" prefWidth="121.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Confirm Arrival" />
+        <Button fx:id="btnConfrimArrival" layoutX="262.0" layoutY="175.0" mnemonicParsing="false" onAction="#onButtonConfirmArrivalClicked" prefHeight="38.0" prefWidth="121.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Confirm Arrival" />
 
         <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="13.0" layoutY="313.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="38.0" prefWidth="121.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+        <Button fx:id="btnGoBack" layoutX="21.0" layoutY="251.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="38.0" prefWidth="121.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
         <!-- Lost My Code -->
-        <Button fx:id="btnLostMyCode" layoutX="471.0" layoutY="313.0" mnemonicParsing="false" onAction="#onLostMyCodeButtonClicked" prefHeight="38.0" prefWidth="114.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="Lost My Code" />
+        <Button fx:id="btnLostMyCode" layoutX="472.0" layoutY="251.0" mnemonicParsing="false" onAction="#onLostMyCodeButtonClicked" prefHeight="38.0" prefWidth="114.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="Lost My Code" />
 
     </children>
 </AnchorPane>

@@ -34,12 +34,7 @@ public class GetTableFormGUIController implements IServerResponseListener{
     private RadioButton radioBtnSubscriber;
     @FXML
     private TextField txtFieldConfirmation;
-    @FXML
-    private Label lblOR;
-    @FXML
-    private Label lblSubscriberID;
-    @FXML
-    private TextField txtFieldSubscriberID;
+
     @FXML
     private Button btnConfrimArrival;
     @FXML
@@ -78,20 +73,12 @@ public class GetTableFormGUIController implements IServerResponseListener{
             BistroUtilities.showMessage("Bistro Restaurant", "Dear Guest, please enter confirmation code");
             return;
         }
-        if (CustomerStateManager.getInstance().getSubscriber() != null && (txtFieldSubscriberID.getText().isEmpty() || txtFieldConfirmation.getText().isEmpty())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Dear Subscriber, please enter confirmation code or subscriber ID");
-            return;
-        }
 
-        if (!BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
+        if (CustomerStateManager.getInstance().getSubscriber() == null && !BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid confirmation code");
             return;
         }
 
-        if (!BistroUtilities.isNumeric(txtFieldSubscriberID.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid subscriber ID");
-            return;
-        }
         controller.requestArrivalConfirmation(new OrderRequest(UUID.fromString(txtFieldConfirmation.getText()), null, null, fillSubscriberIDDetails(), null, null));
     }
     @FXML
@@ -112,27 +99,20 @@ public class GetTableFormGUIController implements IServerResponseListener{
     private void clearForm() {
         adjustFormBasedOnUserType();
         txtFieldConfirmation.clear();
-        txtFieldSubscriberID.clear();
     }
 
     private void adjustFormBasedOnUserType(){
         if (CustomerStateManager.getInstance().getSubscriber() != null) {
             lblSubscriberInfo.setVisible(true);
-            lblOR.setVisible(true);
-            lblSubscriberID.setVisible(true);
-            txtFieldSubscriberID.setVisible(true);
         }
         else{
             lblSubscriberInfo.setVisible(false);
-            lblOR.setVisible(false);
-            lblSubscriberID.setVisible(false);
-            txtFieldSubscriberID.setVisible(false);
         }
 
     }
 
     private Integer fillSubscriberIDDetails(){
-        return ((radioBtnSubscriber.isSelected() || CustomerStateManager.getInstance().getSubscriber() != null) && !txtFieldSubscriberID.getText().isEmpty()) ? Integer.parseInt(txtFieldSubscriberID.getText()) : null;
+        return (CustomerStateManager.getInstance().getSubscriber() != null)? CustomerStateManager.getInstance().getSubscriber().getSubscriberId() : null;
     }
 
 }

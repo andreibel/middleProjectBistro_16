@@ -45,18 +45,9 @@ public class MainFormGUIController {
     private void initialize() {
         //CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
         WorkerStateManager.getInstance().setManager(true);
-
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            onSceneShown();
-                        });
-                    }
-                });
-            }
-        });
+        updateMainFormWhenSceneIsShown();
+        if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
+            btnSubscriber.setText("Subscriber Area");
     }
 
     /**
@@ -154,8 +145,18 @@ public class MainFormGUIController {
         BistroUtilities.switchScreen((Node) event.getSource(), "/Order/NoOrderForm.fxml", "Bistro Restaurant - Dine-In without Order");
     }
 
-    private void onSceneShown() {
-        if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
-            btnSubscriber.setText("Subscriber Area");
+    private void updateMainFormWhenSceneIsShown() {
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
+                                btnSubscriber.setText("Subscriber Area");
+                        });
+                    }
+                });
+            }
+        });
     }
 }
