@@ -34,9 +34,9 @@ public enum APICallType {
     ORDER_ARRIVED_WAITING_RESPONSE, // WaitingResponse✅
     ORDER_ARRIVED_ERROR,
 
-    ORDER_LOST_CONFORMATION_CODE, // OrderRequest✅
-    ORDER_LOST_CONFORMATION_CODE_RESPONSE, // OrderResponse✅
-    ORDER_LOST_CONFORMATION_CODE_ERROR, // ✅
+    ORDER_LOST_CONFORMATION_CODE, // TimeGetterRequest
+    ORDER_LOST_CONFORMATION_CODE_RESPONSE, // OrderResponse
+    ORDER_LOST_CONFORMATION_CODE_ERROR, //
 
     COMPLETE_ORDER, // UUID ✅
     COMPLETE_ORDER_RESPONSE, // File ✅
@@ -72,6 +72,7 @@ public enum APICallType {
     UPDATE_SUBSCRIBER, // SubscriberRequest ✅
     UPDATE_SUBSCRIBER_RESPONSE, // SubscriberResponse ✅
     UPDATE_SUBSCRIBER_ERROR, // ✅
+
 
     //   /$$      /$$                     /$$
 //  | $$ /$$$| $$  /$$$$$$   /$$$$$$ | $$   /$$  /$$$$$$   /$$$$$$

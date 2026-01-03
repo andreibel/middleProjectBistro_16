@@ -5,12 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class TimeGetterRequest implements Serializable {
-    private LocalDate date;
-    private int capacity;
+public class TableResponse implements Serializable {
+    private Integer capacity;
+    private Integer quantity;
 }
