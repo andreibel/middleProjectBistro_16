@@ -407,15 +407,35 @@ public class OrderService {
         return true;
     }
 
-    public OrderResponse lostConformCode(OrderRequest request) {
-        OrderResponse response = null;
-        if (request.getEmail() != null) {
-            response = OrderMapper.mapOrderToOrderResponse(tx.inTransaction(() ->
-                    orderRepository.findOneByEmail(request.getEmail(), request.getOrderDateTime())));
-        } else if (request.getPhoneNumber() != null) {
-            response = OrderMapper.mapOrderToOrderResponse(tx.inTransaction(() ->
-                    orderRepository.findOneByPhoneNumber(request.getPhoneNumber(), request.getOrderDateTime())));
-        }
+    public List<OrderResponse> lostConformCode(OrderRequest request) {
+        List<OrderResponse>response  = new ArrayList<>();
+        if (request.getSubscriberId() != null)
+            response = tx.inTransaction(() -> orderRepository
+                    .findBySubscriberId(request.getSubscriberId())
+                    .stream()
+                    .filter(order -> order.getOrderDateTime().isAfter(LocalDateTime.now()))
+                    .toList()
+            ).stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
+        else if (request.getEmail() != null)
+            response = tx.inTransaction(() -> orderRepository
+                            .findByEmail(request.getEmail())
+                            .stream()
+                            .filter(order -> order.getOrderDateTime().isAfter(LocalDateTime.now()))
+                            .toList()
+                    ).stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
+        else if (request.getPhoneNumber() != null)
+            response = tx.inTransaction(() -> orderRepository
+                            .findByPhone(request.getPhoneNumber())
+                            .stream()
+                            .filter(order -> order.getOrderDateTime().isAfter(LocalDateTime.now()))
+                            .toList()
+                    ).stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
         return response;
     }
 

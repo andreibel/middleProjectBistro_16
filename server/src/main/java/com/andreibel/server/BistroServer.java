@@ -1,5 +1,6 @@
 package com.andreibel.server;
 
+import com.andreibel.message.Message;
 import com.andreibel.server.controller.Serve;
 import com.andreibel.server.services.OrderClosingScheduler;
 import com.andreibel.server.services.OrderTimeoutScheduler;
@@ -11,6 +12,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+import static com.andreibel.message.APICallType.CHANGE_BISTRO_TIME_ERROR;
 import static com.andreibel.server.utils.TUI.*;
 
 public class BistroServer extends Application {

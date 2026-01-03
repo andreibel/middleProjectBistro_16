@@ -34,9 +34,9 @@ public enum APICallType {
     ORDER_ARRIVED_WAITING_RESPONSE, // WaitingResponse✅
     ORDER_ARRIVED_ERROR,
 
-    ORDER_LOST_CONFORMATION_CODE, // TimeGetterRequest
-    ORDER_LOST_CONFORMATION_CODE_RESPONSE, // OrderResponse
-    ORDER_LOST_CONFORMATION_CODE_ERROR, //
+    ORDER_LOST_CONFORMATION_CODE, // TimeGetterRequest ✅
+    ORDER_LOST_CONFORMATION_CODE_RESPONSE, // OrderResponse ✅
+    ORDER_LOST_CONFORMATION_CODE_ERROR, //✅
 
     COMPLETE_ORDER, // UUID ✅
     COMPLETE_ORDER_RESPONSE, // File ✅
@@ -90,21 +90,21 @@ public enum APICallType {
     WORKER_CREATE_RESPONSE, // WorkerResponse ✅
     WORKER_CREATE_ERROR, // ✅
 
-    CREATE_SUBSCRIBER, // SubscriberRequest
-    CREATE_SUBSCRIBER_RESPONSE, // SubscriberResponse
-    CREATE_SUBSCRIBER_ERROR,
+    CREATE_SUBSCRIBER, // SubscriberRequest ✅
+    CREATE_SUBSCRIBER_RESPONSE, // SubscriberResponse✅
+    CREATE_SUBSCRIBER_ERROR,// ✅
 
-    ADD_SPECIAL_DAY, // SpecialDayRequest
-    ADD_SPECIAL_DAY_RESPONSE, // none
-    ADD_SPECIAL_DAY_ERROR,
+    ADD_SPECIAL_DAY, // ✅
+    ADD_SPECIAL_DAY_RESPONSE, // none ✅
+    ADD_SPECIAL_DAY_ERROR, // ✅
 
-    CHANGE_BISTRO_TIME, // BistroTimeRequest
-    CHANGE_BISTRO_TIME_RESPONSE, // none
-    CHANGE_BISTRO_TIME_ERROR,
+    CHANGE_BISTRO_TIME, // BistroTimeRequest  ✅
+    CHANGE_BISTRO_TIME_RESPONSE, // none  ✅
+    CHANGE_BISTRO_TIME_ERROR, //  ✅
 
-    GET_ALL_TABLES, // none
-    GET_ALL_TABLES_RESPONSE, // List<TableResponse>
-    GET_ALL_TABLES_ERROR,
+    GET_ALL_TABLES, // none  ✅
+    GET_ALL_TABLES_RESPONSE, // List<TableResponse>  ✅
+    GET_ALL_TABLES_ERROR, //  ✅
 
     EDIT_BISTRO_LAYOUT, // List<TableRequest>
     EDIT_BISTRO_LAYOUT_RESPONSE, // none

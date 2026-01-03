@@ -7,6 +7,7 @@ import com.lloseng.ocsf.server.ConnectionToClient;
 import java.io.IOException;
 
 import static com.andreibel.server.utils.TUI.serverInputLog;
+import static com.andreibel.server.utils.TUI.serverOutputLog;
 
 /**
  * OCSF-based server implementation for the Bistro system.
@@ -126,10 +127,10 @@ public class Serve extends AbstractServer {
                 case WORKER_LOGIN -> workerController.login(message);
                 case WORKER_CREATE -> workerController.createWorker(message);
                 case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
-                case ADD_SPECIAL_DAY -> null;
-                case CHANGE_BISTRO_TIME -> null;
-                case GET_ALL_TABLES -> null;
-                case EDIT_BISTRO_LAYOUT -> null;
+                case ADD_SPECIAL_DAY -> workerController.addSpecialDay(message);
+                case CHANGE_BISTRO_TIME -> workerController.editRegulaDay(message); //
+                case GET_ALL_TABLES -> workerController.getAllTables(); //
+                case EDIT_BISTRO_LAYOUT -> workerController.updateTables(message);
                 case SCHEDULES_REPORT -> null;
                 case SUBSCRIBER_REPORT -> null;
                 case GET_WAITING_LIST -> null;
@@ -140,7 +141,7 @@ public class Serve extends AbstractServer {
                 case ARRIVE_WAITING_LIST -> null;
                 default -> null;
             };
-
+            serverOutputLog(response);
             client.sendToClient(response);
 
         } catch (IllegalArgumentException | IOException e) {

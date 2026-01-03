@@ -176,8 +176,8 @@ public class OrderController {
             return null;
         }
 
-        OrderResponse data = orderService.lostConformCode(((OrderRequest) message.getData()));
-        if (data == null) return new Message(ORDER_LOST_CONFORMATION_CODE_ERROR, null);
+        List<OrderResponse> data = orderService.lostConformCode(((OrderRequest) message.getData()));
+        if (data == null || data.isEmpty()) return new Message(ORDER_LOST_CONFORMATION_CODE_ERROR, null);
         return new Message(ORDER_LOST_CONFORMATION_CODE_RESPONSE, data);
     }
 }
