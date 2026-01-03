@@ -111,9 +111,14 @@ public class BistroClientController {
         client.send(new Message(APICallType.ADD_TO_WAITING_LIST, req));
     }
 
-    public void requestLostConfirmationCode(String email, String phoneNumber) {
+    public void requestAllOrdersForCustomer(String email, String phoneNumber) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.ORDER_LOST_CONFORMATION_CODE, new OrderRequest(null, null, null, null, email, phoneNumber)));
+    }
+
+    public void requestSendConfirmationCode(String message) {
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.ORDER_LOST_CONFORMATION_CODE, message));
     }
 
     //=======================Worker Request==========================

@@ -3,6 +3,7 @@ package com.andreibel.client.Table;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.DTO.OrderResponse;
@@ -45,7 +46,6 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     @FXML
     private Button btnGoBack;
 
-    private String email, phoneNumber;
     private boolean isFetchingOrders = true;
 
     private BistroClientController controller;
@@ -58,28 +58,16 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     @SuppressWarnings("unchecked")
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.GET_ALL_ORDERS_CUSTOMER_RESPONSE) {
-
-        }
-        else if (message.getType() == APICallType.GET_ALL_ORDERS_CUSTOMER_ERROR){
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error it was unable to fetch orders.");
-        }
-        else if (message.getType() == APICallType.ORDER_LOST_CONFORMATION_CODE_RESPONSE){
-            if (isFetchingOrders) {
-                Platform.runLater(() -> {
-                    addOrdersTimesToCombobox((ArrayList<OrderResponse>) message.getData());
-                    if (!comboBoxOrders.getItems().isEmpty()) {
-                        isFetchingOrders = false;
-                        btnRetrieveCode.setText("Retrieve Code");
-                        lblOrders.setDisable(false);
-                        comboBoxOrders.setDisable(false);
-                    }
-                });
-            }
-            else{
-                clearForm();
-                BistroUtilities.showMessage("Bistro Restaurant", "We've sent you the confirmation code to your email/phone number, please check");
-            }
+        if (message.getType() == APICallType.ORDER_LOST_CONFORMATION_CODE_RESPONSE){
+            Platform.runLater(() -> {
+                addOrdersTimesToCombobox((ArrayList<OrderResponse>) message.getData());
+                if (!comboBoxOrders.getItems().isEmpty()) {
+                    isFetchingOrders = false;
+                    btnRetrieveCode.setText("Retrieve Code");
+                    lblOrders.setDisable(false);
+                    comboBoxOrders.setDisable(false);
+                }
+            });
 
         }
         else if (message.getType() == APICallType.ORDER_LOST_CONFORMATION_CODE_ERROR){
@@ -101,15 +89,21 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
                     BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid phone number");
                 }
                 else {
-                    controller.requestAllOrdersForCustomer(new OrderRequest(null, null, null, null, txtFieldEmail.getText(), txtFieldPhoneNumber.getText()));
+                    controller.requestAllOrdersForCustomer(new OrderRequest(null, null, null,
+                            fillSubscriberIDDetails(), txtFieldEmail.getText(), txtFieldPhoneNumber.getText()));
+                    clearForm();
+                    BistroUtilities.showMessage("Bistro Restaurant", "We've sent you the confirmation code to your email/phone number, please check");
                 }
             }
         }
         else{
-            String[] dateTimeOrder = comboBoxOrders.getSelectionModel().getSelectedItem().split(" ");
-            controller.requestLostConfirmationCode(dateTimeOrder[0], dateTimeOrder[1]);
+            if (comboBoxOrders.getSelectionModel().getSelectedItem() != null){
+                controller.requestSendConfirmationCode(sendLogMessageToServer());
+            }
+            else{
+                BistroUtilities.showMessage("Bistro Restaurant", "Please select an order");
+            }
         }
-
     }
     @FXML
     private void onButtonGoBackClicked(ActionEvent event) throws IOException {
@@ -125,6 +119,26 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         for (OrderResponse order : orders){
             comboBoxOrders.getItems().add(order.getOrderDateTime().format(formatter));
+        }
+    }
+
+    private Integer fillSubscriberIDDetails(){
+        return (CustomerStateManager.getInstance().getSubscriber() != null) ?
+                CustomerStateManager.getInstance().getSubscriber().getSubscriberId() :
+                null;
+    }
+
+    private String sendLogMessageToServer(){
+        if (CustomerStateManager.getInstance().getSubscriber() != null){
+            return "Sending confirmation code to " + CustomerStateManager.getInstance().getSubscriber().getEmail();
+        }
+        else{
+            if (!txtFieldEmail.getText().isEmpty()){
+                return "Sending confirmation code to " + txtFieldEmail.getText();
+            }
+            else{
+                return "Sending confirmation code to " + txtFieldPhoneNumber.getText();
+            }
         }
     }
 
