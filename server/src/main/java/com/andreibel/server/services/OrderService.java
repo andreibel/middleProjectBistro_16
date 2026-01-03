@@ -16,7 +16,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
- /**
+
+/**
  * Application service responsible for managing restaurant orders and computing availability.
  *
  * <p>
@@ -195,6 +196,7 @@ public class OrderService {
      * @return updated order as DTO (arrived state)
      */
     public OrderResponse orderArrives(UUID conformationCode) {
+        //TODO: add logic of arriving to bistro but not palace now available,
         return tx.inTransaction(() -> {
             orderRepository.setArrived(conformationCode);
             Order order = orderRepository.findByConformationCode(conformationCode);
@@ -217,10 +219,11 @@ public class OrderService {
      * @return updated order as DTO (completed state)
      */
     public OrderResponse completeOrder(UUID conformationCode) {
-        return tx.inTransaction(() -> {
+        OrderResponse orderResponse = tx.inTransaction(() -> {
             orderRepository.completeOrder(conformationCode);
             return OrderMapper.mapOrderToOrderResponse(orderRepository.findByConformationCode(conformationCode));
         });
+        return orderResponse;
     }
 
     /**
@@ -251,7 +254,7 @@ public class OrderService {
      *   <li>For each slot, validate availability using {@link #isSlotAvailable(LocalDateTime, int, List, TreeMap, int, int)}.</li>
      * </ol>
      *
-     * @param date calendar date to compute availability for
+     * @param date           calendar date to compute availability for
      * @param numberOfGuests requested party size
      * @return list of available start times as {@link LocalTime} (can be empty)
      */
@@ -315,10 +318,10 @@ public class OrderService {
      * If allocation fails at any point, the slot is unavailable.
      * </p>
      *
-     * @param slot reservation candidate start time
-     * @param guests requested party size
-     * @param dayOrders all orders that start on the given date
-     * @param total table inventory map (capacity -> quantity)
+     * @param slot        reservation candidate start time
+     * @param guests      requested party size
+     * @param dayOrders   all orders that start on the given date
+     * @param total       table inventory map (capacity -> quantity)
      * @param intervalMin slot/step size in minutes (e.g., 60)
      * @param durationMin reservation duration in minutes (fixed: 120)
      * @return {@code true} if the slot is available across the entire duration, otherwise {@code false}
@@ -377,8 +380,8 @@ public class OrderService {
      *   </li>
      * </ol>
      *
-     * @param total immutable view of total inventory (capacity -> quantity)
-     * @param collide list of active/colliding orders at a specific time point
+     * @param total       immutable view of total inventory (capacity -> quantity)
+     * @param collide     list of active/colliding orders at a specific time point
      * @param extraGuests requested additional group size
      * @return {@code true} if all groups can be allocated; {@code false} otherwise
      */
@@ -403,4 +406,19 @@ public class OrderService {
         }
         return true;
     }
+
+    public OrderResponse lostConformCode(OrderRequest request) {
+        OrderResponse response = null;
+        if (request.getEmail() != null) {
+            response = OrderMapper.mapOrderToOrderResponse(tx.inTransaction(() ->
+                    orderRepository.findOneByEmail(request.getEmail(), request.getOrderDateTime())));
+        } else if (request.getPhoneNumber() != null) {
+            response = OrderMapper.mapOrderToOrderResponse(tx.inTransaction(() ->
+                    orderRepository.findOneByPhoneNumber(request.getPhoneNumber(), request.getOrderDateTime())));
+        }
+        return response;
+    }
+
+
+
 }

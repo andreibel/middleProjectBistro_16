@@ -2,10 +2,8 @@ package com.andreibel.server.services;
 
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OrderRepository;
-import com.andreibel.server.entity.Order;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

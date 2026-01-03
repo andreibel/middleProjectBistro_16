@@ -83,12 +83,11 @@ public class OrderRepository {
     public List<Order> findAll() throws SQLException {
         String sql = """
                 SELECT *
-                FROM bistro.`Order`;
+                FROM bistro.`Order`
+                WHERE subscriberId IS NOT NULL;
                 """;
         List<Order> orders = new ArrayList<>();
-
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
                 orders.add(mapRelToOrder(rs));
             }
@@ -271,7 +270,130 @@ public class OrderRepository {
         return orders;
     }
 
-    /**
+     /**
+      * Fetches all orders that belong to a specific subscriber.
+      *
+      * <h3>SQL</h3>
+      * <pre>
+      * SELECT *
+      * FROM bistro.`order`
+      * WHERE subscriberId = ?;
+      * </pre>
+      *
+      * <h3>Parameters</h3>
+      * <ul>
+      *   <li>1: {@code subscriberId} (int) — subscriber identifier.</li>
+      * </ul>
+      *
+      * <h3>Result</h3>
+      * Returns a list of {@link Order} rows for the subscriber (can be empty).
+      *
+      * @param subscriberId subscriber identifier
+      * @return orders belonging to the subscriber
+      */
+     public Order findOneBySubscriberId(int subscriberId, LocalDateTime orderDateTime) throws SQLException {
+         String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE subscriberId = ?
+                AND orderDateTime = ?;
+                """;
+
+         List<Order> orders = new ArrayList<>();
+         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+             stmt.setInt(1, subscriberId);
+             stmt.setTimestamp(2, Timestamp.valueOf(orderDateTime));
+             try (ResultSet rs = stmt.executeQuery()) {
+                 while (rs.next()) {
+                     return mapRelToOrder(rs);
+                 }
+             }
+         }
+         return null;
+     }
+     /**
+      * Fetches all orders that belong to a specific subscriber.
+      *
+      * <h3>SQL</h3>
+      * <pre>
+      * SELECT *
+      * FROM bistro.`order`
+      * WHERE subscriberId = ?;
+      * </pre>
+      *
+      * <h3>Parameters</h3>
+      * <ul>
+      *   <li>1: {@code subscriberId} (int) — subscriber identifier.</li>
+      * </ul>
+      *
+      * <h3>Result</h3>
+      * Returns a list of {@link Order} rows for the subscriber (can be empty).
+      *
+      * @param email Order email
+      * @return orders belonging to the subscriber
+      */
+     public Order findOneByEmail(String email, LocalDateTime orderDateTime) throws SQLException {
+         String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE email = ?
+                AND orderDateTime = ?;
+                """;
+
+         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+             stmt.setString(1, email);
+             stmt.setTimestamp(2, Timestamp.valueOf(orderDateTime));
+             try (ResultSet rs = stmt.executeQuery()) {
+                 while (rs.next()) {
+                     return mapRelToOrder(rs);
+                 }
+             }
+         }
+         return null;
+     }
+     /**
+      * Fetches all orders that belong to a specific subscriber.
+      *
+      * <h3>SQL</h3>
+      * <pre>
+      * SELECT *
+      * FROM bistro.`order`
+      * WHERE subscriberId = ?;
+      * </pre>
+      *
+      * <h3>Parameters</h3>
+      * <ul>
+      *   <li>1: {@code subscriberId} (int) — subscriber identifier.</li>
+      * </ul>
+      *
+      * <h3>Result</h3>
+      * Returns a list of {@link Order} rows for the subscriber (can be empty).
+      *
+      * @param phoneNumber Order email
+      * @return orders belonging to the subscriber
+      */
+     public Order findOneByPhoneNumber(String phoneNumber, LocalDateTime orderDateTime) throws SQLException {
+         String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE phoneNumber = ?
+                AND orderDateTime = ?;
+                """;
+
+         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+             stmt.setString(1, phoneNumber);
+             stmt.setTimestamp(2, Timestamp.valueOf(orderDateTime));
+             try (ResultSet rs = stmt.executeQuery()) {
+                 while (rs.next()) {
+                     return mapRelToOrder(rs);
+                 }
+             }
+         }
+         return null;
+     }
+
+
+     /**
      * Inserts a new order row and returns the persisted entity.
      *
      * <h3>SQL</h3>

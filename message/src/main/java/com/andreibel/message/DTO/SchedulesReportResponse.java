@@ -18,4 +18,7 @@ public class SchedulesReportResponse implements Serializable {
     private Map<LocalDate, Map<LocalTime, Integer>> customerArriveDeparture;
     private Map<LocalDate,Integer> CustomerLate;
     private Map<LocalDate,Integer> CustomerDelay;
+    private LocalTime openingTime;
+    private LocalTime closingTime;
+    private Integer interval;
 }

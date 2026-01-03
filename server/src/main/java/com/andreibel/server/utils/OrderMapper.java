@@ -23,7 +23,6 @@ public class OrderMapper {
      */
     public static OrderResponse mapOrderToOrderResponse(Order order) {
         return new OrderResponse(
-                order.getOrderNumber(),
                 order.getNumberOfGuests(),
                 order.getConformationCode(),
                 order.getSubscriberId(),

@@ -2,6 +2,7 @@ package com.andreibel.message;
 
 public enum APICallType {
     /**
+     * <pre>
      *   /$$$$$$                  /$$
      *  /$$__  $$                | $$
      * | $$  \ $$  /$$$$$$   /$$$$$$$  /$$$$$$   /$$$$$$
@@ -10,83 +11,84 @@ public enum APICallType {
      * | $$  | $$| $$      | $$  | $$| $$_____/| $$
      * |  $$$$$$/| $$      |  $$$$$$$|  $$$$$$$| $$
      *  \______/ |__/       \_______/ \_______/|__/
+     * </pre>
      */
-    CREATE_ORDER, // OrderRequest
-    CREATE_ORDER_RESPONSE, // OrderResponse
-    CREATE_ORDER_ERROR,
+    CREATE_ORDER, // OrderRequest // done✅
+    CREATE_ORDER_RESPONSE, // OrderResponse✅
+    CREATE_ORDER_ERROR,//✅
 
-    DELETE_ORDER, // UUID
-    DELETE_ORDER_RESPONSE, // no required
-    DELETE_ORDER_ERROR,
+    DELETE_ORDER, // UUID✅
+    DELETE_ORDER_RESPONSE, // no required✅
+    DELETE_ORDER_ERROR,//✅
 
-    GET_ALL_ORDERS_SUB, // no required
-    GET_ALL_ORDERS_SUB_RESPONSE, // List<OrderResponse>
-    GET_ALL_ORDERS_SUB_ERROR,
+    GET_ALL_ORDERS_SUB, // no required ✅
+    GET_ALL_ORDERS_SUB_RESPONSE, // List<OrderResponse>✅
+    GET_ALL_ORDERS_SUB_ERROR,//✅
 
-    GET_ONE_ORDER, // UUID
-    GET_ONE_ORDER_RESPONSE, // OrderResponse
-    GET_ONE_ORDER_ERROR,
+    GET_ONE_ORDER, // UUID✅
+    GET_ONE_ORDER_RESPONSE, // OrderResponse✅
+    GET_ONE_ORDER_ERROR, // ✅
 
-    ORDER_ARRIVED, // OrderRequest
-    ORDER_ARRIVED_RESPONSE, // OrderResponse
-    ORDER_ARRIVED_WAITING_RESPONSE, // WaitingResponse
+    ORDER_ARRIVED, // OrderRequest✅
+    ORDER_ARRIVED_RESPONSE, // OrderResponse✅
+    ORDER_ARRIVED_WAITING_RESPONSE, // WaitingResponse✅
     ORDER_ARRIVED_ERROR,
 
-    ORDER_LOST_CONFORMATION_CODE, // OrderRequest
+    ORDER_LOST_CONFORMATION_CODE, // TimeGetterRequest
     ORDER_LOST_CONFORMATION_CODE_RESPONSE, // OrderResponse
-    ORDER_LOST_CONFORMATION_CODE_ERROR,
+    ORDER_LOST_CONFORMATION_CODE_ERROR, //
 
-    COMPLETE_ORDER, // UUID,
-    COMPLETE_ORDER_RESPONSE, // RecipeFile
-    COMPLETE_ORDER_ERROR,
+    COMPLETE_ORDER, // UUID ✅
+    COMPLETE_ORDER_RESPONSE, // File ✅
+    COMPLETE_ORDER_ERROR, // ✅
 
-    GET_ALL_TIMES_IN_DATE, // OrderRequest
-    GET_ALL_TIMES_IN_DATE_RESPONSE, // List<LocalTime>,
-    GET_ALL_TIMES_IN_DATE_ERROR,
+    GET_ALL_TIMES_IN_DATE, // OrderRequest ✅
+    GET_ALL_TIMES_IN_DATE_RESPONSE, // List<LocalTime> ✅
+    GET_ALL_TIMES_IN_DATE_ERROR,// ✅
 
-    /**
-     *  /$$$$$$            /$$                                     /$$ /$$
-     *  /$$__  $$          | $$                                    |__/| $$
-     * | $$  \__/ /$$   /$$| $$$$$$$   /$$$$$$$  /$$$$$$$  /$$$$$$  /$$| $$$$$$$   /$$$$$$   /$$$$$$
-     * |  $$$$$$ | $$  | $$| $$__  $$ /$$_____/ /$$_____/ /$$__  $$| $$| $$__  $$ /$$__  $$ /$$__  $$
-     *  \____  $$| $$  | $$| $$  \ $$|  $$$$$$ | $$      | $$  \__/| $$| $$  \ $$| $$$$$$$$| $$  \__/
-     *  /$$  \ $$| $$  | $$| $$  | $$ \____  $$| $$      | $$      | $$| $$  | $$| $$_____/| $$
-     * |  $$$$$$/|  $$$$$$/| $$$$$$$/ /$$$$$$$/|  $$$$$$$| $$      | $$| $$$$$$$/|  $$$$$$$| $$
-     *  \______/  \______/ |_______/ |_______/  \_______/|__/      |__/|_______/  \_______/|__/
-     */
-    GET_ALL_SUBSCRIBERS, // none
-    GET_ALL_SUBSCRIBERS_RESPONSE, // List<SubscriberResponse>
-    GET_ALL_SUBSCRIBERS_ERROR,
 
-    SUBSCRIBER_LOGIN, // Integer
-    SUBSCRIBER_LOGIN_RESPONSE, // SubscriberResponse
-    SUBSCRIBER_LOGIN_ERROR,
+//    /$$$$$$            /$$                                     /$$ /$$
+//   /$$__  $$          | $$                                    |__/| $$
+//  | $$  \__/ /$$   /$$| $$$$$$$   /$$$$$$$  /$$$$$$$  /$$$$$$  /$$| $$$$$$$   /$$$$$$   /$$$$$$
+//  |  $$$$$$ | $$  | $$| $$__  $$ /$$_____/ /$$_____/ /$$__  $$| $$| $$__  $$ /$$__  $$ /$$__  $$
+//   \____  $$| $$  | $$| $$  \ $$|  $$$$$$ | $$      | $$  \__/| $$| $$  \ $$| $$$$$$$$| $$  \__/
+//   /$$  \ $$| $$  | $$| $$  | $$ \____  $$| $$      | $$      | $$| $$  | $$| $$_____/| $$
+//  |  $$$$$$/|  $$$$$$/| $$$$$$$/ /$$$$$$$/|  $$$$$$$| $$      | $$| $$$$$$$/|  $$$$$$$| $$
+//   \______/  \______/ |_______/ |_______/  \_______/|__/      |__/|_______/  \_______/|__/
 
-    GET_SUBSCRIBER_ORDERS, // Integer
-    GET_SUBSCRIBER_ORDERS_RESPONSE, // List<OrderResponse>
-    GET_SUBSCRIBER_ORDERS_ERROR,
 
-    UPDATE_SUBSCRIBER, // SubscriberRequest
-    UPDATE_SUBSCRIBER_RESPONSE, // SubscriberResponse
-    UPDATE_SUBSCRIBER_ERROR,
+    GET_ALL_SUBSCRIBERS, // none ✅
+    GET_ALL_SUBSCRIBERS_RESPONSE, // List<SubscriberResponse> ✅
+    GET_ALL_SUBSCRIBERS_ERROR,// ✅
 
-    /**
-     *  /$$      /$$                     /$$
-     * | $$  /$ | $$                    | $$
-     * | $$ /$$$| $$  /$$$$$$   /$$$$$$ | $$   /$$  /$$$$$$   /$$$$$$
-     * | $$/$$ $$ $$ /$$__  $$ /$$__  $$| $$  /$$/ /$$__  $$ /$$__  $$
-     * | $$$$_  $$$$| $$  \ $$| $$  \__/| $$$$$$/ | $$$$$$$$| $$  \__/
-     * | $$$/ \  $$$| $$  | $$| $$      | $$_  $$ | $$_____/| $$
-     * | $$/   \  $$|  $$$$$$/| $$      | $$ \  $$|  $$$$$$$| $$
-     * |__/     \__/ \______/ |__/      |__/  \__/ \_______/|__/
-     */
-    WORKER_LOGIN, // WorkerAuth
-    WORKER_LOGIN_RESPONSE, // WorkerResponse
-    WORKER_LOGIN_ERROR,
+    SUBSCRIBER_LOGIN, // Integer ✅
+    SUBSCRIBER_LOGIN_RESPONSE, // SubscriberResponse ✅
+    SUBSCRIBER_LOGIN_ERROR, // ✅
 
-    WORKER_CREATE, // WorkerNewRequest
-    WORKER_CREATE_RESPONSE, // WorkerResponse
-    WORKER_CREATE_ERROR,
+    GET_SUBSCRIBER_ORDERS, // Integer ✅
+    GET_SUBSCRIBER_ORDERS_RESPONSE, // List<OrderResponse> ✅
+    GET_SUBSCRIBER_ORDERS_ERROR, // ✅
+
+    UPDATE_SUBSCRIBER, // SubscriberRequest ✅
+    UPDATE_SUBSCRIBER_RESPONSE, // SubscriberResponse ✅
+    UPDATE_SUBSCRIBER_ERROR, // ✅
+
+
+    //   /$$      /$$                     /$$
+//  | $$ /$$$| $$  /$$$$$$   /$$$$$$ | $$   /$$  /$$$$$$   /$$$$$$
+//  | $$/$$ $$ $$ /$$__  $$ /$$__  $$| $$  /$$/ /$$__  $$ /$$__  $$
+//  | $$$$_  $$$$| $$  \ $$| $$  \__/| $$$$$$/ | $$$$$$$$| $$  \__/
+//  | $$$/ \  $$$| $$  | $$| $$      | $$_  $$ | $$_____/| $$
+//  | $$/   \  $$|  $$$$$$/| $$      | $$ \  $$|  $$$$$$$| $$
+//  |__/     \__/ \______/ |__/      |__/  \__/ \_______/|__/
+//
+    WORKER_LOGIN, // WorkerAuth ✅
+    WORKER_LOGIN_RESPONSE, // WorkerResponse ✅
+    WORKER_LOGIN_ERROR, // ✅
+
+    WORKER_CREATE, // WorkerNewRequest ✅
+    WORKER_CREATE_RESPONSE, // WorkerResponse ✅
+    WORKER_CREATE_ERROR, // ✅
 
     CREATE_SUBSCRIBER, // SubscriberRequest
     CREATE_SUBSCRIBER_RESPONSE, // SubscriberResponse
@@ -129,7 +131,7 @@ public enum APICallType {
     GET_ALL_ARRIVED_AND_NOT_COMPLETE_ERROR,
 
     /**
-     *  /$$      /$$           /$$   /$$     /$$                     /$$       /$$             /$$
+     * /$$      /$$           /$$   /$$     /$$                     /$$       /$$             /$$
      * | $$  /$ | $$          |__/  | $$    |__/                    | $$      |__/            | $$
      * | $$ /$$$| $$  /$$$$$$  /$$ /$$$$$$   /$$ /$$$$$$$   /$$$$$$ | $$       /$$  /$$$$$$$ /$$$$$$
      * | $$/$$ $$ $$ |____  $$| $$|_  $$_/  | $$| $$__  $$ /$$__  $$| $$      | $$ /$$_____/|_  $$_/
@@ -137,9 +139,9 @@ public enum APICallType {
      * | $$$/ \  $$$ /$$__  $$| $$  | $$ /$$| $$| $$  | $$| $$  | $$| $$      | $$ \____  $$  | $$ /$$
      * | $$/   \  $$|  $$$$$$$| $$  |  $$$$/| $$| $$  | $$|  $$$$$$$| $$$$$$$$| $$ /$$$$$$$/  |  $$$$/
      * |__/     \__/ \_______/|__/   \___/  |__/|__/  |__/ \____  $$|________/|__/|_______/    \___/
-     *                                                     /$$  \ $$
-     *                                                    |  $$$$$$/
-     *                                                     \______/
+     * /$$  \ $$
+     * |  $$$$$$/
+     * \______/
      */
 
     ADD_TO_WAITING_LIST, // WaitingListRequest
@@ -152,5 +154,9 @@ public enum APICallType {
 
     ARRIVE_WAITING_LIST, // UUID
     ARRIVE_WAITING_LIST_RESPONSE, // none
-    ARRIVE_WAITING_LIST_ERROR
+    ARRIVE_WAITING_LIST_ERROR;
+
+    public String label() {
+        return name().toLowerCase();
+    }
 }

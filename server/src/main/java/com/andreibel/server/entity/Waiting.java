@@ -77,6 +77,7 @@ public class Waiting {
 
 
     public static final String WAITING_NUMBER = "waitingNumber";
+    public static final String NUMBER_OF_GUESTS = "numberOfGuests";
     public static final String WAITING_DATE_TIME = "waitingDateTime";
     public static final String IS_CURRENTLY_WAITING = "isCurrentlyWaiting";
     public static final String CONFIRMATION_CODE = "conformationCode";

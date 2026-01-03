@@ -1,11 +1,12 @@
 package com.andreibel.server.controller;
 
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.WorkerAuth;
 import com.andreibel.message.DTO.WorkerNewRequest;
 import com.andreibel.message.DTO.WorkerResponse;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.WorkerService;
+
+import static com.andreibel.message.APICallType.*;
 
 public class WorkerController {
     private final WorkerService workerService;
@@ -25,15 +26,14 @@ public class WorkerController {
 
     public Message login(Message message) {
         WorkerResponse response = workerService.authWorker((WorkerAuth) message.getData());
-        if (response != null) return new Message(APICallType.LOGIN_WORKER_RESPONSE, response);
-        return new Message(APICallType.ERROR, null);
+        if (response == null) return new Message(WORKER_LOGIN_ERROR, null);
+        return new Message(WORKER_LOGIN_RESPONSE, response);
     }
 
 
     public Message createWorker(Message message) {
-        return new Message(
-                APICallType.WORKER_CREATE_RESPONSE,
-                workerService.createWorker((WorkerNewRequest) message.getData())
-        );
+        WorkerResponse newWorker = workerService.createWorker((WorkerNewRequest) message.getData());
+        if (newWorker == null) return new Message(WORKER_CREATE_ERROR, null);
+        return new Message(WORKER_CREATE_RESPONSE, newWorker);
     }
 }

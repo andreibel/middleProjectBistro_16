@@ -42,22 +42,16 @@ public class SubscriberService {
                 .toList();
     }
 
-    public SubscriberResponse getSubscriber(SubscriberRequest data) {
+    public SubscriberResponse getSubscriber(Integer data) {
         return tx.inTransaction(
                 () -> {
-                    Subscriber subscriber;
-                    if (data.getPhoneNumber() != null)
-                        subscriber = subscriberRepository.getSubscriberByPhone(data.getPhoneNumber());
-                    else if (data.getEmail() != null)
-                        subscriber = subscriberRepository.getSubscriberByEmail(data.getEmail());
-                    else
-                        subscriber = subscriberRepository.getSubscriberById(data.getSubscriberId());
+                    Subscriber subscriber = subscriberRepository.getSubscriberById(data);
                     return SubscriberMapper.mapSubscriberToSubscriberResponse(subscriber);
                 }
         );
     }
 
-    public SubscriberResponse getSubscriberAndOrders(SubscriberRequest data) {
+    public SubscriberResponse getSubscriberAndOrders(Integer data) {
         return tx.inTransaction(() -> {
             SubscriberResponse subscriber = getSubscriber(data);
             subscriber.setOrders(
@@ -74,7 +68,7 @@ public class SubscriberService {
     public SubscriberResponse updateSub(SubscriberRequest data) {
         return tx.inTransaction( () -> {
             subscriberRepository.updateBySubID(data);
-            return getSubscriber(data);
+            return getSubscriber(data.getSubscriberId());
         });
     }
 }
