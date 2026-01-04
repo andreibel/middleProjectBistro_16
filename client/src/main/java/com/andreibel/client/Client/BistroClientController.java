@@ -4,6 +4,7 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.*;
 import com.andreibel.message.Message;
+import javafx.application.Platform;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -44,8 +45,15 @@ public class BistroClientController {
             return;
         }
         //Only one GUI Controller will invoke onServerResponse method
-        for (IServerResponseListener listener : listeners)
-            listener.onServerResponse(response);
+        Platform.runLater(() -> {
+            for (IServerResponseListener listener : listeners) {
+                try {
+                    listener.onServerResponse(response);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
 
@@ -158,9 +166,19 @@ public class BistroClientController {
         client.send(new Message(APICallType.GET_ALL_ACTIVE_ORDER, null));
     }
 
-    public void requestCurrentDining(){
+    public void requestCurrentDiningList(){
         if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType))
+        client.send(new Message(APICallType.GET_ALL_ARRIVED_AND_NOT_COMPLETE, null));
+    }
+
+    public void requestBistroTimes(){
+        if (!isClientAvailable()) return;
+        //client.send(new Message(APICallType., null));
+    }
+
+    public void requestEditBistroTimes(BistroTimeRequest req){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.CHANGE_BISTRO_TIME, req));
     }
 
     private boolean isClientAvailable() {

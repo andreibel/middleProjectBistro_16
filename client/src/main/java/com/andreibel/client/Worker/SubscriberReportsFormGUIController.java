@@ -71,11 +71,9 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
         if (message.getType() == APICallType.SUBSCRIBER_REPORT_RESPONSE){
             subscriberOrdersCount = ((SubscriberReportResponse)message.getData()).getSubscriberOrdersCount();
             subscriberWaitingListCount = ((SubscriberReportResponse)message.getData()).getSubscriberWaitingListCount();
-            Platform.runLater(() -> {
-                initiateSubscriberOrdersBarChart();
-                initiateSubscriberWaitingBarChart();
-                putDataInCharts();
-            });
+            initiateSubscriberOrdersBarChart();
+            initiateSubscriberWaitingBarChart();
+            putDataInCharts();
         }
         else if (message.getType() == APICallType.SUBSCRIBER_REPORT_ERROR){
             BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, was unable to retrieve report data.");

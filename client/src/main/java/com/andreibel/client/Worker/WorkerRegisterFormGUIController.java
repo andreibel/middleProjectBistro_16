@@ -6,6 +6,7 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.WorkerNewRequest;
 import com.andreibel.message.Message;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -39,7 +40,7 @@ public class WorkerRegisterFormGUIController implements IServerResponseListener 
 
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.WORKER_CREATE_RESPONSE){
+        if (message.getType() == APICallType.WORKER_CREATE_RESPONSE) {
             clearForm();
             BistroUtilities.showMessage("Bistro Restaurant", "Successfully added a new worker.");
         }

@@ -79,9 +79,7 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
     public void onServerResponse(Message message) {
 
         if (message.getType() == APICallType.GET_WAITING_LIST_RESPONSE) {
-            Platform.runLater(() ->
-                    populateTable((List<WaitingListResponse>) message.getData())
-            );
+            populateTable((List<WaitingListResponse>) message.getData());
         }
 
         else if (message.getType() == APICallType.ADD_TO_WAITING_LIST_ERROR) {

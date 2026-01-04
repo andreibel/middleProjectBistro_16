@@ -71,7 +71,6 @@ public class OrderFormGUIController implements IServerResponseListener {
         controller.addListener(this);
         adjustFormToWizardSetup();
         setDatePicker();
-        Platform.runLater(() -> btnOrderNow.requestFocus());
     }
 
     @Override

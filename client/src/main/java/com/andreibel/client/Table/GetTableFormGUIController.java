@@ -48,7 +48,6 @@ public class GetTableFormGUIController implements IServerResponseListener{
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-        radioBtnGuest.setSelected(true);
         adjustFormBasedOnUserType();
     }
 

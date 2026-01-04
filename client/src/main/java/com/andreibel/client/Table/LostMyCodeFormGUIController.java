@@ -59,16 +59,13 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     @Override
     public void onServerResponse(Message message) {
         if (message.getType() == APICallType.ORDER_LOST_CONFORMATION_CODE_RESPONSE){
-            Platform.runLater(() -> {
-                addOrdersTimesToCombobox((ArrayList<OrderResponse>) message.getData());
-                if (!comboBoxOrders.getItems().isEmpty()) {
-                    isFetchingOrders = false;
-                    btnRetrieveCode.setText("Retrieve Code");
-                    lblOrders.setDisable(false);
-                    comboBoxOrders.setDisable(false);
-                }
-            });
-
+            addOrdersTimesToCombobox((ArrayList<OrderResponse>) message.getData());
+            if (!comboBoxOrders.getItems().isEmpty()) {
+                isFetchingOrders = false;
+                btnRetrieveCode.setText("Retrieve Code");
+                lblOrders.setDisable(false);
+                comboBoxOrders.setDisable(false);
+            }
         }
         else if (message.getType() == APICallType.ORDER_LOST_CONFORMATION_CODE_ERROR){
             BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, we're unable to send you the confirmation code, please try again later");

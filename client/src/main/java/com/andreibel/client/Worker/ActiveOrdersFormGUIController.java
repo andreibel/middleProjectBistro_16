@@ -64,9 +64,7 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
     @Override
     public void onServerResponse(Message message) {
         if (message.getType() == APICallType.GET_ALL_ACTIVE_RESPONSE) {
-            Platform.runLater(() ->
-                    populateTable((List<OrderResponse>) message.getData())
-            );
+            populateTable((List<OrderResponse>) message.getData());
         } else if (message.getType() == APICallType.GET_ALL_ACTIVE_ERROR) {
             BistroUtilities.showMessage(
                     "Bistro Restaurant",

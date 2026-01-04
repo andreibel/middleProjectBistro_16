@@ -69,17 +69,13 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
     public void onServerResponse(Message message) {
 
         if (message.getType() == APICallType.GET_ALL_SUBSCRIBERS_RESPONSE) {
-            Platform.runLater(() ->
-                    populateTable((List<SubscriberResponse>) message.getData())
-            );
+            populateTable((List<SubscriberResponse>) message.getData());
         }
 
-        if (message.getType() == APICallType.GET_ALL_SUBSCRIBERS_ERROR) {
-            Platform.runLater(() ->
-                    BistroUtilities.showMessage(
-                            "Bistro Restaurant",
-                            "Due to server error, unable to fetch all subscribers."
-                    )
+        else if (message.getType() == APICallType.GET_ALL_SUBSCRIBERS_ERROR) {
+            BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Due to server error, unable to fetch all subscribers."
             );
         }
     }

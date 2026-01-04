@@ -73,15 +73,12 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
     @SuppressWarnings("unchecked")
     public void onServerResponse(Message message) {
         if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_RESPONSE) {
-            Platform.runLater(() -> populateTable((List<OrderResponse>) message.getData()));
+            populateTable((List<OrderResponse>) message.getData());
         }
-
-        if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_ERROR) {
-            Platform.runLater(() ->
-                    BistroUtilities.showMessage(
-                            "Bistro Restaurant",
-                            "Unable to retrieve order history due to server error."
-                    )
+        else if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_ERROR) {
+            BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Unable to retrieve order history due to server error."
             );
         }
     }

@@ -72,20 +72,18 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
     @Override
     public void onServerResponse(Message message) {
         if (message.getType() == APICallType.SCHEDULES_REPORT_RESPONSE) {
-            Platform.runLater(() -> {
-                SchedulesReportResponse data = (SchedulesReportResponse) message.getData();
+            SchedulesReportResponse data = (SchedulesReportResponse) message.getData();
 
-                customerArriveDeparture = data.getCustomerArriveDeparture();
-                customerLate = data.getCustomerLate();
-                customerDelay = data.getCustomerDelay();
-                openingTime = data.getOpeningTime();
-                closingTime = data.getClosingTime();
-                interval = data.getInterval();
+            customerArriveDeparture = data.getCustomerArriveDeparture();
+            customerLate = data.getCustomerLate();
+            customerDelay = data.getCustomerDelay();
+            openingTime = data.getOpeningTime();
+            closingTime = data.getClosingTime();
+            interval = data.getInterval();
 
-                clearCharts();
-                setupLineChart();
-                setupBarChart();
-            });
+            clearCharts();
+            setupLineChart();
+            setupBarChart();
         } else if (message.getType() == APICallType.SCHEDULES_REPORT_ERROR) {
             BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to get the report.");
         }

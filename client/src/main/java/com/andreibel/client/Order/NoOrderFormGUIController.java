@@ -51,18 +51,8 @@ public class NoOrderFormGUIController implements IServerResponseListener {
     public void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
+        adjustFormWhenSceneIsShown();
         adjustElementsBasedOnUserType();
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            adjustElementsBasedOnUserType();
-                        });
-                    }
-                });
-            }
-        });
     }
 
     @Override
@@ -112,6 +102,20 @@ public class NoOrderFormGUIController implements IServerResponseListener {
             btnSubmit.setLayoutX(buttonGuestLocation.getX());
             btnSubmit.setLayoutY(buttonGuestLocation.getY());
         }
+    }
+
+    private void adjustFormWhenSceneIsShown(){
+        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        newWindow.setOnShown(event -> {
+                            adjustElementsBasedOnUserType();
+                        });
+                    }
+                });
+            }
+        });
     }
 
     private Integer fillSubscriberIDDetails(){

@@ -43,8 +43,8 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
-        //CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
-        WorkerStateManager.getInstance().setManager(true);
+        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
+        //WorkerStateManager.getInstance();
         updateMainFormWhenSceneIsShown();
         if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
             btnSubscriber.setText("Subscriber Area");
