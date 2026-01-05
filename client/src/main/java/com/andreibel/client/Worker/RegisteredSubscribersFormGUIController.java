@@ -6,7 +6,6 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,7 +24,6 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
 
     @FXML
     private TableView<SubscriberResponse> tblSubscribers;
-
     @FXML
     private TableColumn<SubscriberResponse, Integer> colSubscriberId;
     @FXML
@@ -34,22 +32,19 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
     private TableColumn<SubscriberResponse, String> colEmail;
     @FXML
     private TableColumn<SubscriberResponse, String> colPhone;
-
     @FXML
     private AnchorPane rootPane;
-
     @FXML
     private Button btnGoBack;
 
     private BistroClientController controller;
-    private ObservableList<SubscriberResponse> subscribersList;
+    private final ObservableList<SubscriberResponse> subscribersList = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
 
-        subscribersList = FXCollections.observableArrayList();
         tblSubscribers.setItems(subscribersList);
         tblSubscribers.setEditable(false);
 
@@ -67,22 +62,18 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
     @Override
     @SuppressWarnings("unchecked")
     public void onServerResponse(Message message) {
-
-        if (message.getType() == APICallType.GET_ALL_SUBSCRIBERS_RESPONSE) {
-            populateTable((List<SubscriberResponse>) message.getData());
-        }
-
-        else if (message.getType() == APICallType.GET_ALL_SUBSCRIBERS_ERROR) {
-            BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Due to server error, unable to fetch all subscribers."
-            );
+        switch (message.getType()) {
+            case GET_ALL_SUBSCRIBERS_RESPONSE -> {
+                List<SubscriberResponse> subscribers = (List<SubscriberResponse>) message.getData();
+                if (subscribers != null) populateTable(subscribers);
+            }
+            case GET_ALL_SUBSCRIBERS_ERROR ->
+                    BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, unable to fetch all subscribers.");
         }
     }
 
     private void populateTable(List<SubscriberResponse> subscribers) {
-        subscribersList.clear();
-        subscribersList.addAll(subscribers);
+        subscribersList.setAll(subscribers);
     }
 
     private void requestSubscribersWhenSceneIsShown() {
@@ -90,9 +81,7 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
             if (newScene != null) {
                 newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event ->
-                                controller.requestAllSubscribersInfo()
-                        );
+                        newWindow.setOnShown(event -> controller.requestAllSubscribersInfo());
                     }
                 });
             }
@@ -101,7 +90,6 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
 
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        controller.removeListener(this);
         subscribersList.clear();
 
         BistroUtilities.switchScreen(

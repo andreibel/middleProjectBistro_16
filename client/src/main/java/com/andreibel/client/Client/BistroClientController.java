@@ -181,6 +181,21 @@ public class BistroClientController {
         client.send(new Message(APICallType.CHANGE_BISTRO_TIME, req));
     }
 
+    public void requestTables(){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.GET_ALL_TABLES, null));
+    }
+
+    public void requestApplyLayoutChanges(List<TableRequest> reqs){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.EDIT_BISTRO_LAYOUT, reqs));
+    }
+
+    public void requestNewEventCreation(SpecialDayRequest req){
+        if (!isClientAvailable()) return;
+        client.send(new Message(APICallType.ADD_SPECIAL_DAY, req));
+    }
+
     private boolean isClientAvailable() {
         if (client == null || !client.isConnected()) {
             BistroUtilities.showMessage("Bistro Restaurant - Client Error","Client not connected");

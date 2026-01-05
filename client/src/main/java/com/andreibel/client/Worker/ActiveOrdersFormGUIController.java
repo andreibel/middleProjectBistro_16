@@ -6,7 +6,6 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -31,9 +30,9 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
     private TableView<OrderResponse> tblActiveOrders;
 
     @FXML
-    private TableColumn<OrderResponse, String> colNumberOfGuests;
+    private TableColumn<OrderResponse, Integer> colNumberOfGuests;
     @FXML
-    private TableColumn<OrderResponse, String> colSubscriberId;
+    private TableColumn<OrderResponse, Integer> colSubscriberId;
     @FXML
     private TableColumn<OrderResponse, String> colEmail;
     @FXML
@@ -56,17 +55,15 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
         tblActiveOrders.setEditable(false);
 
         initializeTableColumns();
-
         controller.requestActiveOrders();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.GET_ALL_ACTIVE_RESPONSE) {
-            populateTable((List<OrderResponse>) message.getData());
-        } else if (message.getType() == APICallType.GET_ALL_ACTIVE_ERROR) {
-            BistroUtilities.showMessage(
+        switch (message.getType()) {
+            case GET_ALL_ACTIVE_RESPONSE -> populateTable((List<OrderResponse>) message.getData());
+            case GET_ALL_ACTIVE_ERROR -> BistroUtilities.showMessage(
                     "Bistro Restaurant",
                     "Due to server error, we're unable to get the active orders for " + getCurrentDate()
             );
@@ -74,13 +71,12 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
     }
 
     private void populateTable(List<OrderResponse> data) {
-        activeList.clear();
-        activeList.addAll(data);
+        if (data == null) return;
+        activeList.setAll(data);
     }
 
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        controller.removeListener(this);
         activeList.clear();
 
         BistroUtilities.switchScreen(
@@ -90,7 +86,6 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
         );
     }
 
-    @FXML
     private void initializeTableColumns() {
         colNumberOfGuests.setCellValueFactory(new PropertyValueFactory<>("numberOfGuests"));
         colSubscriberId.setCellValueFactory(new PropertyValueFactory<>("subscriberId"));
@@ -100,7 +95,6 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
     }
 
     private String getCurrentDate() {
-        return LocalDate.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

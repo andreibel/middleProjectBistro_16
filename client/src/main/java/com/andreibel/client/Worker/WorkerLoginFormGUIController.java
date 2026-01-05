@@ -93,24 +93,25 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
      */
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.WORKER_LOGIN_RESPONSE) {
-            if (message.getData() == null) {
-                BistroUtilities.showMessage(
-                        "Bistro Restaurant",
-                        "Worker does not exist."
-                );
-                return;
+        switch (message.getType()) {
+            case WORKER_LOGIN_RESPONSE -> {
+                if (message.getData() == null) {
+                    BistroUtilities.showMessage(
+                            "Bistro Restaurant",
+                            "Worker does not exist."
+                    );
+                    return;
+                }
+
+                WorkerResponse response = (WorkerResponse) message.getData();
+                WorkerStateManager.getInstance().setWorkerName(txtFieldStaffName.getText().trim());
+                WorkerStateManager.getInstance().setManager(response.isManager());
             }
-
-            WorkerResponse response = (WorkerResponse) message.getData();
-            WorkerStateManager.getInstance().setWorkerName(txtFieldStaffName.getText());
-            WorkerStateManager.getInstance().setManager(response.isManager());
-
-        } else if (message.getType() == APICallType.WORKER_LOGIN_ERROR) {
-            BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Due to a server error, login could not be completed."
-            );
+            case WORKER_LOGIN_ERROR ->
+                    BistroUtilities.showMessage(
+                            "Bistro Restaurant",
+                            "Due to a server error, login could not be completed."
+                    );
         }
     }
 
@@ -121,10 +122,20 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
      */
     @FXML
     private void onLoginButtonClicked(ActionEvent event) {
-        controller.requestWorkerLogin(
-                txtFieldStaffName.getText(),
-                txtFieldPassword.getText()
-        );
+        String staffName = txtFieldStaffName.getText().trim();
+        String password = txtFieldPassword.getText().trim();
+
+        if (staffName.isEmpty()) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter your staff name.");
+            return;
+        }
+
+        if (password.isEmpty()) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter your password.");
+            return;
+        }
+
+        controller.requestWorkerLogin(staffName, password);
     }
 
     /**

@@ -16,9 +16,8 @@ import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
-//TODO Finish onServerResponse
-
 public class SubscriberRegisterFormGUIController implements IServerResponseListener {
+
     @FXML
     private Label lblName;
     @FXML
@@ -35,8 +34,7 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
     private Button btnRegister;
     @FXML
     private Button btnGoBack;
-    @FXML
-    private AnchorPane rootPane;
+    @FXML private AnchorPane rootPane;
 
     private BistroClientController controller;
 
@@ -49,53 +47,58 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
 
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.CREATE_SUBSCRIBER_RESPONSE){
-            clearForm();
-            BistroUtilities.showMessage("Bistro Restaurant", "Successfully registered new subscriber!");
-        }
-        else if (message.getType() == APICallType.CREATE_SUBSCRIBER_ERROR){
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to register new subscriber.");
+        switch (message.getType()) {
+            case CREATE_SUBSCRIBER_RESPONSE -> {
+                clearForm();
+                BistroUtilities.showMessage("Bistro Restaurant", "Successfully registered new subscriber!");
+            }
+            case CREATE_SUBSCRIBER_ERROR ->
+                    BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to register new subscriber.");
         }
     }
 
     @FXML
     private void onRegisterButtonClicked(ActionEvent event) {
-        if (txtFieldName.getText().isEmpty()){
+        String name = txtFieldName.getText();
+        String email = txtFieldEmail.getText();
+        String phone = txtFieldPhoneNumber.getText();
+
+        if (name.isEmpty()) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter subscriber name.");
             return;
         }
-        if (txtFieldEmail.getText().isEmpty()){
+        if (email.isEmpty()) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter subscriber email.");
             return;
         }
-        if (txtFieldPhoneNumber.getText().isEmpty()){
+        if (phone.isEmpty()) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter phone number.");
             return;
         }
 
-        if (!BistroUtilities.isValidFullName(txtFieldName.getText())){
+        if (!BistroUtilities.isValidFullName(name)) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid subscriber name.");
             return;
         }
-        if (!BistroUtilities.isValidEmail(txtFieldEmail.getText())){
+        if (!BistroUtilities.isValidEmail(email)) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid subscriber email.");
             return;
         }
-
-        if (!BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())){
+        if (!BistroUtilities.isValidPhoneNumber(phone)) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid phone number.");
             return;
         }
-        controller.requestRegisterNewSubscriber(new SubscriberRequest(null, txtFieldEmail.getText(), txtFieldName.getText(), txtFieldPhoneNumber.getText()));
 
+        controller.requestRegisterNewSubscriber(new SubscriberRequest(null, email, name, phone));
     }
+
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
         clearForm();
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }
 
-    private void clearForm(){
+    private void clearForm() {
         txtFieldName.clear();
         txtFieldEmail.clear();
         txtFieldPhoneNumber.clear();

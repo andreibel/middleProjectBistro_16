@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="rootPane" prefHeight="570.0" prefWidth="601.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.ChangeBistroTimeFormGUIController"> <!-- soft warm background -->
+<AnchorPane fx:id="rootPane" prefHeight="611.0" prefWidth="604.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.ChangeBistroTimeFormGUIController"> <!-- soft warm background -->
 
    <children>
       <!-- Main Title -->
@@ -39,10 +39,10 @@
       <Label fx:id="lblEventClose" layoutX="325.0" layoutY="419.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Closing Time:" />
       <TextField fx:id="txtFieldEventClose" layoutX="422.0" layoutY="416.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
 
-      <Button fx:id="btnCreateNewEvent" layoutX="228.0" layoutY="466.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="154.0" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px;" text="Create New Event" />
+      <Button fx:id="btnCreateNewEvent" layoutX="225.0" layoutY="507.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="154.0" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px;" text="Create New Event" />
 
       <!-- Go Back Button -->
-      <Button fx:id="btnGoBack" layoutX="15.0" layoutY="511.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="103.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 6px;" text="Go Back" />
+      <Button fx:id="btnGoBack" layoutX="13.0" layoutY="552.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="103.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 6px;" text="Go Back" />
       <Label fx:id="lblInterval" layoutX="87.0" layoutY="192.0" text="Interval between orders:">
          <font>
             <Font size="16.0" />
@@ -50,6 +50,17 @@
       </Label>
       <TextField fx:id="txtFieldInterval" layoutX="252.0" layoutY="190.0" prefHeight="25.0" prefWidth="160.0" />
       <Label fx:id="lblInfoRange" layoutX="88.0" layoutY="207.0" prefHeight="17.0" prefWidth="160.0" text="Range between: 15 to 60 minutes" textAlignment="CENTER" wrapText="true">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Label>
+      <Label fx:id="lblEventInterval" layoutX="105.0" layoutY="460.0" text="Interval between orders:">
+         <font>
+            <Font size="16.0" />
+         </font>
+      </Label>
+      <TextField fx:id="txtFieldEventInterval" layoutX="270.0" layoutY="458.0" prefHeight="25.0" prefWidth="160.0" />
+      <Label fx:id="lblEventInfoRange" layoutX="106.0" layoutY="475.0" prefHeight="17.0" prefWidth="160.0" text="Range between: 15 to 60 minutes" textAlignment="CENTER" wrapText="true">
          <font>
             <Font size="11.0" />
          </font>

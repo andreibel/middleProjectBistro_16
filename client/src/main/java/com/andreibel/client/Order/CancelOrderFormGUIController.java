@@ -68,18 +68,19 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
      */
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.DELETE_ORDER_RESPONSE) {
-            txtFieldConfirmationCode.clear();
-            BistroUtilities.showMessage(
-                    "Bistro Restaurant - Order Cancellation",
-                    "Your order has been successfully canceled."
-            );
-        }
-        else if (message.getType() == APICallType.DELETE_ORDER_ERROR) {
-            BistroUtilities.showMessage(
-                    "Bistro Restaurant - Cancellation Failed",
-                    "Due to a server error, your order could not be canceled. Please contact the staff for assistance."
-            );
+        switch (message.getType()) {
+            case DELETE_ORDER_RESPONSE ->{
+                txtFieldConfirmationCode.clear();
+                BistroUtilities.showMessage(
+                        "Bistro Restaurant - Order Cancellation",
+                        "Your order has been successfully canceled."
+                );
+            }
+            case DELETE_ORDER_ERROR ->
+                BistroUtilities.showMessage(
+                        "Bistro Restaurant - Cancellation Failed",
+                        "Due to a server error, your order could not be canceled. Please contact the staff for assistance."
+                );
         }
     }
 

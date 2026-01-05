@@ -7,7 +7,6 @@ import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,7 +16,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.List;
@@ -52,15 +53,13 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         tblViewOrderHistory.setEditable(false);
 
         initializeTableColumns();
-
-        lblSubscriber.setText(
-                "Hi, " +
-                        CustomerStateManager.getInstance().getSubscriber().getName() +
-                        ", here is your orders history:"
-        );
+        updateSubscriberLabel();
 
         requestOrdersWhenSceneIsShown();
-        controller.requestAllSubscriberOrders(CustomerStateManager.getInstance().getSubscriber().getSubscriberId());
+        Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
+        if (subscriberId != null) {
+            controller.requestAllSubscriberOrders(subscriberId);
+        }
     }
 
     private void initializeTableColumns() {
@@ -69,14 +68,27 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         colNumberOfPeople.setCellValueFactory(new PropertyValueFactory<>("numberOfPeople"));
     }
 
+    private void updateSubscriberLabel() {
+        if (CustomerStateManager.getInstance().getSubscriber() != null) {
+            lblSubscriber.setText(
+                    "Hi, " +
+                            CustomerStateManager.getInstance().getSubscriber().getName() +
+                            ", here is your orders history:"
+            );
+        } else {
+            lblSubscriber.setText("Orders History:");
+        }
+    }
+
     @Override
     @SuppressWarnings("unchecked")
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_RESPONSE) {
-            populateTable((List<OrderResponse>) message.getData());
-        }
-        else if (message.getType() == APICallType.GET_SUBSCRIBER_ORDERS_ERROR) {
-            BistroUtilities.showMessage(
+        switch (message.getType()) {
+            case GET_SUBSCRIBER_ORDERS_RESPONSE -> {
+                List<OrderResponse> orders = (List<OrderResponse>) message.getData();
+                if (orders != null) populateTable(orders);
+            }
+            case GET_SUBSCRIBER_ORDERS_ERROR -> BistroUtilities.showMessage(
                     "Bistro Restaurant",
                     "Unable to retrieve order history due to server error."
             );
@@ -88,13 +100,8 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
 
         int rowNumber = 1;
         for (OrderResponse order : orders) {
-            orderHistoryList.add(
-                    new OrderHistory(
-                            rowNumber++,
-                            order.getOrderDateTime().toString(),
-                            order.getNumberOfGuests()
-                    )
-            );
+            String dateTime = order.getOrderDateTime() != null ? order.getOrderDateTime().toString() : "-";
+            orderHistoryList.add(new OrderHistory(rowNumber++, dateTime, order.getNumberOfGuests()));
         }
     }
 
@@ -103,13 +110,12 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
             if (newScene != null) {
                 newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event ->
-                                controller.requestAllSubscriberOrders(
-                                        CustomerStateManager.getInstance()
-                                                .getSubscriber()
-                                                .getSubscriberId()
-                                )
-                        );
+                        newWindow.setOnShown(event -> {
+                            Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
+                            if (subscriberId != null) {
+                                controller.requestAllSubscriberOrders(subscriberId);
+                            }
+                        });
                     }
                 });
             }
@@ -118,7 +124,6 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
 
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        controller.removeListener(this);
         orderHistoryList.clear();
 
         BistroUtilities.switchScreen(
@@ -128,21 +133,13 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         );
     }
 
+    @AllArgsConstructor
+    @Getter
+    @Setter
     public static class OrderHistory {
 
-        @Getter
         private final int orderRowNumber;
-
-        @Getter
         private final String orderDateTime;
-
-        @Getter
         private final int numberOfPeople;
-
-        public OrderHistory(int orderRowNumber, String orderDateTime, int numberOfPeople) {
-            this.orderRowNumber = orderRowNumber;
-            this.orderDateTime = orderDateTime;
-            this.numberOfPeople = numberOfPeople;
-        }
     }
 }

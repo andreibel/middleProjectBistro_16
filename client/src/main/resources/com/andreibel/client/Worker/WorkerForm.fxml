@@ -97,7 +97,7 @@
         </VBox>
 
         <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="460.0" prefHeight="42.0" prefWidth="110.0" style="-fx-background-color: #607D8B; -fx-text-fill: white;" text="Go Back" />
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="460.0" onAction="#onGoBackButtonClicked" prefHeight="42.0" prefWidth="110.0" style="-fx-background-color: #607D8B; -fx-text-fill: white;" text="Go Back" />
 
     </children>
 </AnchorPane>

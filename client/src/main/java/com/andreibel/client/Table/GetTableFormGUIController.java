@@ -15,14 +15,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
-
-//TODO: Finish OnServerResponse and add parameter for arrival time
-
-
 import java.io.IOException;
 import java.util.UUID;
 
-public class GetTableFormGUIController implements IServerResponseListener{
+public class GetTableFormGUIController implements IServerResponseListener {
 
     @FXML
     private Label lblSubscriberInfo;
@@ -42,7 +38,7 @@ public class GetTableFormGUIController implements IServerResponseListener{
     @FXML
     private Button btnLostMyCode;
 
-    BistroClientController controller;
+    private BistroClientController controller;
 
     @FXML
     private void initialize() {
@@ -53,65 +49,92 @@ public class GetTableFormGUIController implements IServerResponseListener{
 
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.ORDER_ARRIVED_RESPONSE){
-            clearForm();
-            CustomerStateManager.getInstance().setArrivedToTable(true);
-            CustomerStateManager.getInstance().setConfirmationCode(Integer.parseInt(txtFieldConfirmation.getText()));
-            BistroUtilities.showMessage("Bistro Restaurant", "Thank you for confirming your arrival, please head to your table");
+        switch (message.getType()) {
+            case ORDER_ARRIVED_RESPONSE -> {
+                CustomerStateManager.getInstance().setArrivedToTable(true);
+                String codeText = txtFieldConfirmation.getText().trim();
+                if (!codeText.isEmpty() && BistroUtilities.isNumeric(codeText)) {
+                    CustomerStateManager.getInstance().setConfirmationCode(Integer.parseInt(codeText));
+                }
+                clearForm();
+                BistroUtilities.showMessage(
+                        "Bistro Restaurant",
+                        "Thank you for confirming your arrival, please head to your table"
+                );
+            }
+            case ORDER_ARRIVED_WAITING_RESPONSE -> BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Thank you for confirming your arrival. Unfortunately, we currently don't have a table ready for you.\n" +
+                            "You'll be entering a waiting list and we'll let you know when your table is ready. We apologize for the inconvenience."
+            );
+            case ORDER_ARRIVED_ERROR -> BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Due to server error, it was unable to confirm your arrival. Please contact staff for help."
+            );
         }
-        else if (message.getType() == APICallType.ORDER_ARRIVED_WAITING_RESPONSE)
-            BistroUtilities.showMessage("Bistro Restaurant", "Thank you for confirming your arrival, Unfortunately we currently don't have a table ready for you.\nYou'll be entering a waiting list and we'll let you know when your table is ready, we apologize for the inconvenience.");
-        else if (message.getType() == APICallType.ORDER_ARRIVED_ERROR)
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to confirm your arrival, please contact staff for help");
-
     }
 
     @FXML
-    private void onButtonConfirmArrivalClicked(ActionEvent event)  {
-        if (CustomerStateManager.getInstance().getSubscriber() == null && txtFieldConfirmation.getText().isEmpty()) {
+    private void onButtonConfirmArrivalClicked(ActionEvent event) {
+        boolean isGuest = CustomerStateManager.getInstance().getSubscriber() == null;
+
+        if (isGuest && txtFieldConfirmation.getText().isBlank()) {
             BistroUtilities.showMessage("Bistro Restaurant", "Dear Guest, please enter confirmation code");
             return;
         }
 
-        if (CustomerStateManager.getInstance().getSubscriber() == null && !BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter valid confirmation code");
+        if (isGuest && !BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid confirmation code");
             return;
         }
 
-        controller.requestArrivalConfirmation(new OrderRequest(UUID.fromString(txtFieldConfirmation.getText()), null, null, fillSubscriberIDDetails(), null, null));
+        UUID confirmationUUID = null;
+        if (!txtFieldConfirmation.getText().isBlank()) {
+            try {
+                confirmationUUID = UUID.fromString(txtFieldConfirmation.getText().trim());
+            }
+            catch (IllegalArgumentException e) {
+                BistroUtilities.showMessage("Bistro Restaurant", "Invalid confirmation code format");
+                return;
+            }
+        }
+
+        controller.requestArrivalConfirmation(new OrderRequest(
+                confirmationUUID,
+                null,
+                null,
+                CustomerStateManager.fillSubscriberIDDetails(),
+                null,
+                null
+        ));
     }
+
     @FXML
     private void onLostMyCodeButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node)event.getSource(), "/Table/LostMyCodeForm.fxml", "Bistro Restaurant - Lost My Code");
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Table/LostMyCodeForm.fxml",
+                "Bistro Restaurant - Lost My Code"
+        );
     }
 
     @FXML
     private void onButtonGoBackClicked(ActionEvent event) throws IOException {
         clearForm();
         BistroUtilities.switchScreen(
-                (Node)event.getSource(),
+                (Node) event.getSource(),
                 "/Main/MainForm.fxml",
                 "Bistro Restaurant"
         );
     }
 
     private void clearForm() {
-        adjustFormBasedOnUserType();
         txtFieldConfirmation.clear();
+        adjustFormBasedOnUserType();
     }
 
-    private void adjustFormBasedOnUserType(){
-        if (CustomerStateManager.getInstance().getSubscriber() != null) {
-            lblSubscriberInfo.setVisible(true);
-        }
-        else{
-            lblSubscriberInfo.setVisible(false);
-        }
-
+    private void adjustFormBasedOnUserType() {
+        boolean isSubscriber = CustomerStateManager.getInstance().getSubscriber() != null;
+        lblSubscriberInfo.setVisible(isSubscriber);
     }
-
-    private Integer fillSubscriberIDDetails(){
-        return (CustomerStateManager.getInstance().getSubscriber() != null)? CustomerStateManager.getInstance().getSubscriber().getSubscriberId() : null;
-    }
-
 }

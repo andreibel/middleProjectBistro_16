@@ -18,7 +18,6 @@
 
         <TableView fx:id="tblViewRestaurantLayout" editable="true" layoutX="14.0" layoutY="50.0" prefHeight="392.0" prefWidth="586.0">
             <columns>
-                <TableColumn fx:id="colTableNumber" prefWidth="75.0" text="Table Number" />
                 <TableColumn fx:id="colCapacity" prefWidth="75.0" text="Capacity" />
                 <TableColumn fx:id="colQuantity" prefWidth="75.0" text="Quantity" />
             </columns>
@@ -27,13 +26,13 @@
             </columnResizePolicy>
         </TableView>
 
-        <Button fx:id="btnRemoveTable" layoutX="496.0" layoutY="443.0" mnemonicParsing="false" onAction="#onAddTableButtonClicked" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-size: 14px;" text="Remove Table">
+        <Button fx:id="btnRemoveTable" layoutX="496.0" layoutY="443.0" mnemonicParsing="false" onAction="#onRemoveTableButtonClicked" style="-fx-background-color: #E53935; -fx-text-fill: white; -fx-font-size: 14px;" text="Remove Table">
             <tooltip>
                 <Tooltip text="Remove the selected table from the layout." wrapText="true" />
             </tooltip>
         </Button>
 
-        <Button fx:id="btnConfrimChanges" layoutX="246.0" layoutY="511.0" mnemonicParsing="false" onAction="#onConfirmChangesButtonClicked" prefHeight="41.0" prefWidth="123.0" style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-font-size: 14px;" text="Confirm Changes">
+        <Button fx:id="btnConfirmChanges" layoutX="246.0" layoutY="511.0" mnemonicParsing="false" onAction="#onConfirmChangesButtonClicked" prefHeight="41.0" prefWidth="123.0" style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-font-size: 14px;" text="Confirm Changes">
             <tooltip>
                 <Tooltip text="Save all changes made to the restaurant layout." wrapText="true" />
             </tooltip>

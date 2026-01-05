@@ -6,17 +6,16 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.Label;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -27,35 +26,31 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
 
     @FXML
     private Label lblTitle;
-
     @FXML
     private TableView<WaitingListResponse> tblViewCurrentWaiting;
-
     @FXML
-    private TableColumn<WaitingListResponse, String> colWaitingNumber;
+    private TableColumn<WaitingListResponse, Integer> colWaitingNumber;
     @FXML
-    private TableColumn<WaitingListResponse, String> colOrderNumber;
+    private TableColumn<WaitingListResponse, Integer> colOrderNumber;
     @FXML
-    private TableColumn<WaitingListResponse, String> colNumberOfGuests;
+    private TableColumn<WaitingListResponse, Integer> colNumberOfGuests;
     @FXML
-    private TableColumn<WaitingListResponse, String> colSubscriberID;
+    private TableColumn<WaitingListResponse, Integer> colSubscriberID;
     @FXML
     private TableColumn<WaitingListResponse, String> colEmail;
     @FXML
     private TableColumn<WaitingListResponse, String> colPhoneNumber;
-
     @FXML
     private Button btnGoBack;
 
     private BistroClientController controller;
-    private ObservableList<WaitingListResponse> waitingList;
+    private final ObservableList<WaitingListResponse> waitingList = FXCollections.observableArrayList();
 
     @FXML
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
 
-        waitingList = FXCollections.observableArrayList();
         tblViewCurrentWaiting.setItems(waitingList);
         tblViewCurrentWaiting.setEditable(false);
 
@@ -77,22 +72,15 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
     @Override
     @SuppressWarnings("unchecked")
     public void onServerResponse(Message message) {
-
-        if (message.getType() == APICallType.GET_WAITING_LIST_RESPONSE) {
-            populateTable((List<WaitingListResponse>) message.getData());
-        }
-
-        else if (message.getType() == APICallType.ADD_TO_WAITING_LIST_ERROR) {
-            BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Due to server error, we're unable to fetch the current waiting list"
-            );
+        switch (message.getType()) {
+            case GET_WAITING_LIST_RESPONSE -> populateTable((List<WaitingListResponse>) message.getData());
+            case GET_WAITING_LIST_ERROR ->
+                    BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, unable to fetch current waiting list.");
         }
     }
 
     private void populateTable(List<WaitingListResponse> data) {
-        waitingList.clear();
-        waitingList.addAll(data);
+        waitingList.setAll(data);
     }
 
     private void requestWaitingListWhenSceneIsShown() {
@@ -100,9 +88,7 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
             if (newScene != null) {
                 newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event ->
-                                controller.requestCurrentWaitingList()
-                        );
+                        newWindow.setOnShown(event -> controller.requestCurrentWaitingList());
                     }
                 });
             }
@@ -111,9 +97,7 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
 
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        controller.removeListener(this);
         waitingList.clear();
-
         BistroUtilities.switchScreen(
                 (Node) event.getSource(),
                 "/Worker/WorkerForm.fxml",
@@ -122,7 +106,6 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
     }
 
     private String getCurrentDate() {
-        return LocalDate.now()
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 }

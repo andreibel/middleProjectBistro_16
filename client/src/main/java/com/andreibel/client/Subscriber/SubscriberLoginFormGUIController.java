@@ -15,8 +15,6 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 
-//TODO: Finish onServerResponse
-
 public class SubscriberLoginFormGUIController implements IServerResponseListener {
 
     @FXML
@@ -37,27 +35,38 @@ public class SubscriberLoginFormGUIController implements IServerResponseListener
 
     @Override
     public void onServerResponse(Message message) throws IOException {
-        if (message.getType() == APICallType.SUBSCRIBER_LOGIN_RESPONSE){
-            txtFieldSubscriberId.clear();
-            CustomerStateManager.getInstance().setSubscriber(((SubscriberResponse)message.getData()));
-            BistroUtilities.switchScreen(btnLogin, "/Main/MainForm.fxml", "Bistro Restaurant");
+        switch (message.getType()) {
+            case SUBSCRIBER_LOGIN_RESPONSE -> {
+                SubscriberResponse subscriber = (SubscriberResponse) message.getData();
+                if (subscriber != null) {
+                    CustomerStateManager.getInstance().setSubscriber(subscriber);
+                    txtFieldSubscriberId.clear();
+                    BistroUtilities.switchScreen(btnLogin, "/Main/MainForm.fxml", "Bistro Restaurant");
+                }
+            }
+            case SUBSCRIBER_LOGIN_ERROR -> BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Subscriber ID is incorrect. Please try again."
+            );
         }
-        else if (message.getType() == APICallType.SUBSCRIBER_LOGIN_ERROR)
-            BistroUtilities.showMessage("Bistro Restaurant", "Either the username or password is incorrect.");
     }
 
     @FXML
     private void onLoginButtonClicked(ActionEvent event) {
-        if (txtFieldSubscriberId.getText().isEmpty()) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid username.");
+        String input = txtFieldSubscriberId.getText();
+        if (input == null || input.isBlank()) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter your subscriber ID.");
             return;
         }
-        if (!BistroUtilities.isNumeric(txtFieldSubscriberId.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid username.");
+
+        if (!BistroUtilities.isNumeric(input)) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Subscriber ID must be numeric.");
             return;
         }
-        controller.requestSubscriberLogin(Integer.parseInt(txtFieldSubscriberId.getText()));
+
+        controller.requestSubscriberLogin(Integer.parseInt(input));
     }
+
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
         txtFieldSubscriberId.clear();
@@ -67,5 +76,4 @@ public class SubscriberLoginFormGUIController implements IServerResponseListener
                 "Bistro Restaurant"
         );
     }
-
 }

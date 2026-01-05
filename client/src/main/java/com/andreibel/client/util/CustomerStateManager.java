@@ -83,4 +83,18 @@ public class CustomerStateManager {
     public static boolean hasSubscriberLoggedIn() {
         return instance.getSubscriber() != null;
     }
+    /**
+     * Retrieves the subscriber ID of the currently logged-in subscriber.
+     *
+     * <p>If there is no subscriber logged in, this method returns {@code null}.
+     * This is useful for differentiating between guests and subscribers when making
+     * requests that require a subscriber ID.</p>
+     *
+     * @return the subscriber ID if a subscriber is logged in; {@code null} otherwise
+     */
+    public static Integer fillSubscriberIDDetails() {
+        return CustomerStateManager.getInstance().getSubscriber() != null
+                ? CustomerStateManager.getInstance().getSubscriber().getSubscriberId()
+                : null;
+    }
 }

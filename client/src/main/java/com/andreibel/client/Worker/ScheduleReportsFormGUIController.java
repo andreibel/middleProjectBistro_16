@@ -3,11 +3,9 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
-import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.SchedulesReportResponse;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -63,40 +61,39 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-
-        lblTitle.setText("Subscribers Report for Month: " + getCurrentMonth());
+        lblTitle.setText("Schedules Report for Month: " + getCurrentMonth());
         requestScheduleReportWhenSceneIsShown();
         controller.requestSchedulesReport();
     }
 
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.SCHEDULES_REPORT_RESPONSE) {
-            SchedulesReportResponse data = (SchedulesReportResponse) message.getData();
+        switch (message.getType()){
+            case SCHEDULES_REPORT_RESPONSE -> {
+                SchedulesReportResponse data = (SchedulesReportResponse) message.getData();
+                if (data == null) return;
 
-            customerArriveDeparture = data.getCustomerArriveDeparture();
-            customerLate = data.getCustomerLate();
-            customerDelay = data.getCustomerDelay();
-            openingTime = data.getOpeningTime();
-            closingTime = data.getClosingTime();
-            interval = data.getInterval();
+                customerArriveDeparture = data.getCustomerArriveDeparture();
+                customerLate = data.getCustomerLate();
+                customerDelay = data.getCustomerDelay();
+                openingTime = data.getOpeningTime();
+                closingTime = data.getClosingTime();
+                interval = data.getInterval();
 
-            clearCharts();
-            setupLineChart();
-            setupBarChart();
-        } else if (message.getType() == APICallType.SCHEDULES_REPORT_ERROR) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to get the report.");
+                clearCharts();
+                setupLineChart();
+                setupBarChart();
+            }
+            case SCHEDULES_REPORT_ERROR -> {
+                BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to get the report.");
+            }
         }
     }
 
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
         clearCharts();
-        BistroUtilities.switchScreen(
-                (Node) event.getSource(),
-                "/Worker/WorkerForm.fxml",
-                "Bistro Restaurant - Staff Area"
-        );
+        BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }
 
     @FXML
@@ -105,7 +102,7 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         lineChartArrivalsDepartures.getData().clear();
 
         if (selectedSeries != null) {
-            if (selectedSeries.getName().equals("All Days")) {
+            if ("All Days".equals(selectedSeries.getName())) {
                 lineChartArrivalsDepartures.getData().addAll(days);
             } else {
                 lineChartArrivalsDepartures.getData().add(selectedSeries);
@@ -117,7 +114,6 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         days.clear();
         lineChartArrivalsDepartures.getData().clear();
 
-        // X Axis: hours
         List<String> hours = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         LocalTime tempTime = openingTime;
@@ -127,12 +123,9 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         }
         xAxis.setCategories(FXCollections.observableArrayList(hours));
         xAxis.setLabel("Hour");
-
-        // Y Axis
         yAxis.setLabel("Number of People");
         yAxis.setAutoRanging(true);
 
-        // Populate series per day
         int dayCounter = 1;
         for (LocalDate date : customerArriveDeparture.keySet()) {
             XYChart.Series<String, Number> series = new XYChart.Series<>();
@@ -165,16 +158,13 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
             public String toString(XYChart.Series<String, Number> series) {
                 return series.getName();
             }
-
             @Override
-            public XYChart.Series<String, Number> fromString(String string) {
-                return null;
-            }
+            public XYChart.Series<String, Number> fromString(String string) { return null; }
         });
 
         comboBoxTrack.getSelectionModel().selectFirst();
     }
-    @SuppressWarnings("unchecked")
+
     private void setupBarChart() {
         barChartLatesDelays.getData().clear();
 
@@ -183,19 +173,17 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         XYChart.Series<String, Number> delaySeries = new XYChart.Series<>();
         delaySeries.setName("Delay");
 
-        for (LocalDate date : customerLate.keySet()) {
+        for (LocalDate date : customerArriveDeparture.keySet()) {
             String dayLabel = String.valueOf(date.getDayOfMonth());
-            lateSeries.getData().add(new XYChart.Data<>(dayLabel, customerLate.get(date)));
-            delaySeries.getData().add(new XYChart.Data<>(dayLabel, customerDelay.get(date)));
+            lateSeries.getData().add(new XYChart.Data<>(dayLabel, customerLate.getOrDefault(date, 0)));
+            delaySeries.getData().add(new XYChart.Data<>(dayLabel, customerDelay.getOrDefault(date, 0)));
         }
 
         barChartLatesDelays.getData().addAll(lateSeries, delaySeries);
 
-        // Configure axes
-        List<String> daysOfMonth = new ArrayList<>();
-        for (LocalDate date : customerArriveDeparture.keySet()) {
-            daysOfMonth.add(String.valueOf(date.getDayOfMonth()));
-        }
+        List<String> daysOfMonth = customerArriveDeparture.keySet().stream()
+                .map(d -> String.valueOf(d.getDayOfMonth()))
+                .toList();
         xDayAxis.setCategories(FXCollections.observableArrayList(daysOfMonth));
         xDayAxis.setLabel("Day of Month");
         yPeopleAxis.setLabel("Number of People");
@@ -213,9 +201,7 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
             if (newScene != null) {
                 newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event ->
-                                controller.requestSchedulesReport()
-                        );
+                        newWindow.setOnShown(event -> controller.requestSchedulesReport());
                     }
                 });
             }

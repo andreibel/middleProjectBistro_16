@@ -5,9 +5,7 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.SubscriberReportResponse;
-import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -20,19 +18,16 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 
-import java.time.LocalDate;
-import java.time.Month;
-import java.time.format.TextStyle;
-import java.util.Locale;
-
 import java.io.IOException;
-import java.util.ArrayList;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
-
-//TODO: Need to finish onServerResponse, setting the data in each of the line charts
+import java.util.stream.Collectors;
 
 public class SubscriberReportsFormGUIController implements IServerResponseListener {
+
     @FXML
     private AnchorPane rootPane;
     @FXML
@@ -63,30 +58,37 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
         lblTitle.setText("Subscribers Report for Month: " + getCurrentMonth());
         requestSubscribersReportWhenSceneIsShown();
         controller.requestSubscribersReport();
-
     }
 
     @Override
     public void onServerResponse(Message message) {
-        if (message.getType() == APICallType.SUBSCRIBER_REPORT_RESPONSE){
-            subscriberOrdersCount = ((SubscriberReportResponse)message.getData()).getSubscriberOrdersCount();
-            subscriberWaitingListCount = ((SubscriberReportResponse)message.getData()).getSubscriberWaitingListCount();
-            initiateSubscriberOrdersBarChart();
-            initiateSubscriberWaitingBarChart();
-            putDataInCharts();
-        }
-        else if (message.getType() == APICallType.SUBSCRIBER_REPORT_ERROR){
-            BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, was unable to retrieve report data.");
-        }
+        switch (message.getType()){
+            case SUBSCRIBER_REPORT_RESPONSE -> {
+                SubscriberReportResponse response = (SubscriberReportResponse) message.getData();
+                if (response == null) return;
 
+                subscriberOrdersCount = response.getSubscriberOrdersCount();
+                subscriberWaitingListCount = response.getSubscriberWaitingListCount();
+
+                barChartSubscribersOrders.getData().clear();
+                barChartSubscribersWaiting.getData().clear();
+
+                initiateSubscriberOrdersBarChart();
+                initiateSubscriberWaitingBarChart();
+                putDataInCharts();
+            }
+            case SUBSCRIBER_REPORT_ERROR ->
+                    BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, was unable to retrieve report data.");
+        }
     }
+
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
         clearReport();
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }
 
-    private void clearReport(){
+    private void clearReport() {
         barChartSubscribersOrders.getData().clear();
         barChartSubscribersWaiting.getData().clear();
     }
@@ -96,9 +98,7 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
             if (newScene != null) {
                 newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            controller.requestSubscribersReport();
-                        });
+                        newWindow.setOnShown(e -> controller.requestSubscribersReport());
                     }
                 });
             }
@@ -106,51 +106,44 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
     }
 
     private void putDataInCharts() {
-        // ===== Orders Chart =====
         XYChart.Series<String, Number> ordersSeries = new XYChart.Series<>();
         ordersSeries.setName("Orders");
-        for (Map.Entry<LocalDate, Integer> entry : subscriberOrdersCount.entrySet()) {
-            String day = String.valueOf(entry.getKey().getDayOfMonth());
-            ordersSeries.getData().add(new XYChart.Data<>(day, entry.getValue()));
-        }
+        subscriberOrdersCount.keySet().forEach(date ->
+                ordersSeries.getData().add(new XYChart.Data<>(String.valueOf(date.getDayOfMonth()), subscriberOrdersCount.get(date)))
+        );
         barChartSubscribersOrders.getData().add(ordersSeries);
 
-        // ===== Waiting List Chart =====
         XYChart.Series<String, Number> waitingSeries = new XYChart.Series<>();
         waitingSeries.setName("Waiting List");
-        for (Map.Entry<LocalDate, Integer> entry : subscriberWaitingListCount.entrySet()) {
-            String day = String.valueOf(entry.getKey().getDayOfMonth());
-            waitingSeries.getData().add(new XYChart.Data<>(day, entry.getValue()));
-        }
+        subscriberWaitingListCount.keySet().forEach(date ->
+                waitingSeries.getData().add(new XYChart.Data<>(String.valueOf(date.getDayOfMonth()), subscriberWaitingListCount.get(date)))
+        );
         barChartSubscribersWaiting.getData().add(waitingSeries);
     }
-    private void initiateSubscriberOrdersBarChart(){
-        List<String> days = new ArrayList<>();
-        for (LocalDate localDate : subscriberOrdersCount.keySet()) {
-            days.add(Integer.toString(localDate.getDayOfMonth()));
-        }
+
+    private void initiateSubscriberOrdersBarChart() {
+        List<String> days = subscriberOrdersCount.keySet().stream()
+                .map(date -> String.valueOf(date.getDayOfMonth()))
+                .collect(Collectors.toList());
         xDayAxisOrders.setCategories(FXCollections.observableArrayList(days));
         xDayAxisOrders.setLabel("Day of Month");
         yOrdersAxis.setLabel("Number of Orders");
         yOrdersAxis.setAutoRanging(true);
     }
 
-    private void initiateSubscriberWaitingBarChart(){
-        List<String> days = new ArrayList<>();
-        for (LocalDate localDate : subscriberWaitingListCount.keySet()) {
-            days.add(Integer.toString(localDate.getDayOfMonth()));
-        }
+    private void initiateSubscriberWaitingBarChart() {
+        List<String> days = subscriberWaitingListCount.keySet().stream()
+                .map(date -> String.valueOf(date.getDayOfMonth()))
+                .collect(Collectors.toList());
         xDayAxisWaiting.setCategories(FXCollections.observableArrayList(days));
         xDayAxisWaiting.setLabel("Day of Month");
         yWaitingAxis.setLabel("Number of Subscribers Waiting");
         yWaitingAxis.setAutoRanging(true);
     }
 
-
     public static String getCurrentMonth() {
         return LocalDate.now()
                 .getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.getDefault());
     }
-
 }
