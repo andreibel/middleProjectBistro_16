@@ -27,6 +27,7 @@ public class WorkerController {
         if (instance == null) {
             instance = new WorkerController();
         }
+
         return instance;
     }
 
