@@ -5,6 +5,8 @@ import com.andreibel.server.entity.OpenTime;
 import com.andreibel.server.utils.OpenTimeMapper;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public class OpenTimeRepository {
@@ -27,12 +29,15 @@ public class OpenTimeRepository {
 
     public OpenTime findRegular() throws SQLException {
 
-        String sql = "SELECT * FROM bistro.`OpenTime` WHERE id = 1;";
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String sql = """
+                SELECT * 
+                FROM bistro.`OpenTime` 
+                WHERE id = 1;
+                """;
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             if (!rs.next()) {
-                return null; // או throw חדש: אין קונפיגורציה רגילה
+                return null;
             }
 
             return OpenTimeMapper.mapRelToOpenTime(rs);
@@ -41,7 +46,12 @@ public class OpenTimeRepository {
 
     public List<OpenTime> findSpecialActual() throws SQLException {
         List<OpenTime> openTimes = new java.util.ArrayList<>();
-        String sql = "SELECT * " + "FROM bistro.`OpenTime` " + "WHERE id <> 1 and " + OpenTime.SPATIAL_DATE + " >= NOW();";
+        String sql = """
+                SELECT * 
+                FROM bistro.`OpenTime` 
+                WHERE id <> 1
+                AND SpatialDate >= NOW(); 
+                """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 openTimes.add(OpenTimeMapper.mapRelToOpenTime(rs));
@@ -50,22 +60,31 @@ public class OpenTimeRepository {
         return openTimes;
     }
 
-    public void addNewSpecial(Date date, Time open, Time close, int interval) throws SQLException {
-        String sql = "INSERT INTO bistro.`OpenTime` (`id`, `SpatialDate`, `openTime`, `closeTime`, `interval`) VALUES (?, ?, ?, ?, ?);";
+    public void addNewSpecial(LocalDate date, String title, LocalTime open, LocalTime close, int interval) throws SQLException {
+        String sql = """
+                INSERT INTO bistro.`OpenTime`
+                    (`SpatialDate`,`title`, `openTime`, `closeTime`, `interval`)
+                VALUES (?,?, ?, ?, ?);
+                """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setDate(2, date);
-            stmt.setTime(3, open);
-            stmt.setTime(4, close);
+            stmt.setDate(1, Date.valueOf(date));
+            stmt.setString(2, title);
+            stmt.setTime(3, Time.valueOf(open));
+            stmt.setTime(4, Time.valueOf(close));
             stmt.setInt(5, interval);
             stmt.executeUpdate();
         }
     }
 
-    public void updateRegular(Time open, Time close, int interval) throws SQLException {
-        String sql = "UPDATE bistro.`OpenTime` " + "SET `openTime` = ?, `closeTime` = ?, `interval` = ? " + "WHERE id = 1;";
+    public void updateRegular(LocalTime open, LocalTime close, int interval) throws SQLException {
+        String sql = """
+                UPDATE bistro.`OpenTime`
+                SET `openTime` = ?, `closeTime` = ?, `interval` = ?
+                WHERE id = 1;
+                """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setTime(1, open);
-            stmt.setTime(2, close);
+            stmt.setTime(1, Time.valueOf(open));
+            stmt.setTime(2, Time.valueOf(close));
             stmt.setInt(3, interval);
             stmt.executeUpdate();
         }

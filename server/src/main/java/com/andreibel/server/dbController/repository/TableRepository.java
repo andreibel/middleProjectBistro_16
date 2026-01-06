@@ -30,6 +30,7 @@ import static com.andreibel.server.utils.TableMapper.mapRelToTable;
  * The class follows the Singleton pattern to ensure a single instance
  * is used throughout the application lifecycle.
  * </p>
+ *
  * @author Andrei Beloziyorove
  */
 public class TableRepository {
@@ -67,11 +68,14 @@ public class TableRepository {
      * @throws SQLException if a database access error occurs
      */
     public List<Table> findAll() throws SQLException {
-        String sql = "SELECT * FROM bistro.`Table`";
+        String sql = """
+                SELECT *
+                FROM bistro.`Table`
+                """;
+        //"SELECT * FROM bistro.`Table`";
         List<Table> tables = new ArrayList<>();
 
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 tables.add(mapRelToTable(rs));
@@ -79,5 +83,19 @@ public class TableRepository {
         }
 
         return tables;
+    }
+
+    public void editTable(int capacity, int quantity)throws SQLException {
+        String sql = """
+                UPDATE bistro.`Table`
+                SET quantity = ?
+                WHERE capacity = ?
+                """;
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setInt(1, quantity);
+            stmt.setInt(2, capacity);
+            stmt.executeUpdate();
+
+        }
     }
 }

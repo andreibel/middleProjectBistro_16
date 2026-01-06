@@ -4,16 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class SpecialDayRequest implements Serializable {
-    private LocalDate date;
-    private String title;
+public class BistroTimeDTO {
     private LocalTime startTime;
     private LocalTime endTime;
     private Integer interval;

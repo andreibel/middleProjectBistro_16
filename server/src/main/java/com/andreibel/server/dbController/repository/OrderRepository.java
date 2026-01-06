@@ -269,6 +269,84 @@ public class OrderRepository {
         }
         return orders;
     }
+     /**
+      * Fetches all orders that belong to a specific subscriber.
+      *
+      * <h3>SQL</h3>
+      * <pre>
+      * SELECT *
+      * FROM bistro.`order`
+      * WHERE subscriberId = ?;
+      * </pre>
+      *
+      * <h3>Parameters</h3>
+      * <ul>
+      *   <li>1: {@code subscriberId} (int) — subscriber identifier.</li>
+      * </ul>
+      *
+      * <h3>Result</h3>
+      * Returns a list of {@link Order} rows for the subscriber (can be empty).
+      *
+      * @param email subscriber identifier
+      * @return orders belonging to the subscriber
+      */
+     public List<Order> findByEmail(String email) throws SQLException {
+         String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE email = ?;
+                """;
+
+         List<Order> orders = new ArrayList<>();
+         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+             stmt.setString(1, email);
+             try (ResultSet rs = stmt.executeQuery()) {
+                 while (rs.next()) {
+                     orders.add(mapRelToOrder(rs));
+                 }
+             }
+         }
+         return orders;
+     }
+     /**
+      * Fetches all orders that belong to a specific subscriber.
+      *
+      * <h3>SQL</h3>
+      * <pre>
+      * SELECT *
+      * FROM bistro.`order`
+      * WHERE subscriberId = ?;
+      * </pre>
+      *
+      * <h3>Parameters</h3>
+      * <ul>
+      *   <li>1: {@code subscriberId} (int) — subscriber identifier.</li>
+      * </ul>
+      *
+      * <h3>Result</h3>
+      * Returns a list of {@link Order} rows for the subscriber (can be empty).
+      *
+      * @param phone subscriber identifier
+      * @return orders belonging to the subscriber
+      */
+     public List<Order> findByPhone(String phone) throws SQLException {
+         String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE phoneNumber = ?;
+                """;
+
+         List<Order> orders = new ArrayList<>();
+         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+             stmt.setString(1, phone);
+             try (ResultSet rs = stmt.executeQuery()) {
+                 while (rs.next()) {
+                     orders.add(mapRelToOrder(rs));
+                 }
+             }
+         }
+         return orders;
+     }
 
      /**
       * Fetches all orders that belong to a specific subscriber.

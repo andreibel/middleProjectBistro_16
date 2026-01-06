@@ -12,6 +12,7 @@ import com.andreibel.server.entity.Table;
 import com.andreibel.server.utils.OrderMapper;
 
 import java.sql.Date;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -218,12 +219,11 @@ public class OrderService {
      * @param conformationCode confirmation code identifying the order
      * @return updated order as DTO (completed state)
      */
-    public OrderResponse completeOrder(UUID conformationCode) {
-        OrderResponse orderResponse = tx.inTransaction(() -> {
+    public void completeOrder(UUID conformationCode) {
+        tx.inTransaction(() -> {
             orderRepository.completeOrder(conformationCode);
-            return OrderMapper.mapOrderToOrderResponse(orderRepository.findByConformationCode(conformationCode));
+            return null;
         });
-        return orderResponse;
     }
 
     /**
@@ -276,6 +276,25 @@ public class OrderService {
             LocalDateTime closeDT = date.atTime(close);
             LocalDateTime lastStart = closeDT.minusMinutes(DURATION_MIN);
 
+            // Enforce a minimum lead time of 1 hour for same-day reservations.
+            // Example: if now is 14:30, a 15:00 slot is NOT allowed.
+            LocalDateTime firstSlot = openDT;
+            if (date.equals(LocalDate.now())) {
+                LocalDateTime minLead = LocalDateTime.now().plusHours(1);
+
+                // If the earliest allowed time is after opening, align it to the next valid slot boundary.
+                if (minLead.isAfter(firstSlot)) {
+                    long diffMin = Duration.between(firstSlot, minLead).toMinutes();
+                    long steps = (diffMin + intervalMin - 1L) / intervalMin; // ceil
+                    firstSlot = firstSlot.plusMinutes(steps * intervalMin);
+                }
+            }
+
+            // If no slot can satisfy the lead-time + duration constraints, return empty.
+            if (firstSlot.isAfter(lastStart)) {
+                return Collections.emptyList();
+            }
+
             // Build table inventory: capacity -> quantity
             List<Table> types = tableRepository.findAll();
             TreeMap<Integer, Integer> total = new TreeMap<>();
@@ -286,11 +305,12 @@ public class OrderService {
 
             // Evaluate each slot and collect available start times.
             List<LocalTime> result = new ArrayList<>();
-            for (LocalDateTime slot = openDT; !slot.isAfter(lastStart); slot = slot.plusMinutes(intervalMin)) {
+            for (LocalDateTime slot = firstSlot; !slot.isAfter(lastStart); slot = slot.plusMinutes(intervalMin)) {
                 if (isSlotAvailable(slot, numberOfGuests, dayOrders, total, intervalMin, DURATION_MIN)) {
                     result.add(slot.toLocalTime());
                 }
             }
+
             return result;
         });
     }
@@ -407,18 +427,59 @@ public class OrderService {
         return true;
     }
 
-    public OrderResponse lostConformCode(OrderRequest request) {
-        OrderResponse response = null;
-        if (request.getEmail() != null) {
-            response = OrderMapper.mapOrderToOrderResponse(tx.inTransaction(() ->
-                    orderRepository.findOneByEmail(request.getEmail(), request.getOrderDateTime())));
-        } else if (request.getPhoneNumber() != null) {
-            response = OrderMapper.mapOrderToOrderResponse(tx.inTransaction(() ->
-                    orderRepository.findOneByPhoneNumber(request.getPhoneNumber(), request.getOrderDateTime())));
-        }
+    public List<OrderResponse> lostConformCode(OrderRequest request) {
+        List<OrderResponse>response  = new ArrayList<>();
+        if (request.getSubscriberId() != null)
+            response = tx.inTransaction(() -> orderRepository
+                    .findBySubscriberId(request.getSubscriberId())
+                    .stream()
+                    .filter(order -> order.getOrderDateTime().isAfter(LocalDateTime.now()))
+                    .toList()
+            ).stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
+        else if (request.getEmail() != null)
+            response = tx.inTransaction(() -> orderRepository
+                            .findByEmail(request.getEmail())
+                            .stream()
+                            .filter(order -> order.getOrderDateTime().isAfter(LocalDateTime.now()))
+                            .toList()
+                    ).stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
+        else if (request.getPhoneNumber() != null)
+            response = tx.inTransaction(() -> orderRepository
+                            .findByPhone(request.getPhoneNumber())
+                            .stream()
+                            .filter(order -> order.getOrderDateTime().isAfter(LocalDateTime.now()))
+                            .toList()
+                    ).stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
         return response;
     }
 
 
+    public List<OrderResponse> getAllActiveOrders() {
+        return tx.inTransaction(() -> {
+            List<Order> orders = orderRepository.findAll();
+            return orders.stream()
+                    .filter(order -> order.getOrderDateTime().toLocalDate().equals(LocalDate.now()))
+                    .filter(order -> !order.isOrderCompleted())
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList();
+        });
+    }
 
+    public List<OrderResponse> getCurrentEat() {
+        return tx.inTransaction(() -> {
+           List<Order> orders = orderRepository.findAll();
+           return orders.stream()
+                   .filter(order -> order.getOrderDateTime().toLocalDate().equals(LocalDate.now()))
+                   .filter(Order::isOrderArrive)
+                   .filter(order -> !order.isOrderCompleted())
+                   .map(OrderMapper::mapOrderToOrderResponse)
+                   .toList();
+        });
+    }
 }

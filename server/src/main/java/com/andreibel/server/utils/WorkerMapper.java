@@ -29,7 +29,6 @@ public class WorkerMapper {
         return Worker.builder()
                 .workerName(rs.getString(Worker.WORKER_NAME))
                 .workerPassword(rs.getString(Worker.WORKER_PASSWORD))
-                .workerEmail(rs.getString(Worker.WORKER_EMAIL))
                 .isManager(rs.getBoolean(Worker.IS_MANAGER))
                 .build();
     }
