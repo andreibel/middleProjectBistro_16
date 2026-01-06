@@ -21,10 +21,6 @@ public enum APICallType {
     DELETE_ORDER_RESPONSE, // no required✅
     DELETE_ORDER_ERROR,//✅
 
-    GET_ALL_ORDERS_SUB, // no required ✅
-    GET_ALL_ORDERS_SUB_RESPONSE, // List<OrderResponse>✅
-    GET_ALL_ORDERS_SUB_ERROR,//✅
-
     GET_ONE_ORDER, // UUID✅
     GET_ONE_ORDER_RESPONSE, // OrderResponse✅
     GET_ONE_ORDER_ERROR, // ✅
@@ -129,6 +125,10 @@ public enum APICallType {
     GET_ALL_ARRIVED_AND_NOT_COMPLETE, // none
     GET_ALL_ARRIVED_AND_NOT_COMPLETE_RESPONSE, // List<OrderResponse>
     GET_ALL_ARRIVED_AND_NOT_COMPLETE_ERROR,
+
+    GET_REGULAR_OPEN_TIME,
+    GET_REGULAR_OPEN_TIME_RESPONSE,
+    GET_REGULAR_OPEN_TIME_ERROR,
 
     /**
      * /$$      /$$           /$$   /$$     /$$                     /$$       /$$             /$$

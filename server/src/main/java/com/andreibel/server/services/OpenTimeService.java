@@ -1,11 +1,11 @@
 package com.andreibel.server.services;
 
-import com.andreibel.message.DTO.BistroTimeRequest;
+import com.andreibel.message.DTO.BistroTimeDTO;
 import com.andreibel.message.DTO.SpecialDayRequest;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OpenTimeRepository;
-
-import java.sql.SQLException;
+import com.andreibel.server.entity.OpenTime;
+import com.andreibel.server.utils.OpenTimeMapper;
 
 public class OpenTimeService {
     private static OpenTimeService instance;
@@ -36,7 +36,7 @@ public class OpenTimeService {
         });
     }
 
-    public void editRegulaDay(BistroTimeRequest data) {
+    public void editRegulaDay(BistroTimeDTO data) {
         tx.inTransaction(() -> {
             openTimeRepository.updateRegular(
                     data.getStartTime(),
@@ -46,5 +46,12 @@ public class OpenTimeService {
             return null;
         });
 
+    }
+
+    public BistroTimeDTO getRegular() {
+        return tx.inTransaction(() -> {
+            OpenTime regular =  openTimeRepository.findRegular();
+            return OpenTimeMapper.mapOpenTimeToDTO(regular);
+        });
     }
 }

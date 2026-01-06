@@ -24,6 +24,7 @@ import static com.andreibel.server.utils.SubscriberMapper.mapRelToSubscriber;
  * <p>
  * Implemented as a Singleton.
  * </p>
+ *
  * @author Andrei Beloziyorove
  */
 public class SubscriberRepository {
@@ -52,10 +53,12 @@ public class SubscriberRepository {
      * @return stored subscriber
      */
     public Subscriber addSubscriber(SubscriberRequest sub) throws SQLException {
-        String sql = "INSERT INTO bistro.subscriber ("
-                + Subscriber.EMAIL + ", "
-                + Subscriber.NAME + ", "
-                + Subscriber.PHONE_NUMBER + ") VALUES (?,?,?);";
+        String sql = """
+                INSERT INTO bistro.`subscriber`
+                (`email`, `name`, `phoneNumber`)
+                VALUES (?,?,?);
+                """;
+
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, sub.getEmail());
@@ -115,11 +118,13 @@ public class SubscriberRepository {
      * @return all subscribers in the database
      */
     public List<Subscriber> findAll() throws SQLException {
-        String sql = "SELECT * FROM bistro.`subscriber`;";
+        String sql = """
+                SELECT *
+                FROM bistro.`subscriber`;
+                """;
         List<Subscriber> subscribers = new ArrayList<>();
 
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
                 subscribers.add(mapRelToSubscriber(rs));
@@ -130,9 +135,7 @@ public class SubscriberRepository {
 
 
     public void updateBySubID(SubscriberRequest data) {
-        String sql = "UPDATE bistro.subscriber " +
-                "SET " + Subscriber.NAME + " = ? , " + Subscriber.PHONE_NUMBER + " = ?, " + Subscriber.EMAIL + " = ?" +
-                "WHERE " + Subscriber.SUBSCRIBER_ID + " = ?;";
+        String sql = "UPDATE bistro.subscriber " + "SET " + Subscriber.NAME + " = ? , " + Subscriber.PHONE_NUMBER + " = ?, " + Subscriber.EMAIL + " = ?" + "WHERE " + Subscriber.SUBSCRIBER_ID + " = ?;";
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, data.getName());
             stmt.setString(2, data.getPhoneNumber());

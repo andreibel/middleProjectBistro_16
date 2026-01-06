@@ -19,7 +19,7 @@ public class WorkerService {
 
     // TODO: move to config or ENV file
     private static final String SECRET =
-            "TOKEN";
+            "8b6de9f7c15fa54fd4fb30e5fc583fa237e0b39bc24264c4c93426a1a4b585ab";
 
     private WorkerService() {
         this.workerRepository = WorkerRepository.getInstance();

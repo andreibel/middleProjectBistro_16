@@ -9,7 +9,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class BistroTimeRequest {
+public class BistroTimeDTO {
     private LocalTime startTime;
     private LocalTime endTime;
     private Integer interval;

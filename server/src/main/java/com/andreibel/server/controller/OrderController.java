@@ -2,6 +2,7 @@ package com.andreibel.server.controller;
 
 import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.DTO.OrderResponse;
+import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
@@ -84,16 +85,6 @@ public class OrderController {
         return new Message(GET_ONE_ORDER_RESPONSE, orderResponse);
     }
 
-    /**
-     * Handles a request to retrieve all orders.
-     *
-     * @return response message containing all orders
-     */
-    public Message getAllOrdersBySubscriber() {
-        List<OrderResponse> orders = orderService.getAllOrders();
-        if (orders == null) return new Message(GET_ALL_ORDERS_SUB_ERROR, null);
-        return new Message(GET_ALL_ORDERS_SUB_RESPONSE, orders);
-    }
 
     /**
      * Handles a request to cancel (delete) an order by confirmation code.
@@ -138,12 +129,10 @@ public class OrderController {
      * @return response message containing the updated order
      */
     public Message closeOrder(Message message) {
-
+        orderService.completeOrder((UUID) message.getData());
         return new Message(
                 COMPLETE_ORDER_RESPONSE,
-                orderService.completeOrder(
-                        ((OrderRequest) message.getData()).getConformationCode()
-                )
+                null
         );
     }
 
@@ -160,10 +149,10 @@ public class OrderController {
      * @return response message containing a list of available times
      */
     public Message getAllAvailableTime(Message message) {
-        OrderRequest data = (OrderRequest) message.getData();
+        TimeGetterRequest data = (TimeGetterRequest) message.getData();
         List<LocalTime> allAvailableTimeInDate = orderService.getAllAvailableTimeInDate(
-                data.getOrderDateTime().toLocalDate(),
-                data.getNumberOfGuests()
+                data.getDate(),
+                data.getCapacity()
         );
         if (allAvailableTimeInDate == null || allAvailableTimeInDate.isEmpty())
             return new Message(GET_ALL_TIMES_IN_DATE_ERROR, null);
@@ -179,5 +168,17 @@ public class OrderController {
         List<OrderResponse> data = orderService.lostConformCode(((OrderRequest) message.getData()));
         if (data == null || data.isEmpty()) return new Message(ORDER_LOST_CONFORMATION_CODE_ERROR, null);
         return new Message(ORDER_LOST_CONFORMATION_CODE_RESPONSE, data);
+    }
+
+    public Message getAllActiveOrder() {
+        List<OrderResponse> activeOrders = orderService.getAllActiveOrders();
+        if (activeOrders == null) return new Message(GET_ALL_ACTIVE_ERROR, null);
+        return new Message(GET_ALL_ACTIVE_RESPONSE, activeOrders);
+    }
+
+    public Message getNowEating() {
+        List<OrderResponse> activeEat = orderService.getCurrentEat();
+        if (activeEat == null)  return new Message(GET_ALL_ARRIVED_AND_NOT_COMPLETE_ERROR, null);
+        return new Message(GET_ALL_ARRIVED_AND_NOT_COMPLETE_RESPONSE, activeEat);
     }
 }

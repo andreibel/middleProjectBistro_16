@@ -51,7 +51,7 @@ public class WorkerController {
     }
 
     public Message editRegulaDay(Message message) {
-        openTimeService.editRegulaDay((BistroTimeRequest)message.getData());
+        openTimeService.editRegulaDay((BistroTimeDTO)message.getData());
         return new Message(CHANGE_BISTRO_TIME_RESPONSE, null);
     }
 
@@ -65,5 +65,10 @@ public class WorkerController {
         if (!(message.getData() instanceof List)) return new Message(EDIT_BISTRO_LAYOUT_ERROR, null);
         tableService.editTables((List<TableRequest>)message.getData());
         return new Message(EDIT_BISTRO_LAYOUT_RESPONSE, null);
+    }
+
+    public Message getRegularDate() {
+        BistroTimeDTO regular = openTimeService.getRegular();
+        return new Message(GET_REGULAR_OPEN_TIME_RESPONSE, regular);
     }
 }
