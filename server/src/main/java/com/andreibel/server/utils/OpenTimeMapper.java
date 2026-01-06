@@ -10,6 +10,7 @@ public class OpenTimeMapper {
         return OpenTime.builder()
                 .id(rs.getInt(OpenTime.ID))
                 .SpatialDate(rs.getDate(OpenTime.SPATIAL_DATE))
+                .title(rs.getString(OpenTime.TITLE))
                 .openTime(rs.getTime(OpenTime.OPEN_TIME))
                 .closeTime(rs.getTime(OpenTime.CLOSE_TIME))
                 .interval(rs.getInt(OpenTime.INTERVAL))

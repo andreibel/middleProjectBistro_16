@@ -60,17 +60,18 @@ public class OpenTimeRepository {
         return openTimes;
     }
 
-    public void addNewSpecial(LocalDate date, LocalTime open, LocalTime close, int interval) throws SQLException {
+    public void addNewSpecial(LocalDate date, String title, LocalTime open, LocalTime close, int interval) throws SQLException {
         String sql = """
                 INSERT INTO bistro.`OpenTime`
-                    (`SpatialDate`, `openTime`, `closeTime`, `interval`)
-                VALUES (?, ?, ?, ?);
+                    (`SpatialDate`,`title`, `openTime`, `closeTime`, `interval`)
+                VALUES (?,?, ?, ?, ?);
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setDate(1, Date.valueOf(date));
-            stmt.setTime(2, Time.valueOf(open));
-            stmt.setTime(3, Time.valueOf(close));
-            stmt.setInt(4, interval);
+            stmt.setString(2, title);
+            stmt.setTime(3, Time.valueOf(open));
+            stmt.setTime(4, Time.valueOf(close));
+            stmt.setInt(5, interval);
             stmt.executeUpdate();
         }
     }

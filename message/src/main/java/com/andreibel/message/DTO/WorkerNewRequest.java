@@ -12,6 +12,5 @@ import java.io.Serializable;
 public class WorkerNewRequest implements Serializable {
     private String name;
     private String password;
-    private String email;
     private boolean isManager;
 }

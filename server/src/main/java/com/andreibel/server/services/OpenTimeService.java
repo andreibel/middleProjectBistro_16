@@ -27,6 +27,7 @@ public class OpenTimeService {
         tx.inTransaction(() -> {
             openTimeRepository.addNewSpecial(
                     data.getDate(),
+                    data.getTitle(),
                     data.getStartTime(),
                     data.getEndTime(),
                     data.getInterval()

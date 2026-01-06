@@ -13,6 +13,7 @@ import java.time.LocalTime;
 @Data
 public class SpecialDayRequest implements Serializable {
     private LocalDate date;
+    private String title;
     private LocalTime startTime;
     private LocalTime endTime;
     private Integer interval;

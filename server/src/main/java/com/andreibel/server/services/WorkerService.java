@@ -50,7 +50,7 @@ public class WorkerService {
         return tx.inTransaction(() -> {
             // prevent duplicates
             Worker existing = workerRepository.findByWorkerName(request.getName());
-            if (existing != null) return null; // or throw "already exists"
+            if (existing != null) return null;
 
             String passwordHmacHex = HmacUtil.hmacSha256Hex(
                     request.getPassword().getBytes(StandardCharsets.UTF_8),
@@ -60,7 +60,6 @@ public class WorkerService {
             Worker toInsert = Worker.builder()
                     .workerName(request.getName())
                     .workerPassword(passwordHmacHex)
-                    .workerEmail(request.getEmail())
                     .isManager(request.isManager())
                     .build();
             Worker saved = workerRepository.addWorker(toInsert);

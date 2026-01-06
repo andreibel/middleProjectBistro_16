@@ -25,10 +25,11 @@ import java.sql.Time;
  * (
  *     id          int auto_increment
  *         primary key,
- *     SpatialDate date null,
- *     openTime    time null,
- *     closeTime   time null,
- *     `interval`  int  null
+ *     SpatialDate date        null,
+ *     title       varchar(50) null,
+ *     openTime    time        null,
+ *     closeTime   time        null,
+ *     `interval`  int         null
  * );
  * </pre></blockquote>
  * <hr/>
@@ -41,12 +42,14 @@ import java.sql.Time;
 public class OpenTime {
     private int id;
     private Date SpatialDate; // null for the regular day
+    private String title;
     private Time openTime;
     private Time closeTime;
     private int interval;
 
     public static final String ID = "id";
     public static final String SPATIAL_DATE = "SpatialDate";
+    public static final String TITLE = "title";
     public static final String OPEN_TIME = "openTime";
     public static final String CLOSE_TIME = "closeTime";
     public static final String INTERVAL = "interval";

@@ -34,6 +34,9 @@ public class TableService {
         }
     }
     public List<TableResponse> getAllTables() {
-        return tx.inTransaction(tableRepository::findAll).stream().map(TableMapper::mapTableToResonance).toList();
+        return tx.inTransaction(tableRepository::findAll)
+                .stream()
+                .map(TableMapper::mapTableToResonance)
+                .toList();
     }
 }
