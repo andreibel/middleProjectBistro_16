@@ -59,22 +59,12 @@ public class BistroClientController {
 
 
     //=======================Order Request==========================
-
-    //NEED TO CHANGE ORDER REQUEST AND ADD A FIELD FOR STATUS
     public void requestCompleteOrder(UUID confirmationCode) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.COMPLETE_ORDER, confirmationCode));
     }
-    public void requestOrder(int numberOfPeople, LocalDateTime date, Integer subscriberId, String email, String phoneNumber) {
+    public void requestOrderCreation(OrderRequest req) {
         if (!isClientAvailable()) return;
-        OrderRequest req = new OrderRequest(
-                null,
-                numberOfPeople,
-                date,
-                subscriberId,
-                email,
-                phoneNumber
-        );
         client.send(new Message(APICallType.CREATE_ORDER, req));
     }
 
@@ -83,7 +73,7 @@ public class BistroClientController {
         client.send(new Message(APICallType.GET_ALL_TIMES_IN_DATE, req));
     }
 
-    public void requestOrderCancel(int confirmationCode){
+    public void requestOrderCancel(UUID confirmationCode){
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.DELETE_ORDER, confirmationCode));
     }
@@ -91,9 +81,9 @@ public class BistroClientController {
     //=======================Subscriber Request==========================
     public void requestSubscriberLogin(Integer subscriberId) {
         if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType.SUBSCRIBER_LOGIN, subscriberId));
+        client.send(new Message(APICallType.SUBSCRIBER_LOGIN, subscriberId));
     }
-    public void requestAllSubscriberOrders(int subscriberId) {
+    public void requestAllSubscriberOrders(Integer subscriberId) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.GET_SUBSCRIBER_ORDERS, subscriberId));
     }
@@ -126,9 +116,9 @@ public class BistroClientController {
 
     //=======================Worker Request==========================
 
-    public void requestWorkerLogin(String username, String password){
+    public void requestWorkerLogin(WorkerAuth req){
         if (!isClientAvailable()) return;
-        client.send(new Message(APICallType.WORKER_LOGIN, new WorkerAuth(username, password)));
+        client.send(new Message(APICallType.WORKER_LOGIN, req));
     }
 
     public void requestRegisterNewSubscriber(SubscriberRequest req) {
@@ -173,10 +163,10 @@ public class BistroClientController {
 
     public void requestBistroTimes(){
         if (!isClientAvailable()) return;
-        //client.send(new Message(APICallType., null));
+        client.send(new Message(APICallType.GET_REGULAR_OPEN_TIME, null));
     }
 
-    public void requestEditBistroTimes(BistroTimeRequest req){
+    public void requestEditBistroTimes(BistroTimeDTO req){
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.CHANGE_BISTRO_TIME, req));
     }

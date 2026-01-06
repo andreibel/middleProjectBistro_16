@@ -5,6 +5,7 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import javafx.application.Platform;
@@ -21,7 +22,7 @@ import java.util.List;
 
 public class OrderFormGUIController implements IServerResponseListener {
 
-    private enum WizardStep { PART1, PART2_TIME, PART3_USER_TYPE }
+    private enum WizardStep { PART1, PART2_TIME, PART3_USER_INFO }
 
     @FXML
     private DatePicker datePickerOrder;
@@ -51,6 +52,7 @@ public class OrderFormGUIController implements IServerResponseListener {
         setDatePicker();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onServerResponse(Message message) throws IOException {
         switch (message.getType()) {
@@ -61,9 +63,9 @@ public class OrderFormGUIController implements IServerResponseListener {
                 BistroUtilities.switchScreen(btnOrderNow,"/Main/MainForm.fxml", "Bistro Restaurant");
             }
             case CREATE_ORDER_ERROR -> BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, order creation failed.");
-            case GET_ALL_TIMES_IN_DATE_RESPONSE -> {
+            case GET_ALL_TIMES_IN_DATE_RESPONSE ->
                 populateAvailableTimes((List<LocalTime>) message.getData());
-            }
+            case GET_ALL_TIMES_IN_DATE_ERROR -> BistroUtilities.showMessage("Bistro Restaurant", "There are no available times in this day.");
         }
     }
 
@@ -84,10 +86,10 @@ public class OrderFormGUIController implements IServerResponseListener {
                     createOrder();
                 }
                 else {
-                    wizardStep = WizardStep.PART3_USER_TYPE;
+                    wizardStep = WizardStep.PART3_USER_INFO;
                 }
             }
-            case PART3_USER_TYPE -> {
+            case PART3_USER_INFO -> {
                 if (!validatePart3()) return;
                 createOrder();
             }
@@ -98,7 +100,7 @@ public class OrderFormGUIController implements IServerResponseListener {
     @FXML
     private void onPreviousButtonClicked(ActionEvent event) {
         if (wizardStep == WizardStep.PART2_TIME) wizardStep = WizardStep.PART1;
-        else if (wizardStep == WizardStep.PART3_USER_TYPE) wizardStep = WizardStep.PART2_TIME;
+        else if (wizardStep == WizardStep.PART3_USER_INFO) wizardStep = WizardStep.PART2_TIME;
         adjustFormToWizardStep();
     }
 
@@ -135,7 +137,7 @@ public class OrderFormGUIController implements IServerResponseListener {
                 comboBoxTime.setVisible(true); lblTime.setVisible(true);
                 btnOrderNow.setText(isSubscriber ? "Order Now" : "Next");
             }
-            case PART3_USER_TYPE -> {
+            case PART3_USER_INFO -> {
                 if (!isSubscriber) {
                     lblWizardTitle.setText("Step 3 / 3 - Customer Info");
                     txtFieldEmail.setVisible(true); lblEmail.setVisible(true);
@@ -187,12 +189,11 @@ public class OrderFormGUIController implements IServerResponseListener {
     }
 
     private void createOrder() {
-        controller.requestOrder(
-                Integer.parseInt(txtFieldNumberOfPeople.getText()),
+        controller.requestOrderCreation(new OrderRequest(null,  Integer.parseInt(txtFieldNumberOfPeople.getText()),
                 LocalDateTime.of(datePickerOrder.getValue(), LocalTime.parse(comboBoxTime.getValue())),
-                CustomerStateManager.getInstance().getSubscriber() != null ? CustomerStateManager.getInstance().getSubscriber().getSubscriberId() : null,
+                CustomerStateManager.fillSubscriberIDDetails(),
                 txtFieldEmail.getText(),
-                txtFieldPhoneNumber.getText()
+                txtFieldPhoneNumber.getText())
         );
         wizardStep = WizardStep.PART1;
     }

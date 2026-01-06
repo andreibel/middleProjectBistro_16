@@ -5,6 +5,7 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.WorkerStateManager;
 import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.WorkerAuth;
 import com.andreibel.message.DTO.WorkerResponse;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
@@ -135,7 +136,7 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
             return;
         }
 
-        controller.requestWorkerLogin(staffName, password);
+        controller.requestWorkerLogin(new WorkerAuth(staffName, password));
     }
 
     /**

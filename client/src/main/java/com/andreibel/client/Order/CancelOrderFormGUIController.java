@@ -11,6 +11,7 @@ import javafx.scene.Node;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
+import java.util.UUID;
 
 /**
  * GUI controller for the order cancellation form.
@@ -112,7 +113,7 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
         }
 
         controller.requestOrderCancel(
-                Integer.parseInt(txtFieldConfirmationCode.getText())
+                UUID.fromString(txtFieldConfirmationCode.getText())
         );
     }
 

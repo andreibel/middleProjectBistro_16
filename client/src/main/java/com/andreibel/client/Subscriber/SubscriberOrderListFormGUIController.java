@@ -57,9 +57,7 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
 
         requestOrdersWhenSceneIsShown();
         Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
-        if (subscriberId != null) {
-            controller.requestAllSubscriberOrders(subscriberId);
-        }
+        controller.requestAllSubscriberOrders(subscriberId);
     }
 
     private void initializeTableColumns() {

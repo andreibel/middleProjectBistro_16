@@ -68,6 +68,8 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
     @Override
     public void onServerResponse(Message message) {
         switch (message.getType()) {
+            case GET_REGULAR_OPEN_TIME_RESPONSE -> fillDataInFields((BistroTimeDTO)message.getData());
+            case GET_REGULAR_OPEN_TIME_ERROR -> BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to fetch restaurant time.");
             case CHANGE_BISTRO_TIME_RESPONSE ->
                     BistroUtilities.showMessage("Bistro Restaurant", "Successfully changed restaurant times");
             case CHANGE_BISTRO_TIME_ERROR ->
@@ -84,9 +86,9 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
         if (!isTimesValidated(txtFieldOpen.getText(), txtFieldClose.getText(), txtFieldInterval.getText()))
             return;
 
-        //controller.requestEditBistroTimes(new BistroTimeRequest(LocalTime.parse(txtFieldOpen.getText(), TIME_FORMATTER),
-        //        LocalTime.parse(txtFieldClose.getText(), TIME_FORMATTER),
-        //        Integer.parseInt(txtFieldInterval.getText())));
+        controller.requestEditBistroTimes(new BistroTimeDTO(LocalTime.parse(txtFieldOpen.getText(), TIME_FORMATTER),
+                LocalTime.parse(txtFieldClose.getText(), TIME_FORMATTER),
+                Integer.parseInt(txtFieldInterval.getText())));
     }
 
     @FXML
@@ -141,6 +143,10 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
                 setDisable(empty || date.isBefore(LocalDate.now()));
             }
         });
+    }
+
+    private void fillDataInFields(BistroTimeDTO response){
+        //Put data in fields
     }
 
     public boolean isValidDate() {

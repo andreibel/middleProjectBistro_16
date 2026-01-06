@@ -79,7 +79,7 @@ public class WorkerRegisterFormGUIController implements IServerResponseListener 
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid password");
             return;
         }
-
+        //TODO: Remove email from request
         controller.requestRegisterNewWorker(
                 new WorkerNewRequest(workerName, password, null, chkBoxManager.isSelected())
         );

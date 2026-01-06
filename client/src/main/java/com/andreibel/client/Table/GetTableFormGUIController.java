@@ -19,32 +19,14 @@ import java.io.IOException;
 import java.util.UUID;
 
 public class GetTableFormGUIController implements IServerResponseListener {
-
-    @FXML
-    private Label lblSubscriberInfo;
-    @FXML
-    private Label lblWhoAmI;
-    @FXML
-    private RadioButton radioBtnGuest;
-    @FXML
-    private RadioButton radioBtnSubscriber;
     @FXML
     private TextField txtFieldConfirmation;
-
-    @FXML
-    private Button btnConfrimArrival;
-    @FXML
-    private Button btnGoBack;
-    @FXML
-    private Button btnLostMyCode;
-
     private BistroClientController controller;
 
     @FXML
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-        adjustFormBasedOnUserType();
     }
 
     @Override
@@ -56,7 +38,7 @@ public class GetTableFormGUIController implements IServerResponseListener {
                 if (!codeText.isEmpty() && BistroUtilities.isNumeric(codeText)) {
                     CustomerStateManager.getInstance().setConfirmationCode(Integer.parseInt(codeText));
                 }
-                clearForm();
+                txtFieldConfirmation.clear();
                 BistroUtilities.showMessage(
                         "Bistro Restaurant",
                         "Thank you for confirming your arrival, please head to your table"
@@ -120,21 +102,11 @@ public class GetTableFormGUIController implements IServerResponseListener {
 
     @FXML
     private void onButtonGoBackClicked(ActionEvent event) throws IOException {
-        clearForm();
+        txtFieldConfirmation.clear();
         BistroUtilities.switchScreen(
                 (Node) event.getSource(),
                 "/Main/MainForm.fxml",
                 "Bistro Restaurant"
         );
-    }
-
-    private void clearForm() {
-        txtFieldConfirmation.clear();
-        adjustFormBasedOnUserType();
-    }
-
-    private void adjustFormBasedOnUserType() {
-        boolean isSubscriber = CustomerStateManager.getInstance().getSubscriber() != null;
-        lblSubscriberInfo.setVisible(isSubscriber);
     }
 }
