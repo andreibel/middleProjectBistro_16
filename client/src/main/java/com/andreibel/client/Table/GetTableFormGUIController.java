@@ -65,11 +65,6 @@ public class GetTableFormGUIController implements IServerResponseListener {
             return;
         }
 
-        if (isGuest && !BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid confirmation code");
-            return;
-        }
-
         UUID confirmationUUID = null;
         if (!txtFieldConfirmation.getText().isBlank()) {
             try {
@@ -81,14 +76,7 @@ public class GetTableFormGUIController implements IServerResponseListener {
             }
         }
 
-        controller.requestArrivalConfirmation(new OrderRequest(
-                confirmationUUID,
-                null,
-                null,
-                CustomerStateManager.fillSubscriberIDDetails(),
-                null,
-                null
-        ));
+        controller.requestArrivalConfirmation(confirmationUUID);
     }
 
     @FXML

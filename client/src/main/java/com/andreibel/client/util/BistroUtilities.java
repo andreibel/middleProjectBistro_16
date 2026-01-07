@@ -121,7 +121,7 @@ public final class BistroUtilities {
     }
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^(?:[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+)?$\n"
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
     );
 
     /**
@@ -134,6 +134,7 @@ public final class BistroUtilities {
         if (email == null || email.isEmpty()) return false;
         return EMAIL_PATTERN.matcher(email).matches();
     }
+
 
     // Regex for digits only
     private static final Pattern DIGITS_ONLY_PATTERN = Pattern.compile("^\\d+$");

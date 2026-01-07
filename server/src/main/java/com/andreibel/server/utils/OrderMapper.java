@@ -78,13 +78,15 @@ public class OrderMapper {
      * @throws SQLException if the result set is invalid.
      */
     public static Order mapRelToOrder(ResultSet rs) throws SQLException {
+        LocalDateTime arriveDateTime = rs.getTimestamp(Order.ORDER_ARRIVE_DATE_TIME) == null ? null
+                : rs.getTimestamp(Order.ORDER_ARRIVE_DATE_TIME).toLocalDateTime();
         return Order.builder()
                 .orderNumber(rs.getInt(Order.ORDER_NUMBER))
                 .numberOfGuests(rs.getInt(Order.NUMBER_OF_GUESTS))
                 .conformationCode(UUID.fromString(rs.getString(Order.CONFIRMATION_CODE)))
                 .orderDateTime(rs.getTimestamp(Order.ORDER_DATE_TIME).toLocalDateTime())
                 .placedOrderDateTime(rs.getTimestamp(Order.PLACED_ORDER_DATE_TIME).toLocalDateTime())
-                .orderArriveDateTime(rs.getTimestamp(Order.ORDER_ARRIVE_DATE_TIME).toLocalDateTime())
+                .orderArriveDateTime(arriveDateTime)
                 .orderCancelled(rs.getBoolean(Order.ORDER_CANCELLED))
                 .orderArrive(rs.getBoolean(Order.ORDER_ARRIVED))
                 .orderCompleted(rs.getBoolean(Order.ORDER_COMPLETED))

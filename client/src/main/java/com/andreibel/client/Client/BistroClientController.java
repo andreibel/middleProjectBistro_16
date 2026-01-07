@@ -94,7 +94,7 @@ public class BistroClientController {
     }
 
     //=======================Table Request==========================
-    public void requestArrivalConfirmation(OrderRequest req) {
+    public void requestArrivalConfirmation(UUID req) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.ORDER_ARRIVED, req));
     }

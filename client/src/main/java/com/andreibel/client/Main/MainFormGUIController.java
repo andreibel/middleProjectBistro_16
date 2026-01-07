@@ -43,7 +43,7 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
-        //CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
+        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
         WorkerStateManager.getInstance().setManager(true);
         updateMainFormWhenSceneIsShown();
         if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())

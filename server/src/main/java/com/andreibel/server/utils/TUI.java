@@ -40,6 +40,8 @@ public class TUI {
     }
 
     public static void serverInputLog(Message message) {
+        String  str = message.getData() == null ? null : shorten(message.getData().toString(), 105);
+
         System.out.printf(
                 """
        │ ┌────── request: to  --> server ──────┐                                                                                                             │
@@ -47,7 +49,7 @@ public class TUI {
        │ │ %-37s │ %-105s │ │
        │ └───────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
         """, message.getType().toString(),
-                shorten(message.getData().toString(), 105)
+                str
         );
     }
 

@@ -13,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 import static com.andreibel.message.APICallType.WORKER_LOGIN;
 import static com.andreibel.server.utils.TUI.*;
@@ -43,10 +44,6 @@ public class BistroServer extends Application {
         DB_PASSWORD = params.getOrDefault("db_password", "tikraetzeM4!");
         conf(PORT, DB_URL, DB_USER, DB_PASSWORD);
         startLog();
-        Message msg  = new Message(WORKER_LOGIN, new WorkerAuth("andrei", "Andrei1234567890"));
-        serverOutputLog(msg);
-        Message res = WorkerController.getInstance().login(msg);
-        serverOutputLog(res);
         FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();

@@ -727,7 +727,7 @@ public class OrderRepository {
                 WHERE orderCancelled = 0
                   AND orderCompleted = 0
                   AND orderArrive = 0
-                  AND orderArriveDateTime < ?
+                  AND orderDateTime < ?
                 """;
         LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
         try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
