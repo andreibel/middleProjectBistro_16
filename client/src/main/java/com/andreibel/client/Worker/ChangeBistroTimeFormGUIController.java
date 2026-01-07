@@ -4,7 +4,7 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.BistroTimeRequest;
+import com.andreibel.message.DTO.BistroTimeDTO;
 import com.andreibel.message.DTO.SpecialDayRequest;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
@@ -103,7 +103,7 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
 
         controller.requestNewEventCreation(
                 new SpecialDayRequest(
-                        datePickerEvent.getValue(),
+                        datePickerEvent.getValue().atStartOfDay().toLocalDate(), txtFieldEventName.getText(),
                         LocalTime.parse(txtFieldEventOpen.getText(), TIME_FORMATTER),
                         LocalTime.parse(txtFieldEventClose.getText(), TIME_FORMATTER),
                         Integer.parseInt(txtFieldEventInterval.getText())
@@ -146,10 +146,12 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
     }
 
     private void fillDataInFields(BistroTimeDTO response){
-        //Put data in fields
+        txtFieldOpen.setText(response.getStartTime().toString());
+        txtFieldClose.setText(response.getEndTime().toString());
+        txtFieldInterval.setText(String.valueOf(response.getInterval()));
     }
 
-    public boolean isValidDate() {
+    private boolean isValidDate() {
         LocalDate selectedDate = datePickerEvent.getValue();
         if (selectedDate == null) {
             BistroUtilities.showMessage("Bistro Restaurant", "Please enter event date");
@@ -158,7 +160,7 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
         return true;
     }
 
-    public boolean isTimesValidated(String opening, String closing, String interval) {
+    private boolean isTimesValidated(String opening, String closing, String interval) {
         if (opening == null || opening.isEmpty() ||
                 closing == null || closing.isEmpty() ||
                 interval == null || interval.isEmpty()) {
