@@ -1,6 +1,7 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.Message;
+import com.andreibel.server.services.WaitingListService;
 import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
@@ -49,6 +50,8 @@ public class Serve extends AbstractServer {
     SubscriberController subscriberController;
 
     WorkerController workerController;
+
+    WaitingController waitingController;
     /**
      * GUI controller reference (optional).
      * Used to update UI on client connect/disconnect/exception events.
@@ -69,6 +72,7 @@ public class Serve extends AbstractServer {
         orderController = OrderController.getInstance();
         subscriberController = SubscriberController.getInstance();
         workerController = WorkerController.getInstance();
+        waitingController = WaitingController.getInstance();
     }
 
     /**
@@ -131,14 +135,14 @@ public class Serve extends AbstractServer {
                 case GET_ALL_TABLES -> workerController.getAllTables(); // ✅
                 case EDIT_BISTRO_LAYOUT -> workerController.updateTables(message); //✅
                 case GET_REGULAR_OPEN_TIME -> workerController.getRegularDate();//✅
-                case SCHEDULES_REPORT -> null;
-                case SUBSCRIBER_REPORT -> null;
-                case GET_WAITING_LIST -> null;
+                case SCHEDULES_REPORT -> waitingController.scheduleReport(message);// ✅
+                case SUBSCRIBER_REPORT -> waitingController.subscriberReport(message);// ✅
+                case GET_WAITING_LIST -> waitingController.getWaitingList(message);// ✅
                 case GET_ALL_ACTIVE_ORDER -> orderController.getAllActiveOrder(); //✅
                 case GET_ALL_ARRIVED_AND_NOT_COMPLETE -> orderController.getNowEating(); //✅
-                case ADD_TO_WAITING_LIST -> null;
-                case REMOVE_FROM_WAITING_LIST -> null;
-                case ARRIVE_WAITING_LIST -> null;
+                case ADD_TO_WAITING_LIST -> waitingController.addWaitingList(message);// ✅
+                case REMOVE_FROM_WAITING_LIST -> waitingController.removeFromWaitingList(message);// ✅
+                case ARRIVE_WAITING_LIST -> waitingController.arriveWaitingList(message);// ✅
                 default -> null;
             };
             serverOutputLog(response);
