@@ -4,11 +4,9 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -16,8 +14,8 @@ import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class OrderFormGUIController implements IServerResponseListener {

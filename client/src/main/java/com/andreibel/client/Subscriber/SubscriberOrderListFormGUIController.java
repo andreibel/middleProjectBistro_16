@@ -4,7 +4,6 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;

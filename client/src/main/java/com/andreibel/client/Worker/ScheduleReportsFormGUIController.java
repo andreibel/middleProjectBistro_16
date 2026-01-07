@@ -3,7 +3,6 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.SchedulesReportResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
@@ -22,7 +21,10 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class ScheduleReportsFormGUIController implements IServerResponseListener {
 

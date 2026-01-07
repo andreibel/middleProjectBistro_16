@@ -4,7 +4,6 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.WorkerStateManager;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.WorkerAuth;
 import com.andreibel.message.DTO.WorkerResponse;
 import com.andreibel.message.Message;

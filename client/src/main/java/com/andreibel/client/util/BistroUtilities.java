@@ -1,6 +1,5 @@
 package com.andreibel.client.util;
 
-import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
