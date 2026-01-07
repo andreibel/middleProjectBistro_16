@@ -10,68 +10,43 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="794.0" prefWidth="1054.0"
-            style="-fx-background-color: #fff4e0;"
-            xmlns="http://javafx.com/javafx/23.0.1"
-            xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.andreibel.client.Worker.ScheduleReportsFormGUIController">
+<AnchorPane fx:id="rootPane" prefHeight="794.0" prefWidth="1054.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.ScheduleReportsFormGUIController">
 
     <children>
 
         <!-- Title -->
-        <Label fx:id="lblTitle"
-               layoutX="347.0" layoutY="14.0"
-               text="Schedules Report for Month: MONTH_NAME"
-               wrapText="true"
-               prefWidth="360.0">
+        <Label fx:id="lblTitle" layoutX="347.0" layoutY="14.0" prefWidth="360.0" text="Schedules Report for Month: MONTH_NAME" wrapText="true">
             <font>
-                <Font size="19.0"/>
+                <Font size="19.0" />
             </font>
         </Label>
 
         <!-- Track Specific Day -->
-        <Label fx:id="lblTrack"
-               layoutX="59.0" layoutY="53.0"
-               text="Track a specific day:"/>
-        <ComboBox fx:id="comboBoxTrack"
-                  layoutX="184.0" layoutY="49.0"
-                  prefWidth="89.0" prefHeight="25.0"
-                  onAction="#onComboBoxTrackValueSelected"/>
+        <Label fx:id="lblTrack" layoutX="59.0" layoutY="53.0" text="Track a specific day:" />
+        <ComboBox fx:id="comboBoxTrack" layoutX="184.0" layoutY="49.0" onAction="#onComboBoxTrackValueSelected" prefHeight="25.0" prefWidth="89.0" />
 
         <!-- Line Chart: Arrivals & Departures -->
-        <LineChart fx:id="lineChartArrivalsDepartures"
-                   layoutX="24.0" layoutY="76.0"
-                   prefWidth="1002.0" prefHeight="329.0"
-                   title="Customers Arrivals and Departures">
+        <LineChart fx:id="lineChartArrivalsDepartures" layoutX="24.0" layoutY="76.0" prefHeight="329.0" prefWidth="1002.0" title="Customers Arrivals and Departures">
             <xAxis>
-                <CategoryAxis fx:id="xAxis"/>
+                <CategoryAxis fx:id="xAxis" />
             </xAxis>
             <yAxis>
-                <NumberAxis fx:id="yAxis"/>
+                <NumberAxis fx:id="yAxis" />
             </yAxis>
         </LineChart>
 
         <!-- Bar Chart: Lates & Delays -->
-        <BarChart fx:id="barChartLatesDelays"
-                  layoutX="26.0" layoutY="425.0"
-                  prefWidth="1002.0" prefHeight="305.0"
-                  title="Customers Lates and Delays">
+        <BarChart fx:id="barChartLatesDelays" layoutX="26.0" layoutY="425.0" prefHeight="305.0" prefWidth="1002.0" title="Customers Lates and Delays">
             <xAxis>
-                <CategoryAxis fx:id="xDayAxis"/>
+                <CategoryAxis fx:id="xDayAxis" />
             </xAxis>
             <yAxis>
-                <NumberAxis fx:id="yPeopleAxis"/>
+                <NumberAxis fx:id="yPeopleAxis" />
             </yAxis>
         </BarChart>
 
         <!-- Go Back Button -->
-        <Button fx:id="btnGoBack"
-                layoutX="15.0" layoutY="742.0"
-                prefWidth="89.0" prefHeight="37.0"
-                mnemonicParsing="false"
-                text="Go Back"
-                style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;"
-                onAction="#onGoBackButtonClicked"/>
+        <Button fx:id="btnGoBack" layoutX="15.0" layoutY="742.0" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="37.0" prefWidth="89.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
 
     </children>
 </AnchorPane>

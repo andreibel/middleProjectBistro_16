@@ -23,7 +23,7 @@
 
             <columns>
                 <TableColumn fx:id="colRowNumber" prefWidth="75.0" text="#" />
-                <TableColumn fx:id="colOrderDate" prefWidth="120.0" text="Order Date" />
+                <TableColumn fx:id="colOrderDateTime" prefWidth="120.0" text="Order Date &amp; Time" />
                 <TableColumn fx:id="colNumberOfPeople" prefWidth="118.0" text="# of People" />
             </columns>
 

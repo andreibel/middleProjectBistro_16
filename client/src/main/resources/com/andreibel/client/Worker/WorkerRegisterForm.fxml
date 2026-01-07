@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerRegisterFormGUIController">
+    <children>
+
+        <Label fx:id="lblTitle" layoutX="14.0" layoutY="14.0" text="Register New Worker:">
+            <font>
+                <Font size="23.0" />
+            </font>
+        </Label>
+
+        <Label fx:id="lblWorkerName" layoutX="117.0" layoutY="122.0" text="Worker Name:">
+            <font>
+                <Font size="17.0" />
+            </font>
+        </Label>
+
+        <Label fx:id="lblPassword" layoutX="101.0" layoutY="190.0" text="Create Password:">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </Label>
+
+        <TextField fx:id="txtFieldWorkerName" layoutX="233.0" layoutY="121.0" prefHeight="26.0" prefWidth="205.0" promptText="Enter Worker's Full Name..." />
+
+        <TextField fx:id="txtFieldPassword" layoutX="233.0" layoutY="188.0" prefHeight="26.0" prefWidth="205.0" promptText="Create new password..." />
+
+        <Label fx:id="lblManager" layoutX="126.0" layoutY="255.0" text="Is a Manager?">
+            <font>
+                <Font size="16.0" />
+            </font>
+        </Label>
+
+        <CheckBox fx:id="chkBoxManager" layoutX="233.0" layoutY="256.0" mnemonicParsing="false" />
+
+        <!-- Primary Action -->
+        <Button fx:id="btnRegisterWorker" layoutX="260.0" layoutY="297.0" mnemonicParsing="false" onAction="#onButtonRegisterWorkerClicked" prefHeight="39.0" prefWidth="152.0" style="-fx-background-color: #2196F3;                      -fx-text-fill: white;                      -fx-font-size: 14px;                      -fx-font-weight: bold;" text="Register New Worker" />
+
+        <!-- Go Back -->
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="348.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="39.0" prefWidth="94.0" style="-fx-background-color: #E0E0E0;                      -fx-text-fill: #333333;                      -fx-font-size: 13px;" text="Go Back" />
+
+    </children>
+</AnchorPane>

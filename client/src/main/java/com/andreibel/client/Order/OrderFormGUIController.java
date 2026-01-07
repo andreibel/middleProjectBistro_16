@@ -1,18 +1,29 @@
 package com.andreibel.client.Order;
 
-import com.andreibel.client.util.ScreenTransfer;
+import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.Client.IServerResponseListener;
+import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.TimeGetterRequest;
+import com.andreibel.message.Message;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.LocalDateTime;
+import java.util.List;
 
-public class OrderFormGUIController {
+public class OrderFormGUIController implements IServerResponseListener {
+
+    private enum WizardStep { PART1, PART2_TIME, PART3_USER_INFO }
+
     @FXML
     private DatePicker datePickerOrder;
     @FXML
@@ -20,142 +31,202 @@ public class OrderFormGUIController {
     @FXML
     private TextField txtFieldNumberOfPeople;
     @FXML
-    private RadioButton radioGuest;
-    @FXML
-    private RadioButton radioSubscriber;
-    @FXML
-    private TextField txtFieldSubscriberId;
-    @FXML
     private TextField txtFieldEmail;
     @FXML
     private TextField txtFieldPhoneNumber;
     @FXML
-    private Button btnOrderNow;
+    private Label lblWizardTitle, lblDate, lblNumberOfPeople, lblTime, lblEmail, lblPhoneNumber, lblOR;
     @FXML
-    private Button btnGoBack;
-    @FXML
-    void adjustFormBasedOnType(ActionEvent event){
-        if(radioSubscriber.isSelected()){
-            txtFieldSubscriberId.setVisible(true);
-            txtFieldSubscriberId.setManaged(true);
-            txtFieldEmail.setVisible(false);
-            txtFieldEmail.setManaged(false);
-            txtFieldPhoneNumber.setVisible(false);
-            txtFieldPhoneNumber.setManaged(false);
-        }
-        else{
-            txtFieldSubscriberId.setVisible(false);
-            txtFieldSubscriberId.setManaged(false);
-            txtFieldEmail.setVisible(true);
-            txtFieldEmail.setManaged(true);
-            txtFieldPhoneNumber.setVisible(true);
-            txtFieldPhoneNumber.setManaged(true);
-        }
-    }
-    @FXML
-    public void initialize() {
+    private Button btnOrderNow, btnPrevious, btnGoBack;
 
-        radioGuest.setSelected(true);
-        adjustFormBasedOnType(null);
+    private WizardStep wizardStep = WizardStep.PART1;
+    private BistroClientController controller;
+
+    @FXML
+    private void initialize() {
+        controller = BistroClientController.getInstance();
+        controller.addListener(this);
+
+        comboBoxTime.setDisable(true);
+        adjustFormToWizardStep();
+        setDatePicker();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public void onServerResponse(Message message) throws IOException {
+        switch (message.getType()) {
+            case CREATE_ORDER_RESPONSE -> {
+                clearForm();
+                wizardStep = WizardStep.PART1;
+                BistroUtilities.showMessage("Bistro Restaurant", "Your order has been successfully created!");
+                BistroUtilities.switchScreen(btnOrderNow,"/Main/MainForm.fxml", "Bistro Restaurant");
+            }
+            case CREATE_ORDER_ERROR -> BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, order creation failed.");
+            case GET_ALL_TIMES_IN_DATE_RESPONSE ->
+                populateAvailableTimes((List<LocalTime>) message.getData());
+            case GET_ALL_TIMES_IN_DATE_ERROR -> BistroUtilities.showMessage("Bistro Restaurant", "There are no available times in this day.");
+        }
+    }
 
     @FXML
-    public void onOrderNowButtonClicked(ActionEvent event) {
-
-        // reading data from the form
-        int guests;
-        try {
-            guests = Integer.parseInt(numberOfPeopleField.getText().trim());
-        } catch (NumberFormatException e) {
-            showError("Please enter a valid number of people");
-            return;
-        }
-
-        LocalDate date = datePicker.getValue();
-        if (date == null) {
-            showError("Please select a date");
-            return;
-        }
-
-        String timeStr = timeCombo.getValue();
-        if (timeStr == null) {
-            showError("Please select a time");
-            return;
-        }
-
-        LocalDateTime orderDateTime =
-                LocalDateTime.of(date, LocalTime.parse(timeStr));
-
-
-
-
-
-        Integer subscriberId = null;
-        String email = null;
-        String phoneNumber = null;
-
-        if (subscriberRadio.isSelected()) {
-            // Subscriber selected
-            String idText = subscriberIdField.getText().trim();
-            if (idText.isEmpty()) {
-                showError("Please enter Subscriber ID");
-                return;
+    private void onOrderNowButtonClicked(ActionEvent event) {
+        switch (wizardStep) {
+            case PART1 -> {
+                if (!validatePart1()) return;
+                controller.requestAvailableTimes(
+                        new TimeGetterRequest(datePickerOrder.getValue(),
+                                Integer.parseInt(txtFieldNumberOfPeople.getText()))
+                );
+                wizardStep = WizardStep.PART2_TIME;
             }
-            subscriberId = Integer.parseInt(idText);
-        } else {
-            // Guest selected
-            email = emailField.getText().trim();
-            phoneNumber = phoneField.getText().trim();
-
-            if (email.isEmpty() || phoneNumber.isEmpty()) {
-                showError("Please enter Email and Phone Number");
-                return;
+            case PART2_TIME -> {
+                if (!validatePart2()) return;
+                if (CustomerStateManager.getInstance().getSubscriber() != null) {
+                    createOrder();
+                }
+                else {
+                    wizardStep = WizardStep.PART3_USER_INFO;
+                }
+            }
+            case PART3_USER_INFO -> {
+                if (!validatePart3()) return;
+                createOrder();
             }
         }
+        adjustFormToWizardStep();
+    }
 
-        // --------------------------------------------------
-        // calling Controller / Client
-        // --------------------------------------------------
+    @FXML
+    private void onPreviousButtonClicked(ActionEvent event) {
+        if (wizardStep == WizardStep.PART2_TIME) wizardStep = WizardStep.PART1;
+        else if (wizardStep == WizardStep.PART3_USER_INFO) wizardStep = WizardStep.PART2_TIME;
+        adjustFormToWizardStep();
+    }
 
-        controller.updateOrder(
-                selected.getOrderNumber(),
-                guests,
-                orderDateTime,
-                subscriberId,
-                email,
-                phoneNumber
+    @FXML
+    private void onGoBackButtonClick(ActionEvent event) throws IOException {
+        wizardStep = WizardStep.PART1;
+        clearForm();
+        adjustFormToWizardStep();
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Main/MainForm.fxml", "Bistro Restaurant");
+    }
+
+    private void adjustFormToWizardStep() {
+        boolean isSubscriber = CustomerStateManager.getInstance().getSubscriber() != null;
+        int totalSteps = isSubscriber ? 2 : 3;
+
+        // Reset visibility
+        datePickerOrder.setVisible(false); lblDate.setVisible(false);
+        txtFieldNumberOfPeople.setVisible(false); lblNumberOfPeople.setVisible(false);
+        comboBoxTime.setVisible(false); lblTime.setVisible(false);
+        txtFieldEmail.setVisible(false); lblEmail.setVisible(false);
+        txtFieldPhoneNumber.setVisible(false); lblPhoneNumber.setVisible(false);
+        lblOR.setVisible(false);
+        btnPrevious.setVisible(wizardStep != WizardStep.PART1);
+
+        switch (wizardStep) {
+            case PART1 -> {
+                lblWizardTitle.setText("Step 1 / " + totalSteps + " - Number of People and Date");
+                datePickerOrder.setVisible(true); lblDate.setVisible(true);
+                txtFieldNumberOfPeople.setVisible(true); lblNumberOfPeople.setVisible(true);
+                btnOrderNow.setText("Next");
+            }
+            case PART2_TIME -> {
+                lblWizardTitle.setText("Step 2 / " + totalSteps + " - Select Order Time");
+                comboBoxTime.setVisible(true); lblTime.setVisible(true);
+                btnOrderNow.setText(isSubscriber ? "Order Now" : "Next");
+            }
+            case PART3_USER_INFO -> {
+                if (!isSubscriber) {
+                    lblWizardTitle.setText("Step 3 / 3 - Customer Info");
+                    txtFieldEmail.setVisible(true); lblEmail.setVisible(true);
+                    txtFieldPhoneNumber.setVisible(true); lblPhoneNumber.setVisible(true);
+                    lblOR.setVisible(true);
+                    btnOrderNow.setText("Order Now");
+                }
+            }
+        }
+    }
+
+
+    private boolean validatePart1() {
+        if (txtFieldNumberOfPeople.getText().isEmpty() || !BistroUtilities.isNumeric(txtFieldNumberOfPeople.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Enter valid number of people.");
+            return false;
+        }
+        if (datePickerOrder.getValue() == null) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Select a valid date.");
+            return false;
+        }
+        comboBoxTime.getItems().clear();
+        comboBoxTime.setDisable(true);
+        return true;
+    }
+
+    private boolean validatePart2() {
+        if (comboBoxTime.getValue() == null || comboBoxTime.getValue().isBlank()) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Select a valid time.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validatePart3() {
+        if ((txtFieldEmail.getText().isBlank() && txtFieldPhoneNumber.getText().isBlank())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Enter either email or phone number.");
+            return false;
+        }
+        if (!txtFieldEmail.getText().isBlank() && !BistroUtilities.isValidEmail(txtFieldEmail.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Enter a valid email.");
+            return false;
+        }
+        if (!txtFieldPhoneNumber.getText().isBlank() && !BistroUtilities.isValidPhoneNumber(txtFieldPhoneNumber.getText())) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Enter a valid phone number.");
+            return false;
+        }
+        return true;
+    }
+
+    private void createOrder() {
+        controller.requestOrderCreation(new OrderRequest(null,  Integer.parseInt(txtFieldNumberOfPeople.getText()),
+                LocalDateTime.of(datePickerOrder.getValue(), LocalTime.parse(comboBoxTime.getValue())),
+                CustomerStateManager.fillSubscriberIDDetails(),
+                txtFieldEmail.getText(),
+                txtFieldPhoneNumber.getText())
         );
+        wizardStep = WizardStep.PART1;
     }
 
+    private void populateAvailableTimes(List<LocalTime> times) {
+        comboBoxTime.getItems().clear();
+        if (times.isEmpty()) {
+            comboBoxTime.setPromptText("No times available");
+        } else {
+            for (LocalTime time : times) comboBoxTime.getItems().add(time.toString());
+            comboBoxTime.setPromptText("Select available time");
+            comboBoxTime.setDisable(false);
+        }
+    }
+
+    private void setDatePicker() {
+        datePickerOrder.setEditable(false);
+        datePickerOrder.setPromptText("Select Order Date");
+        datePickerOrder.setDayCellFactory(picker -> new DateCell() {
+            @Override
+            public void updateItem(LocalDate date, boolean empty) {
+                super.updateItem(date, empty);
+                setDisable(empty || date.isBefore(LocalDate.now()));
+            }
+        });
+    }
 
     private void clearForm() {
-
-        txtFieldEmail.setText("");
-        txtFieldPhoneNumber.setText("");
-        txtFieldNumberOfPeople.setText("");
-        txtFieldSubscriberId.setText("");
-
-
+        txtFieldNumberOfPeople.clear();
+        txtFieldEmail.clear();
+        txtFieldPhoneNumber.clear();
         datePickerOrder.setValue(null);
-        comboBoxTime.getSelectionModel().clearSelection();
-
-
-        radioGuest.setSelected(true);
-
-
-        adjustFormBasedOnType(null);
-
-
-        txtFieldEmail.setStyle(null);
-    }
-    @FXML
-    void onGoBackButtonClick(ActionEvent event) throws IOException {
-        clearForm();
-        ScreenTransfer.switchScreen(
-                event,
-                "/Main/MainFormGUIController.fxml",
-                "MainFormGUIController"
-            );
+        comboBoxTime.getItems().clear();
+        comboBoxTime.setDisable(true);
     }
 }

@@ -6,9 +6,10 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="411.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Main.MainFormGUIController"> <!-- solid warm background color -->
+<AnchorPane fx:id="rootPane" prefHeight="411.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Main.MainFormGUIController">
 
     <children>
+
         <!-- Title Label -->
         <Label fx:id="lblMainTitle" layoutX="99.0" layoutY="24.0" prefHeight="50.0" prefWidth="403.0" text="Welcome to Bistro Restaurant" textAlignment="CENTER" wrapText="true">
             <font>
@@ -17,41 +18,49 @@
         </Label>
 
         <!-- Order Now button -->
-        <Button fx:id="btnOrder" layoutX="223.0" layoutY="88.0" mnemonicParsing="false" onAction="#onOrderButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Order Now">
+        <Button fx:id="btnOrder" layoutX="224.0" layoutY="83.0" mnemonicParsing="false" onAction="#onOrderButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Order Now">
             <tooltip>
-                <Tooltip fx:id="toolTipOrder" text="Click to start a new order." wrapText="true" />
+                <Tooltip text="Click to start a new order." wrapText="true" />
+            </tooltip>
+        </Button>
+
+        <!-- I don't have an order button (UPDATED) -->
+        <Button fx:id="btnNoOrder" layoutX="223.0" layoutY="136.0" mnemonicParsing="false" onAction="#onNoOrderButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="I don't have an order" wrapText="true">
+            <tooltip>
+                <Tooltip text="Enter the restaurant without a prior order and get seated." wrapText="true" />
             </tooltip>
         </Button>
 
         <!-- I've arrived button -->
-        <Button fx:id="btnArrived" layoutX="223.0" layoutY="148.0" mnemonicParsing="false" onAction="#onArrivedButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #009688; -fx-text-fill: white; -fx-font-size: 13px;" text="I've arrived to my Order" wrapText="true">
+        <Button fx:id="btnArrived" layoutX="223.0" layoutY="189.0" mnemonicParsing="false" onAction="#onArrivedButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #009688; -fx-text-fill: white; -fx-font-size: 13px;" text="I've arrived to my Order" wrapText="true">
             <tooltip>
-                <Tooltip fx:id="toolTipArrived" text="Mark yourself as present for this order." />
+                <Tooltip text="Mark yourself as present for this order." />
             </tooltip>
         </Button>
 
         <!-- Cancel Order button -->
-        <Button fx:id="btnCancel" layoutX="223.0" layoutY="208.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 14px;" text="Cancel My Order">
+        <Button fx:id="btnCancel" layoutX="223.0" layoutY="249.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 14px;" text="Cancel My Order">
             <tooltip>
-                <Tooltip fx:id="toolTipCancel" text="Changed your mind? Cancel your order here." wrapText="true" />
+                <Tooltip text="Changed your mind? Cancel your order here." wrapText="true" />
             </tooltip>
         </Button>
 
         <!-- Subscriber Area button -->
-        <Button fx:id="btnSubscriber" layoutX="223.0" layoutY="268.0" mnemonicParsing="false" onAction="#onSubscriberButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #FFC107; -fx-text-fill: black; -fx-font-size: 14px;" text="Subscriber Area">
+        <Button fx:id="btnSubscriber" layoutX="223.0" layoutY="309.0" mnemonicParsing="false" onAction="#onSubscriberButtonClicked" prefHeight="40.0" prefWidth="154.0" style="-fx-background-color: #FFC107; -fx-text-fill: black; -fx-font-size: 14px;" text="Subscriber Login">
             <tooltip>
-                <Tooltip fx:id="toolTipSubscriber" text="Access the Subscriber Area to place orders with benefits and view your order history." wrapText="true" />
+                <Tooltip text="Access the Subscriber Area to place orders with benefits and view your order history." wrapText="true" />
             </tooltip>
         </Button>
 
         <!-- Worker button -->
         <Button fx:id="btnWorker" layoutX="423.0" layoutY="360.0" mnemonicParsing="false" onAction="#onWorkerButtonClicked" prefHeight="37.0" prefWidth="150.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="I'm a Worker">
             <tooltip>
-                <Tooltip fx:id="toolTipWorker" text="Access the Worker Area (staff only)." wrapText="true" />
+                <Tooltip text="Access the Worker Area (staff only)." wrapText="true" />
             </tooltip>
         </Button>
 
         <!-- Hover info label -->
         <Label fx:id="lblHoverDetails" layoutX="14.0" layoutY="366.0" prefHeight="25.0" prefWidth="380.0" style="-fx-font-size: 12px; -fx-text-fill: #333;" text="Hover on the buttons to see more details" textAlignment="CENTER" wrapText="true" />
+
     </children>
 </AnchorPane>

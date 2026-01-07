@@ -1,7 +1,6 @@
 package com.andreibel.client;
 
 import com.andreibel.client.Client.BistroClient;
-import com.andreibel.client.Client.BistroClientController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

@@ -1,8 +1,8 @@
 package com.andreibel.client.Main;
 
-import com.andreibel.client.BistroClientGUI;
 import com.andreibel.client.Client.BistroClient;
 import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.util.BistroUtilities;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,21 +21,21 @@ public class MainForm extends Application {
 
         var params = getParameters().getNamed();
 
+        //String host = params.getOrDefault("host", "localhost");
         String host = params.getOrDefault("host", "localhost");
         int port = Integer.parseInt(params.getOrDefault("port", "8080"));
         System.out.println("Connecting to " + host + ":" + port);
         Parent root = fxmlLoader.load();
-        MainFormGUIController guiController = fxmlLoader.getController();
 
-        // create client + controller + wire them
+        // create client + controller + attach client to controller
         BistroClient client = new BistroClient(host, port); // adjust port/host as needed
-        BistroClientController appController = new BistroClientController(guiController);
-        appController.attachClient(client);
-        guiController.setController(appController);
+        BistroClientController.getInstance().attachClient(client);
 
-        client.connectToServer();
+        //client.connectToServer();
 
         Scene scene = new Scene(root, 600, 411);
+        BistroUtilities.addToSceneManager(scene, "/Main/MainForm.fxml");
+
         stage.setTitle("Bistro Restaurant");
         stage.setScene(scene);
         stage.setResizable(false);

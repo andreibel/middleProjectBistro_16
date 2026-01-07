@@ -37,10 +37,10 @@
         <TextField fx:id="txtFieldPassword" layoutX="248.0" layoutY="185.0" promptText="Enter your password here..." />
 
         <!-- Login -->
-        <Button fx:id="btnLogin" layoutX="257.0" layoutY="242.0" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Login" />
+        <Button fx:id="btnLogin" layoutX="257.0" layoutY="242.0" onAction="#onLoginButtonClicked" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Login" />
 
         <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="347.0" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="347.0" onAction="#onGoBackButtonClicked" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
 
     </children>
 </AnchorPane>

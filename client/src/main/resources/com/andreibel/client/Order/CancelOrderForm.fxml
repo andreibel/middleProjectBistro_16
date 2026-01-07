@@ -10,21 +10,21 @@
 
    <children>
       <!-- Title Label -->
-      <Label fx:id="lblTitle" layoutX="30.0" layoutY="20.0" prefHeight="40.0" prefWidth="340.0" text="Please enter your Order Number to Cancel:" textAlignment="CENTER" wrapText="true">
+      <Label fx:id="lblTitle" layoutX="30.0" layoutY="20.0" prefHeight="40.0" prefWidth="340.0" text="Please enter your Confirmation Code to Cancel:" textAlignment="CENTER" wrapText="true">
          <font>
-            <Font size="18.0" />
+            <Font size="17.0" />
          </font>
       </Label>
 
       <!-- Order Number Label -->
-      <Label fx:id="lblOrderNumber" layoutX="40.0" layoutY="100.0" text="Order Number:">
+      <Label fx:id="lblConfrimationCode" layoutX="30.0" layoutY="104.0" text="Confirmation Code:">
          <font>
             <Font size="16.0" />
          </font>
       </Label>
 
       <!-- Order Number TextField -->
-      <TextField fx:id="txtFieldOrderNumber" layoutX="170.0" layoutY="100.0" prefHeight="28.0" prefWidth="180.0" promptText="Enter order number here" />
+      <TextField fx:id="txtFieldConfirmationCode" layoutX="170.0" layoutY="100.0" prefHeight="28.0" prefWidth="180.0" promptText="Enter your confrimation code ..." />
 
       <!-- Cancel Order Button -->
       <Button fx:id="btnCancelOrder" layoutX="140.0" layoutY="150.0" mnemonicParsing="false" onAction="#onCancelOrderButtonClicked" prefHeight="38.0" prefWidth="120.0" style="-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-size: 14px;" text="Cancel My Order">
