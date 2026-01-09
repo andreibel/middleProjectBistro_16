@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="rootPane" prefHeight="900.0" prefWidth="1600.0" stylesheets="@main-form.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Main.MainFormGUIController">
+<AnchorPane fx:id="rootPane" prefHeight="900.0" prefWidth="1600.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Main.MainFormGUIController">
 
     <styleClass>
         <String fx:value="root" />
@@ -27,7 +27,7 @@
                <Label styleClass="title" text="Bistro" />
                <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
                   <image>
-                     <Image url="@../../../../logo.png" />
+                     <Image url="@../../../../img/logo.png" />
                   </image>
                   <viewport>
                      <Rectangle2D minX="1.0" />
@@ -58,13 +58,13 @@
                 </VBox>
 
                 <!-- Actions -->
-                <VBox alignment="CENTER" fillWidth="true" spacing="12">
+                <VBox alignment="CENTER" fillWidth="true" prefHeight="279.0" prefWidth="620.0" spacing="12">
                     <styleClass>
                         <String fx:value="actions" />
                     </styleClass>
 
                     <!-- Order Now -->
-                    <Button fx:id="btnOrder" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOrderButtonClicked" prefHeight="56.0">
+                    <Button fx:id="btnOrder" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOrderButtonClicked" prefHeight="60.0" text="Order Now">
                         <styleClass>
                             <String fx:value="action-btn" />
                             <String fx:value="primary" />
@@ -76,56 +76,98 @@
                   <font>
                      <Font name="JetBrains Mono Regular" size="60.0" />
                   </font>
+                  <graphic>
+                     <ImageView fitHeight="75.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../../../../img/table.png" />
+                        </image>
+                     </ImageView>
+                  </graphic>
                         
                     </Button>
+               <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0">
+                  <children>
+      
+                          <!-- No Order -->
+                          <Button fx:id="btnNoOrder" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onNoOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="I don't have an order" wrapText="true">
+                              <styleClass>
+                                  <String fx:value="action-btn" />
+                                  <String fx:value="outline" />
+                              </styleClass>
 
-                    <!-- No Order -->
-                    <Button fx:id="btnNoOrder" maxWidth="Infinity" mnemonicParsing="false" onAction="#onNoOrderButtonClicked" prefHeight="56.0" text="I don't have an order" wrapText="true">
-                        <styleClass>
-                            <String fx:value="action-btn" />
-                            <String fx:value="outline" />
-                        </styleClass>
+                              <tooltip>
+                                  <Tooltip text="Enter the restaurant without a prior order and get seated." wrapText="true" />
+                              </tooltip>
+                        <graphic>
+                           <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                 <Image url="@../../../../img/enterQueue.png" />
+                              </image></ImageView>
+                        </graphic>
+                          </Button>
 
-                        <tooltip>
-                            <Tooltip text="Enter the restaurant without a prior order and get seated." wrapText="true" />
-                        </tooltip>
-                    </Button>
-
-                    <!-- Arrived -->
-                    <Button fx:id="btnArrived" maxWidth="Infinity" mnemonicParsing="false" onAction="#onArrivedButtonClicked" prefHeight="56.0" text="I've arrived to my Order" wrapText="true">
-                        <styleClass>
-                            <String fx:value="action-btn" />
-                            <String fx:value="outline" />
-                        </styleClass>
-
-                        <tooltip>
-                            <Tooltip text="Mark yourself as present for this order." />
-                        </tooltip>
-                    </Button>
-
-                    <!-- Cancel -->
-                    <Button fx:id="btnCancel" maxWidth="Infinity" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="56.0" text="Cancel My Order">
-                        <styleClass>
-                            <String fx:value="action-btn" />
-                            <String fx:value="danger" />
-                        </styleClass>
-
-                        <tooltip>
-                            <Tooltip text="Changed your mind? Cancel your order here." wrapText="true" />
-                        </tooltip>
-                    </Button>
-
-                    <!-- Subscriber -->
-                    <Button fx:id="btnSubscriber" maxWidth="Infinity" mnemonicParsing="false" onAction="#onSubscriberButtonClicked" prefHeight="56.0" text="Subscriber Login">
-                        <styleClass>
-                            <String fx:value="action-btn" />
-                            <String fx:value="outline" />
-                        </styleClass>
-
-                        <tooltip>
-                            <Tooltip text="Access the Subscriber Area to place orders with benefits and view your order history." wrapText="true" />
-                        </tooltip>
-                    </Button>
+                          <!-- Arrived -->
+                          <Button fx:id="btnArrived" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onArrivedButtonClicked" prefHeight="60.0" prefWidth="300.0" text="I've arrived to my Order" wrapText="true">
+                              <styleClass>
+                                  <String fx:value="action-btn" />
+                                  <String fx:value="outline" />
+                              </styleClass>
+      
+                              <tooltip>
+                                  <Tooltip text="Mark yourself as present for this order." />
+                              </tooltip>
+                        <graphic>
+                           <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                 <Image url="@../../../../img/arrive.png" />
+                              </image></ImageView>
+                        </graphic>
+                          </Button>
+                  </children>
+                  <VBox.margin>
+                     <Insets />
+                  </VBox.margin>
+               </HBox>
+               <HBox alignment="CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0">
+                  <children>
+      
+                          <!-- Subscriber -->
+                          <Button fx:id="btnSubscriber" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onSubscriberButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Subscriber Login">
+                              <styleClass>
+                                  <String fx:value="action-btn" />
+                                  <String fx:value="outline" />
+                              </styleClass>
+      
+                              <tooltip>
+                                  <Tooltip text="Access the Subscriber Area to place orders with benefits and view your order history." wrapText="true" />
+                              </tooltip>
+                        <graphic>
+                           <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                 <Image url="@../../../../img/sub.png" />
+                              </image></ImageView>
+                        </graphic>
+                          </Button>
+      
+                          <!-- Cancel -->
+                          <Button fx:id="btnCancel" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Cancel My Order">
+                              <styleClass>
+                                  <String fx:value="action-btn" />
+                                  <String fx:value="danger" />
+                              </styleClass>
+      
+                              <tooltip>
+                                  <Tooltip text="Changed your mind? Cancel your order here." wrapText="true" />
+                              </tooltip>
+                        <graphic>
+                           <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                              <image>
+                                 <Image url="@../../../../img/cancel.png" />
+                              </image></ImageView>
+                        </graphic>
+                          </Button>
+                  </children>
+               </HBox>
                 </VBox>
 
                 <!-- Footer row -->
@@ -134,24 +176,22 @@
                         <String fx:value="footer" />
                     </styleClass>
 
-                    <Button fx:id="btnWorker" maxWidth="Infinity" mnemonicParsing="false" onAction="#onWorkerButtonClicked" prefHeight="48.0" text="I'm a Worker">
+                    <Button fx:id="btnWorker" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onWorkerButtonClicked" prefHeight="48.0" prefWidth="300.0" text="I'm a Worker">
                         <styleClass>
                             <String fx:value="action-btn" />
                             <String fx:value="worker" />
                         </styleClass>
 
-                        <graphic>
-                            <Label text="badge">
-                                <styleClass>
-                                    <String fx:value="ms-icon" />
-                                    <String fx:value="ms-worker" />
-                                </styleClass>
-                            </Label>
-                        </graphic>
-
                         <tooltip>
                             <Tooltip text="Access the Worker Area (staff only)." wrapText="true" />
                         </tooltip>
+                  <graphic>
+                     <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                        <image>
+                           <Image url="@../../../../img/worker.png" />
+                        </image>
+                     </ImageView>
+                  </graphic>
                     </Button>
                 </HBox>
 

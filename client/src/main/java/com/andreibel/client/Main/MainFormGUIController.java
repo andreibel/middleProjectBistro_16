@@ -46,7 +46,7 @@ public class MainFormGUIController {
         System.out.println("FONT URL = " + fontUrl);
         if (fontUrl != null) Font.loadFont(fontUrl.toExternalForm(), 16);
 
-        var cssUrl = getClass().getResource("/com/andreibel/client/Main/main-form.css");
+        var cssUrl = getClass().getResource("/style/style.css");
         System.out.println("CSS URL = " + cssUrl);
 
         // Add stylesheet when scene becomes available (safe)
@@ -57,8 +57,8 @@ public class MainFormGUIController {
                 }
             }
         });
-        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
-        WorkerStateManager.getInstance().setManager(true);
+//        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
+//        WorkerStateManager.getInstance().setManager(true);
         updateMainFormWhenSceneIsShown();
         if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
             btnSubscriber.setText("Subscriber Area");
