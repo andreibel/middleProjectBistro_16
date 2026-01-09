@@ -58,7 +58,7 @@
                </Pane>
             </children>
             <VBox.margin>
-               <Insets />
+               <Insets top="20.0" />
             </VBox.margin>
          </HBox>
 
@@ -93,7 +93,7 @@
                        </HBox>
                </children>
             </Pane>
-            <Pane prefHeight="320.0" prefWidth="200.0" styleClass="card">
+            <Pane prefHeight="300.0" prefWidth="200.0" styleClass="card">
                <children>
       
                       <!-- Bar chart -->
@@ -106,12 +106,12 @@
                           </yAxis>
                       </BarChart>
                </children>
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
             </Pane>
 
             </VBox>
-         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-         </padding>
 
         </VBox>
 

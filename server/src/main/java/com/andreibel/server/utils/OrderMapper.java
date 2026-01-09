@@ -80,6 +80,7 @@ public class OrderMapper {
     public static Order mapRelToOrder(ResultSet rs) throws SQLException {
         LocalDateTime arriveDateTime = rs.getTimestamp(Order.ORDER_ARRIVE_DATE_TIME) == null ? null
                 : rs.getTimestamp(Order.ORDER_ARRIVE_DATE_TIME).toLocalDateTime();
+
         return Order.builder()
                 .orderNumber(rs.getInt(Order.ORDER_NUMBER))
                 .numberOfGuests(rs.getInt(Order.NUMBER_OF_GUESTS))
