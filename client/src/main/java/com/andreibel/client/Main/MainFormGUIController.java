@@ -57,8 +57,8 @@ public class MainFormGUIController {
                 }
             }
         });
-//        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
-//        WorkerStateManager.getInstance().setManager(true);
+        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
+        WorkerStateManager.getInstance().setManager(true);
         updateMainFormWhenSceneIsShown();
         if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
             btnSubscriber.setText("Subscriber Area");

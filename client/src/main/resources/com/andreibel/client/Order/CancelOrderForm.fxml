@@ -7,17 +7,17 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="900.0" prefWidth="1600.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.CancelOrderFormGUIController"> <!-- warm solid background -->
+<AnchorPane prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.CancelOrderFormGUIController"> <!-- warm solid background -->
 
     <styleClass>
         <String fx:value="root" />
     </styleClass>
     <children>
-        <VBox alignment="TOP_CENTER" spacing="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1500; -fx-max-width: 1500;">
+        <VBox alignment="TOP_CENTER" maxWidth="1060.0" minWidth="1060.0" prefHeight="600.0" prefWidth="1060.0" spacing="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
                 <children>
                     <!-- Top bar (also uses .card, so must override width too) -->
-                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity" minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0" style="-fx-min-width: 1400; -fx-pref-width: 1400; -fx-max-width: 1400;" styleClass="card">
+                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity" minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0" style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
                         <children>
                             <Label fx:id="lblTitle" styleClass="title" text="Cancel Order" wrapText="true" />
                             <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
