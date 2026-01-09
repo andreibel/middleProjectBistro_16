@@ -33,7 +33,7 @@ public class MainForm extends Application {
 
         client.connectToServer();
 
-        Scene scene = new Scene(root, 600, 411);
+        Scene scene = new Scene(root, 1600 , 900);
         BistroUtilities.addToSceneManager(scene, "/Main/MainForm.fxml");
 
         stage.setTitle("Bistro Restaurant");

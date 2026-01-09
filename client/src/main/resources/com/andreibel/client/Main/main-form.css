@@ -1,0 +1,134 @@
+/* ===== Electric Indigo palette =====
+50  #F1E5FF
+100 #E2CCFF
+200 #C599FF
+300 #A866FF
+400 #8B33FF
+500 #6E00FF
+600 #5800CC
+700 #420099
+800 #2C0066
+900 #160033
+950 #0F0024
+*/
+
+.root {
+    -fx-background-color: #FEFEFE;
+    -fx-font-family: "Inter", "Segoe UI", "SF Pro Display", "System";
+}
+
+.card {
+    -fx-background-color: rgba(255,255,255,0.92);
+    -fx-background-radius: 28;
+    -fx-padding: 44;
+    -fx-spacing: 18;
+
+    -fx-max-width: 1000;
+    -fx-min-width: 520;
+
+    -fx-effect: dropshadow(gaussian, rgba(15,0,36,0.18), 28, 0.18, 0, 10);
+    -fx-border-color: rgba(210,210,210,0.8);
+    -fx-border-radius: 28;
+    -fx-border-width: 1.2;
+}
+
+.header { -fx-padding: 6 0 10 0; }
+
+.title {
+    -fx-text-fill: #0F0024;
+    -fx-font-size: 40px;
+    -fx-font-weight: 800;
+}
+
+.subtitle {
+    -fx-text-fill: #420099;
+    -fx-font-size: 15px;
+    -fx-font-weight: 600;
+    -fx-opacity: 0.95;
+}
+
+.actions { -fx-padding: 8 0 0 0; }
+.footer  { -fx-padding: 10 0 0 0; }
+
+/* ===== Buttons ===== */
+.action-btn {
+    -fx-background-radius: 18;
+    -fx-border-radius: 18;
+
+    -fx-padding: 14 18 14 18;
+    -fx-font-size: 16px;
+    -fx-font-weight: 700;
+
+    -fx-alignment: CENTER_LEFT;
+    -fx-graphic-text-gap: 12;
+    -fx-cursor: hand;
+
+    /* default so it won't look like gray swing */
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-text-fill: #2C0066;
+    -fx-border-color: rgba(197,153,255,0.7);
+    -fx-border-width: 1.3;
+}
+
+.primary {
+    -fx-background-color: #6E00FF;
+    -fx-text-fill: white;
+    -fx-border-color: transparent;
+}
+.primary:hover { -fx-background-color: #5800CC; }
+.primary:pressed { -fx-background-color: #420099; }
+
+.outline {
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-border-color: #C599FF;
+    -fx-border-width: 1.6;
+    -fx-text-fill: #2C0066;
+}
+.outline:hover {
+    -fx-background-color: #F1E5FF;
+    -fx-border-color: #A866FF;
+}
+.outline:pressed {
+    -fx-background-color: #E2CCFF;
+    -fx-border-color: #8B33FF;
+}
+
+.danger {
+    -fx-background-color: rgba(226,204,255,0.55);
+    -fx-border-color: #8B33FF;
+    -fx-border-width: 1.6;
+    -fx-text-fill: #160033;
+}
+.danger:hover {
+    -fx-background-color: rgba(197,153,255,0.65);
+    -fx-border-color: #6E00FF;
+}
+
+.worker {
+    -fx-background-color: rgba(241,229,255,0.55);
+    -fx-border-color: rgba(168,102,255,0.9);
+    -fx-border-width: 1.6;
+    -fx-text-fill: #2C0066;
+}
+.worker:hover {
+    -fx-background-color: rgba(226,204,255,0.8);
+}
+
+/* ===== Hint label ===== */
+.hint {
+    -fx-padding: 10 0 0 0;
+    -fx-text-fill: #420099;
+    -fx-font-size: 12.5px;
+    -fx-opacity: 0.9;
+}
+
+/* ===== Material Symbols (Font icons) ===== */
+.ms-icon {
+    -fx-font-family: "Material Symbols Outlined";
+    -fx-font-size: 20px;
+}
+
+.ms-accent { -fx-text-fill: #6E00FF; }
+.ms-on-primary { -fx-text-fill: white; }
+.ms-danger { -fx-text-fill: #420099; }
+.ms-worker { -fx-text-fill: #5800CC; }

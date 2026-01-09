@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.text.Font;
 
 import java.io.IOException;
 
@@ -41,6 +42,21 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
+        var fontUrl = getClass().getResource("/fonts/MaterialSymbolsOutlined-VariableFont_FILL,GRAD,opsz,wght.ttf");
+        System.out.println("FONT URL = " + fontUrl);
+        if (fontUrl != null) Font.loadFont(fontUrl.toExternalForm(), 16);
+
+        var cssUrl = getClass().getResource("/com/andreibel/client/Main/main-form.css");
+        System.out.println("CSS URL = " + cssUrl);
+
+        // Add stylesheet when scene becomes available (safe)
+        rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null && cssUrl != null) {
+                if (!newScene.getStylesheets().contains(cssUrl.toExternalForm())) {
+                    newScene.getStylesheets().add(cssUrl.toExternalForm());
+                }
+            }
+        });
         CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
         WorkerStateManager.getInstance().setManager(true);
         updateMainFormWhenSceneIsShown();
@@ -48,6 +64,10 @@ public class MainFormGUIController {
             btnSubscriber.setText("Subscriber Area");
     }
 
+    private static String ms(String hex) {
+        int code = Integer.parseInt(hex, 16);
+        return new String(Character.toChars(code));
+    }
     /**
      * Navigates to the order creation form.
      *
