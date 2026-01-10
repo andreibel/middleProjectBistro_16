@@ -11,6 +11,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
@@ -41,6 +42,8 @@ public class OrderFormGUIController implements IServerResponseListener {
     private TextField txtFieldPhoneNumber;
     @FXML
     private Button btnOrderNow, btnPrevious, btnGoBack;
+    @FXML
+    private AnchorPane rootPane;
 
     private WizardStep wizardStep = WizardStep.PART1;
     private BistroClientController controller;
@@ -49,10 +52,7 @@ public class OrderFormGUIController implements IServerResponseListener {
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-
-        comboBoxTime.setDisable(true);
-        adjustFormToWizardStep();
-        setDatePicker();
+        adjustFormWhenSceneIsShown();
     }
 
     @SuppressWarnings("unchecked")
@@ -138,7 +138,7 @@ public class OrderFormGUIController implements IServerResponseListener {
             case PART2_TIME -> {
                 TimeHbox.setVisible(true); TimeHbox.setManaged(true);
                 btnOrderNow.setText(isSubscriber ? "Order Now" : "Next");
-                wizardProgrtes.setProgress(0.3);
+                wizardProgrtes.setProgress(isSubscriber ? 0.5 : 0.3);
             }
             case PART3_USER_INFO -> {
                 if (!isSubscriber) {
@@ -210,6 +210,20 @@ public class OrderFormGUIController implements IServerResponseListener {
         }
     }
 
+
+    private void adjustFormWhenSceneIsShown(){
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        comboBoxTime.setDisable(true);
+                        adjustFormToWizardStep();
+                        setDatePicker();
+                    }
+                });
+            }
+        });
+    }
     private void setDatePicker() {
         datePickerOrder.setEditable(false);
         datePickerOrder.setPromptText("Select Order Date");

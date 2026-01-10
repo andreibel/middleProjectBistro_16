@@ -2,10 +2,12 @@ package com.andreibel.client.Subscriber;
 
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.message.DTO.SubscriberResponse;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
@@ -26,6 +28,8 @@ public class SubscriberZoneFormGUIController {
      */
     @FXML
     private Label lblSubscriber;
+    @FXML
+    private AnchorPane rootPane;
 
     /**
      * Initializes the controller after the FXML has been loaded.
@@ -35,9 +39,7 @@ public class SubscriberZoneFormGUIController {
      */
     @FXML
     private void initialize() {
-        lblSubscriber.setText(
-                "Hi " +
-                        CustomerStateManager.getInstance().getSubscriber().getName());
+        updateMainLabelWhenSceneIsShown();
     }
 
     /**
@@ -83,5 +85,19 @@ public class SubscriberZoneFormGUIController {
                 "/Subscriber/SubscriberEditForm.fxml",
                 "Bistro Restaurant - Edit Subscriber Info"
         );
+    }
+
+    private void updateMainLabelWhenSceneIsShown() {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        lblSubscriber.setText(
+                                "Hi " +
+                                        CustomerStateManager.getInstance().getSubscriber().getName());
+                    }
+                });
+            }
+        });
     }
 }

@@ -3,7 +3,9 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.SubscriberReportResponse;
+import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -56,7 +58,6 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
         controller.addListener(this);
         lblTitle.setText("Subscribers Report for Month: " + getCurrentMonth());
         requestSubscribersReportWhenSceneIsShown();
-        controller.requestSubscribersReport();
     }
 
     @Override
@@ -68,9 +69,6 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
 
                 subscriberOrdersCount = response.getSubscriberOrdersCount();
                 subscriberWaitingListCount = response.getSubscriberWaitingListCount();
-
-                barChartSubscribersOrders.getData().clear();
-                barChartSubscribersWaiting.getData().clear();
 
                 initiateSubscriberOrdersBarChart();
                 initiateSubscriberWaitingBarChart();
@@ -93,11 +91,11 @@ public class SubscriberReportsFormGUIController implements IServerResponseListen
     }
 
     private void requestSubscribersReportWhenSceneIsShown() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(e -> controller.requestSubscribersReport());
+                        controller.requestSubscribersReport();
                     }
                 });
             }

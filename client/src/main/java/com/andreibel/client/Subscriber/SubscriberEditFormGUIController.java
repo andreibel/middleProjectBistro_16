@@ -36,12 +36,6 @@ public class SubscriberEditFormGUIController implements IServerResponseListener 
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-
-        SubscriberResponse currentSubscriber = CustomerStateManager.getInstance().getSubscriber();
-        if (currentSubscriber != null) {
-            updateFields(currentSubscriber);
-        }
-
         requestSubscriberDetailsWhenSceneIsShown();
     }
 
@@ -52,7 +46,6 @@ public class SubscriberEditFormGUIController implements IServerResponseListener 
                 SubscriberResponse updated = (SubscriberResponse) message.getData();
                 if (updated != null) {
                     CustomerStateManager.getInstance().setSubscriber(updated);
-                    updateFields(updated);
                     BistroUtilities.showMessage("Bistro Restaurant", "Your information has been updated.");
                 }
             }
@@ -113,14 +106,12 @@ public class SubscriberEditFormGUIController implements IServerResponseListener 
     }
 
     private void requestSubscriberDetailsWhenSceneIsShown() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            SubscriberResponse subscriber = CustomerStateManager.getInstance().getSubscriber();
-                            if (subscriber != null) updateFields(subscriber);
-                        });
+                        SubscriberResponse subscriber = CustomerStateManager.getInstance().getSubscriber();
+                        if (subscriber != null) updateFields(subscriber);
                     }
                 });
             }

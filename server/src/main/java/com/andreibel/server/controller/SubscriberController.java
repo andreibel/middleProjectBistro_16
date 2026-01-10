@@ -81,8 +81,9 @@ public class SubscriberController {
      */
     public Message getSubOrders(Message message) {
         Integer subscriberId = (Integer) message.getData();
-        SubscriberResponse subscriber = subscriberService.getSubscriber(subscriberId);
+        SubscriberResponse subscriber = subscriberService.getSubscriberAndOrders(subscriberId);
         if (message.getData() == null) return new Message(GET_SUBSCRIBER_ORDERS_ERROR, null);
+        System.out.println(subscriber);
         return new Message(GET_SUBSCRIBER_ORDERS_RESPONSE, subscriber);
     }
 
@@ -101,7 +102,7 @@ public class SubscriberController {
 
     public Message updateSub(Message message) {
         SubscriberRequest data = (SubscriberRequest) message.getData();
-        SubscriberResponse updated = subscriberService.getSubscriber(data.getSubscriberId());
+        SubscriberResponse updated = subscriberService.updateSub(data);
         if (updated == null) return new Message(UPDATE_SUBSCRIBER_ERROR, null);
         return new Message(UPDATE_SUBSCRIBER_RESPONSE, updated);
     }

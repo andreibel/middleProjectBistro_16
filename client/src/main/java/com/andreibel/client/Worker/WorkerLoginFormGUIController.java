@@ -96,15 +96,13 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
     public void onServerResponse(Message message) {
         switch (message.getType()) {
             case WORKER_LOGIN_RESPONSE -> {
-                WorkerResponse response = (WorkerResponse) message.getData();
-                WorkerStateManager.getInstance().setWorkerName(txtFieldStaffName.getText().trim());
-                WorkerStateManager.getInstance().setManager(response.isManager());
+                WorkerStateManager.getInstance().setWorker((WorkerResponse) message.getData());
                 Platform.runLater(() -> {
                     try {
                         // Same as go-back, just without ActionEvent
                         BistroUtilities.switchScreen(
                                 btnLogin, // or btnGoBack
-                                "/Main/MainForm.fxml",
+                                "/Worker/WorkerForm.fxml",
                                 "Bistro Restaurant"
                         );
                     } catch (IOException e) {
