@@ -45,7 +45,6 @@ public class MainFormGUIController {
     private void initialize() {
 //        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
 //        WorkerStateManager.getInstance().setManager(true);
-        System.out.println(WorkerStateManager.getInstance().toString());
         updateMainFormWhenSceneIsShown();
     }
 
