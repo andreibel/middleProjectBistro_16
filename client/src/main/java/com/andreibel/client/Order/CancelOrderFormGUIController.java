@@ -103,18 +103,19 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
             );
             return;
         }
-
-        if (!BistroUtilities.isNumeric(txtFieldConfirmationCode.getText())) {
+        try{
+            UUID confirmationCode = UUID.fromString(txtFieldConfirmationCode.getText());
+            controller.requestOrderCancel(
+                    confirmationCode
+            );
+        } catch (IllegalArgumentException e) {
             BistroUtilities.showMessage(
                     "Bistro Restaurant - Order Cancellation Failed",
-                    "The confirmation code provided is not a valid number."
+                    "Invalid confirmation code format."
             );
-            return;
         }
 
-        controller.requestOrderCancel(
-                UUID.fromString(txtFieldConfirmationCode.getText())
-        );
+
     }
 
     /**

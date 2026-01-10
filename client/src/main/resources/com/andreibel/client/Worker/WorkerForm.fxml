@@ -1,103 +1,227 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerFormGUIController">
 
-<AnchorPane fx:id="rootPane" prefHeight="520.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerFormGUIController">
 
     <children>
+        <!-- Full page container -->
+        <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+                <children>
+                    <!-- Top bar (also uses .card, so must override width too) -->
+                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity" minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0" style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+                        <children>
+                            <Label fx:id="lblTitle" styleClass="title" text="Hello STAFF_NAME," wrapText="true" />
+                            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/logo.png" />
+                                </image>
+                                <viewport>
+                                    <Rectangle2D minX="1.0" />
+                                </viewport>
+                            </ImageView>
+                        </children>
+                    </HBox>
+                    <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+                        <children>
 
-        <!-- Title -->
-        <Label fx:id="lblTitle" layoutX="14.0" layoutY="20.0" prefWidth="570.0" text="Hello STAFF_NAME, select an option below to proceed." wrapText="true">
-            <font>
-                <Font size="18.0" />
-            </font>
-        </Label>
+                            <!-- Back button moved here -->
+                            <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="70.0" prefWidth="70.0" styleClass="action-btn" textOverrun="CLIP">
+                                <padding>
+                                    <Insets top="10.0" />
+                                </padding>
+                                <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                        <image>
+                                            <Image url="@../../../../img/back.png" />
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </children>
+                        <HBox.margin>
+                            <Insets />
+                        </HBox.margin>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </Pane>
+                </children>
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </HBox>
+            <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                <children>
 
-        <!-- Main Content -->
-        <VBox layoutX="14.0" layoutY="70.0" prefWidth="570.0" spacing="28">
+                    <!-- ================= SUBSCRIBER SETTINGS ================= -->
+                    <VBox alignment="TOP_CENTER" spacing="10" style="-fx-min-width: 320;" styleClass="card">
+                        <Label fx:id="lblSubscriber" styleClass="subtitle" text="Subscriber Settings">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                        <Button fx:id="btnRegister" minHeight="60.0" onAction="#onRegisterButtonClicked" prefHeight="60.0" prefWidth="270.0" text="New Subscriber">
+                            <tooltip>
+                                <Tooltip text="Register a new subscriber and provide them with exclusive benefits." wrapText="true" />
+                            </tooltip>
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/newSub.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-            <!-- ================= SUBSCRIBER SETTINGS ================= -->
-            <VBox spacing="10">
-                <Label fx:id="lblSubscriber" style="-fx-text-fill: #5d4037; -fx-font-weight: bold;" text="Subscriber Settings">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                </Label>
+                        <Button fx:id="btnSubscribersReport" minHeight="60.0" onAction="#onSubscribersReportButtonClicked" prefHeight="60.0" prefWidth="270.0" styleClass="action-btn" text="Subscribers Report">
+                            <tooltip>
+                                <Tooltip text="View detailed information and statistics about subscribers." wrapText="true" />
+                            </tooltip>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/report.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </VBox>
 
-                <HBox spacing="14">
-                    <Button fx:id="btnRegister" onAction="#onRegisterButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #009688; -fx-text-fill: white;" text="Register New Subscriber">
-                        <tooltip>
-                            <Tooltip text="Register a new subscriber and provide them with exclusive benefits." wrapText="true" />
-                        </tooltip>
-                    </Button>
+                    <!-- ================= RESTAURANT SETTINGS ================= -->
+                    <VBox alignment="TOP_CENTER" spacing="10" style="-fx-min-width: 320;" styleClass="card">
+                        <Label fx:id="lblRestuarant" styleClass="subtitle" text="Restaurant Settings">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                        <Button fx:id="btnChangeLayout" minHeight="60.0" onAction="#onChangeRestaurantLayoutButtonClicked" prefHeight="60.0" prefWidth="270.0" text="Restaurant Layout">
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/tableLayout.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button fx:id="btnSubscribersReport" onAction="#onSubscribersReportButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #1976D2; -fx-text-fill: white;" text="View Subscribers Report">
-                        <tooltip>
-                            <Tooltip text="View detailed information and statistics about subscribers." wrapText="true" />
-                        </tooltip>
-                    </Button>
-                </HBox>
-            </VBox>
+                        <Button fx:id="btnViewCurrentWaiting" minHeight="60.0" onAction="#onViewCurrentWaitingButtonClicked" prefHeight="60.0" prefWidth="270.0" text="Current Waiting List">
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/watingList.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-            <!-- ================= RESTAURANT SETTINGS ================= -->
-            <VBox spacing="10">
-                <Label fx:id="lblRestuarant" style="-fx-text-fill: #5d4037; -fx-font-weight: bold;" text="Restaurant Settings">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                </Label>
+                        <Button fx:id="btnViewCurrentDining" minHeight="60.0" onAction="#onViewCurrentDiningButtonClicked" prefHeight="45.0" prefWidth="270.0" text="Current Dining">
+                            <tooltip>
+                                <Tooltip text="See all current customers dining in the restaurant." wrapText="true" />
+                            </tooltip>
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/dine.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="btnViewActiveOrders" minHeight="60.0" onAction="#onViewCurrentOrderButtonClicked" prefHeight="45.0" prefWidth="270.0" text="Active Orders">
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/activeOrder.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="btnChangeBistro" minHeight="60.0" onAction="#onChangeBistroButtonClicked" prefHeight="45.0" prefWidth="270.0" text="Restaurant Times" textAlignment="CENTER" wrapText="true">
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/time.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </VBox>
 
-                <HBox spacing="14">
-                    <Button fx:id="btnChangeLayout" onAction="#onChangeRestaurantLayoutButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #3F51B5; -fx-text-fill: white;" text="Change Restaurant Layout" />
+                    <!-- ================= MANAGER SETTINGS ================= -->
+                    <VBox fx:id="vBoxManager" alignment="TOP_CENTER" spacing="10" style="-fx-min-width: 320;" styleClass="card">
+                        <Label fx:id="lblManager" styleClass="subtitle" text="Manager Settings">
+                            <font>
+                                <Font size="15.0" />
+                            </font>
+                        </Label>
+                        <Button fx:id="btnRegisterWorker" minHeight="60.0" onAction="#onRegisterWorkerButtonClicked" prefHeight="45.0" prefWidth="270.0" text="Register New Worker">
+                            <tooltip>
+                                <Tooltip text="Add a new worker and define their role in the system." wrapText="true" />
+                            </tooltip>
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/worker.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
 
-                    <Button fx:id="btnViewCurrentWaiting" onAction="#onViewCurrentWaitingButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #3F51B5; -fx-text-fill: white;" text="View Current Waiting List" />
-
-                    <Button fx:id="btnViewCurrentDining" onAction="#onViewCurrentDiningButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #3F51B5; -fx-text-fill: white;" text="View Current Dining">
-                        <tooltip>
-                            <Tooltip text="See all current customers dining in the restaurant." wrapText="true" />
-                        </tooltip>
-                    </Button>
-                </HBox>
-
-                <HBox spacing="14">
-                    <Button fx:id="btnViewActiveOrders" onAction="#onViewCurrentOrderButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #3F51B5; -fx-text-fill: white;" text="View Active Orders" />
-               <Button fx:id="btnChangeBistro" layoutX="10.0" layoutY="10.0" onAction="#onChangeBistroButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #3F51B5; -fx-text-fill: white;" text="Change Restaurant Times/Add Special Events" textAlignment="CENTER" wrapText="true" />
-                </HBox>
-            </VBox>
-
-            <!-- ================= MANAGER SETTINGS ================= -->
-            <VBox fx:id="vBoxManager" spacing="10">
-                <Label fx:id="lblManager" style="-fx-text-fill: #5d4037; -fx-font-weight: bold;" text="Manager Settings">
-                    <font>
-                        <Font size="15.0" />
-                    </font>
-                </Label>
-
-                <HBox spacing="14">
-                    <Button fx:id="btnRegisterWorker" onAction="#onRegisterWorkerButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #F57C00; -fx-text-fill: white;" text="Register New Worker">
-                        <tooltip>
-                            <Tooltip text="Add a new worker and define their role in the system." wrapText="true" />
-                        </tooltip>
-                    </Button>
-
-                    <Button fx:id="btnSchedulesReport" onAction="#onSchedulesReportButtonClicked" prefHeight="45.0" prefWidth="182.0" style="-fx-background-color: #FFA000; -fx-text-fill: white;" text="View Schedules Report">
-                        <tooltip>
-                            <Tooltip text="Review reservation schedules and table availability." wrapText="true" />
-                        </tooltip>
-                    </Button>
-                </HBox>
-            </VBox>
-
+                        <Button fx:id="btnSchedulesReport" minHeight="60.0" onAction="#onSchedulesReportButtonClicked" prefHeight="45.0" prefWidth="270.0" text="Schedules Report">
+                            <tooltip>
+                                <Tooltip text="Review reservation schedules and table availability." wrapText="true" />
+                            </tooltip>
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/report.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                    </VBox>
+                </children>
+            </HBox>
         </VBox>
 
-        <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="460.0" onAction="#onGoBackButtonClicked" prefHeight="42.0" prefWidth="110.0" style="-fx-background-color: #607D8B; -fx-text-fill: white;" text="Go Back" />
 
     </children>
 </AnchorPane>

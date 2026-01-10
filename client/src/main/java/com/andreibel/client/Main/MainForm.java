@@ -31,9 +31,9 @@ public class MainForm extends Application {
         BistroClient client = new BistroClient(host, port); // adjust port/host as needed
         BistroClientController.getInstance().attachClient(client);
 
-        //client.connectToServer();
+        client.connectToServer();
 
-        Scene scene = new Scene(root, 600, 411);
+        Scene scene = new Scene(root, 1060 , 600);
         BistroUtilities.addToSceneManager(scene, "/Main/MainForm.fxml");
 
         stage.setTitle("Bistro Restaurant");

@@ -1,46 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-
-<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerLoginFormGUIController">
+<?import java.lang.String?>
+<AnchorPane prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.WorkerLoginFormGUIController">
 
     <children>
+        <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+                <children>
+                    <!-- Top bar (also uses .card, so must override width too) -->
+                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity" minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0" style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+                        <children>
+                            <Label fx:id="lblTitle" styleClass="title" text="Staff login" wrapText="true" />
+                            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/logo.png" />
+                                </image>
+                                <viewport>
+                                    <Rectangle2D minX="1.0" />
+                                </viewport>
+                            </ImageView>
+                        </children>
+                    </HBox>
+                    <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+                        <children>
 
-        <!-- Title -->
-        <Label fx:id="lblTitle" layoutX="139.0" layoutY="35.0" prefWidth="360.0" text="Hello Staff, please login to continue" wrapText="true">
-            <font>
-                <Font size="22.0" />
-            </font>
-        </Label>
+                            <!-- Back button moved here -->
+                            <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="70.0" prefWidth="70.0" styleClass="action-btn" textOverrun="CLIP">
+                                <padding>
+                                    <Insets top="10.0" />
+                                </padding>
+                                <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                        <image>
+                                            <Image url="@../../../../img/back.png" />
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </children>
+                        <HBox.margin>
+                            <Insets />
+                        </HBox.margin>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </Pane>
+                </children>
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </HBox>
+            <VBox alignment="CENTER" style="-fx-max-width: 500;" styleClass="card">
+                <!-- Title -->
+                <Label layoutX="139.0" layoutY="35.0" prefHeight="60.0" prefWidth="408.0" styleClass="subtitle" text="worker please login to continue" wrapText="true">
+                    <font>
+                        <Font size="22.0" />
+                    </font>
+                </Label>
+                <HBox alignment="CENTER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0" spacing="30.0">
+                    <!-- Staff Name -->
+                    <Label fx:id="lblStaffName" layoutX="150.0" layoutY="121.0" text="Staff Name:">
+                        <font>
+                            <Font size="16.0" />
+                        </font>
+                    </Label>
+                    <!-- Inputs -->
+                    <TextField fx:id="txtFieldStaffName" layoutX="248.0" layoutY="119.0" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" promptText="Enter your name here..." />
+                </HBox>
 
-        <!-- Staff Name -->
-        <Label fx:id="lblStaffName" layoutX="150.0" layoutY="121.0" text="Staff Name:">
-            <font>
-                <Font size="16.0" />
-            </font>
-        </Label>
+                <HBox alignment="CENTER" maxWidth="400.0" minWidth="400.0" prefWidth="400.0" spacing="30.0">
+                    <!-- Password -->
+                    <Label fx:id="lblPassword" layoutX="155.0" layoutY="187.0" text="Password:   ">
+                        <font>
+                            <Font size="16.0" />
+                        </font>
+                    </Label>
+                    <TextField fx:id="txtFieldPassword" layoutX="248.0" layoutY="185.0" maxWidth="200.0" minWidth="200.0" prefWidth="200.0" promptText="Enter your password here..." />
 
-        <!-- Password -->
-        <Label fx:id="lblPassword" layoutX="155.0" layoutY="187.0" text="Password:">
-            <font>
-                <Font size="16.0" />
-            </font>
-        </Label>
+                </HBox>
+                <!-- Login -->
+                <Button fx:id="btnLogin" minHeight="50.0" onAction="#onLoginButtonClicked" prefHeight="50.0"
+                        prefWidth="270.0" text="Login">
+                    <tooltip>
+                        <Tooltip text="Review reservation schedules and table availability." wrapText="true" />
+                    </tooltip>
+                    <styleClass>
+                        <String fx:value="action-btn" />
+                        <String fx:value="outline" />
+                    </styleClass>
+                    <graphic>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../../img/login.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-        <!-- Inputs -->
-        <TextField fx:id="txtFieldStaffName" layoutX="248.0" layoutY="119.0" promptText="Enter your name here..." />
 
-        <TextField fx:id="txtFieldPassword" layoutX="248.0" layoutY="185.0" promptText="Enter your password here..." />
 
-        <!-- Login -->
-        <Button fx:id="btnLogin" layoutX="257.0" layoutY="242.0" onAction="#onLoginButtonClicked" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Login" />
 
-        <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="347.0" onAction="#onGoBackButtonClicked" prefHeight="39.0" prefWidth="86.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
+
+            <VBox.margin>
+               <Insets top="100.0" />
+            </VBox.margin>
+            </VBox>
+
+
+
+        </VBox>
 
     </children>
 </AnchorPane>

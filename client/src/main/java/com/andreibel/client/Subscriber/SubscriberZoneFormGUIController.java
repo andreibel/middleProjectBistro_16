@@ -37,9 +37,7 @@ public class SubscriberZoneFormGUIController {
     private void initialize() {
         lblSubscriber.setText(
                 "Hi " +
-                        CustomerStateManager.getInstance().getSubscriber().getName() +
-                        ", please select the following options:"
-        );
+                        CustomerStateManager.getInstance().getSubscriber().getName());
     }
 
     /**

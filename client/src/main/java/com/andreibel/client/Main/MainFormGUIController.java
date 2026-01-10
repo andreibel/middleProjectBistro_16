@@ -3,9 +3,6 @@ package com.andreibel.client.Main;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.client.util.WorkerStateManager;
-import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.SubscriberResponse;
-import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -43,13 +40,17 @@ public class MainFormGUIController {
      */
     @FXML
     private void initialize() {
-        //CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
-        WorkerStateManager.getInstance().setManager(true);
+//        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
+//        WorkerStateManager.getInstance().setManager(true);
         updateMainFormWhenSceneIsShown();
         if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
             btnSubscriber.setText("Subscriber Area");
     }
 
+    private static String ms(String hex) {
+        int code = Integer.parseInt(hex, 16);
+        return new String(Character.toChars(code));
+    }
     /**
      * Navigates to the order creation form.
      *

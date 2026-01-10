@@ -4,15 +4,10 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
-import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 
 import java.io.IOException;
@@ -65,11 +60,6 @@ public class GetTableFormGUIController implements IServerResponseListener {
             return;
         }
 
-        if (isGuest && !BistroUtilities.isNumeric(txtFieldConfirmation.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid confirmation code");
-            return;
-        }
-
         UUID confirmationUUID = null;
         if (!txtFieldConfirmation.getText().isBlank()) {
             try {
@@ -81,14 +71,7 @@ public class GetTableFormGUIController implements IServerResponseListener {
             }
         }
 
-        controller.requestArrivalConfirmation(new OrderRequest(
-                confirmationUUID,
-                null,
-                null,
-                CustomerStateManager.fillSubscriberIDDetails(),
-                null,
-                null
-        ));
+        controller.requestArrivalConfirmation(confirmationUUID);
     }
 
     @FXML

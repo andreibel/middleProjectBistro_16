@@ -3,7 +3,6 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.SubscriberRequest;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
@@ -93,7 +92,7 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
     }
 
     @FXML
-    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+    private void onButtonGoBackClicked(ActionEvent event) throws IOException {
         clearForm();
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }

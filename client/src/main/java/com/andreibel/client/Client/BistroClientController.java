@@ -7,8 +7,6 @@ import com.andreibel.message.Message;
 import javafx.application.Platform;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -94,7 +92,7 @@ public class BistroClientController {
     }
 
     //=======================Table Request==========================
-    public void requestArrivalConfirmation(OrderRequest req) {
+    public void requestArrivalConfirmation(UUID req) {
         if (!isClientAvailable()) return;
         client.send(new Message(APICallType.ORDER_ARRIVED, req));
     }

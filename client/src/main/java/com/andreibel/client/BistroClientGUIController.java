@@ -1,7 +1,6 @@
 package com.andreibel.client;
 
 import com.andreibel.client.Client.BistroClientController;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -183,20 +182,20 @@ public class BistroClientGUIController {
         }
     }
 
-    // called from BistroClientController when only one order is updated
-    public void refreshSingleOrder(OrderResponse updated) {
-        if (orders == null || updated == null) {
-            return;
-        }
-
-        for (int i = 0; i < orders.size(); i++) {
-            if (orders.get(i).getOrderNumber() == updated.getOrderNumber()) {
-                orders.set(i, updated);                         // OK now, mutable list
-                tableViewOrders.getSelectionModel().select(i);  // keep row selected
-                break;
-            }
-        }
-    }
+//    // called from BistroClientController when only one order is updated
+//    public void refreshSingleOrder(OrderResponse updated) {
+//        if (orders == null || updated == null) {
+//            return;
+//        }
+//
+//        for (int i = 0; i < orders.size(); i++) {
+//            if (orders.get(i).getOrderNumber() == updated.getOrderNumber()) {
+//                orders.set(i, updated);                         // OK now, mutable list
+//                tableViewOrders.getSelectionModel().select(i);  // keep row selected
+//                break;
+//            }
+//        }
+//    }
 
     public void showError(String msg) {
         Alert alert = new Alert(Alert.AlertType.ERROR, msg, ButtonType.OK);

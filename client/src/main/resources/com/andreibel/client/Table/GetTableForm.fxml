@@ -1,34 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<AnchorPane prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.andreibel.client.Table.GetTableFormGUIController">
 
-<AnchorPane prefHeight="256.0" prefWidth="561.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Table.GetTableFormGUIController">
+    <!-- Full page container -->
+    <VBox alignment="TOP_CENTER" spacing="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+            <VBox.margin>
+                <Insets top="10.0"/>
+            </VBox.margin>
+            <!-- Top bar (also uses .card, so must override width too) -->
+            <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity"
+                  minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0"
+                  style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+                <Label fx:id="lblTitle" styleClass="title" text="Get Table" wrapText="true"/>
+                <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../../../img/logo.png"/>
+                    </image>
+                    <viewport>
+                        <Rectangle2D minX="1.0"/>
+                    </viewport>
+                </ImageView>
+            </HBox>
+            <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+                <HBox.margin>
+                    <Insets/>
+                </HBox.margin>
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                </padding>
 
-    <children>
+                <!-- Back button moved here -->
+                <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false"
+                        onAction="#onButtonGoBackClicked" prefHeight="70.0" prefWidth="70.0"
+                        styleClass="action-btn" textOverrun="CLIP">
+                    <padding>
+                        <Insets top="10.0"/>
+                    </padding>
+                    <graphic>
+                        <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <Image url="@../../../../img/back.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </Pane>
+        </HBox>
 
-        <!-- Title -->
-        <Label fx:id="lblTitle" layoutX="56.0" layoutY="25.0" prefWidth="450.0" text="Please confirm your arrival so we can prepare your table" wrapText="true">
-            <font>
-                <Font size="19.0" />
-            </font>
-        </Label>
+        <VBox alignment="CENTER" maxWidth="700.0" minWidth="700.0" prefWidth="700.0" styleClass="card">
+            <Label styleClass="subtitle" text="Enter you conformation code"/>
+            <HBox alignment="CENTER" spacing="30.0">
+                <!-- Confirmation Code -->
+                <Label text="Confirmation Code:"/>
+                <TextField fx:id="txtFieldConfirmation" promptText="Enter your confirmation code here..."/>
+            </HBox>
 
-        <!-- Confirmation Code -->
-        <Label layoutX="79.0" layoutY="105.0" style="-fx-font-size: 14px;" text="Confirmation Code:" />
 
-        <TextField fx:id="txtFieldConfirmation" layoutX="198.0" layoutY="100.0" prefHeight="28.0" prefWidth="216.0" promptText="Enter your confirmation code here..." />
+            <HBox alignment="CENTER" spacing="30.0">
+                <!-- Primary Action -->
+                <Button fx:id="btnConfrimArrival" minHeight="50.0" onAction="#onButtonConfirmArrivalClicked"
+                        prefHeight="50.0" prefWidth="250.0" text="Confirm Arrival">
+                    <tooltip>
+                        <Tooltip text="Review reservation schedules and table availability." wrapText="true"/>
+                    </tooltip>
+                    <styleClass>
+                        <String fx:value="action-btn"/>
+                        <String fx:value="outline"/>
+                    </styleClass>
+                    <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../../../img/newWating.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-        <!-- Confirm Arrival -->
-        <Button fx:id="btnConfrimArrival" layoutX="246.0" layoutY="146.0" mnemonicParsing="false" onAction="#onButtonConfirmArrivalClicked" prefHeight="38.0" prefWidth="121.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Confirm Arrival" />
+            </HBox>
+        </VBox>
+        <HBox alignment="CENTER" maxHeight="70.0" maxWidth="700.0" minHeight="70.0" minWidth="700.0"
+              prefHeight="70.0" prefWidth="700.0" styleClass="card">
+            <Label styleClass="subtitle" text="Forget you conformation code?" wrapText="true"/>
+            <HBox alignment="CENTER" spacing="30.0">
+                <!-- Primary Action -->
+                <Button fx:id="btnLostMyCode" minHeight="50.0" onAction="#onLostMyCodeButtonClicked"
+                        prefHeight="50.0" prefWidth="250.0" text="Confirm Arrival">
+                    <tooltip>
+                        <Tooltip text="Review reservation schedules and table availability." wrapText="true"/>
+                    </tooltip>
+                    <styleClass>
+                        <String fx:value="action-btn"/>
+                        <String fx:value="danger"/>
+                    </styleClass>
+                    <graphic>
+                        <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                            <Image url="@../../../../img/lostCode.png"/>
+                        </ImageView>
+                    </graphic>
+                </Button>
 
-        <!-- Go Back -->
-        <Button fx:id="btnGoBack" layoutX="14.0" layoutY="204.0" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="38.0" prefWidth="121.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
-        <!-- Lost My Code -->
-        <Button fx:id="btnLostMyCode" layoutX="430.0" layoutY="204.0" mnemonicParsing="false" onAction="#onLostMyCodeButtonClicked" prefHeight="38.0" prefWidth="114.0" style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 14px;" text="Lost My Code" />
+            </HBox>
+        </HBox>
+    </VBox>
 
-    </children>
+
 </AnchorPane>

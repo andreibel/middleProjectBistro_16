@@ -34,7 +34,7 @@ public class BistroClientGUI extends Application {
 //        client.connectToServer();
 //        appController.requestOrders();   // load initial data
 
-        Scene scene = new Scene(root, 800, 600);
+        Scene scene = new Scene(root, 1600, 900);
         stage.setTitle("Bistro Restaurant Alpha Build");
         stage.setScene(scene);
         stage.setResizable(false);

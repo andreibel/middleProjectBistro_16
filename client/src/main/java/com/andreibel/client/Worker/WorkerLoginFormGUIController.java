@@ -4,10 +4,10 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.WorkerStateManager;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.WorkerAuth;
 import com.andreibel.message.DTO.WorkerResponse;
 import com.andreibel.message.Message;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -96,22 +96,27 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
     public void onServerResponse(Message message) {
         switch (message.getType()) {
             case WORKER_LOGIN_RESPONSE -> {
-                if (message.getData() == null) {
-                    BistroUtilities.showMessage(
-                            "Bistro Restaurant",
-                            "Worker does not exist."
-                    );
-                    return;
-                }
-
                 WorkerResponse response = (WorkerResponse) message.getData();
                 WorkerStateManager.getInstance().setWorkerName(txtFieldStaffName.getText().trim());
                 WorkerStateManager.getInstance().setManager(response.isManager());
+                Platform.runLater(() -> {
+                    try {
+                        // Same as go-back, just without ActionEvent
+                        BistroUtilities.switchScreen(
+                                btnLogin, // or btnGoBack
+                                "/Main/MainForm.fxml",
+                                "Bistro Restaurant"
+                        );
+                    } catch (IOException e) {
+                        BistroUtilities.showMessage("Bistro Restaurant", "Failed to open main screen.");
+                        e.printStackTrace();
+                    }
+                });
             }
             case WORKER_LOGIN_ERROR ->
                     BistroUtilities.showMessage(
                             "Bistro Restaurant",
-                            "Due to a server error, login could not be completed."
+                            "Worker name or password not current please try again"
                     );
         }
     }
