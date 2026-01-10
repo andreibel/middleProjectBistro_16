@@ -3,33 +3,31 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="520.0" prefWidth="1000.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="520.0" prefWidth="1000.0" style="-fx-background-color: #fff4e0;"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
 
-    <children>
+    <!-- Title -->
+    <Label fx:id="lblTitle" layoutX="20.0" layoutY="15.0" prefWidth="960.0" text="Active Orders for CURRENT_DATE">
+        <font>
+            <Font size="26.0"/>
+        </font>
+    </Label>
 
-        <!-- Title -->
-        <Label fx:id="lblTitle" layoutX="20.0" layoutY="15.0" prefWidth="960.0" text="Active Orders for CURRENT_DATE">
-            <font>
-                <Font size="26.0" />
-            </font>
-        </Label>
+    <!-- Table -->
+    <TableView fx:id="tblActiveOrders" layoutX="20.0" layoutY="65.0" prefHeight="430.0" prefWidth="960.0">
 
-        <!-- Table -->
-        <TableView fx:id="tblActiveOrders" layoutX="20.0" layoutY="65.0" prefHeight="430.0" prefWidth="960.0">
+        <columns>
+            <TableColumn fx:id="colNumberOfGuests" text="Number Of Guests"/>
+            <TableColumn fx:id="colSubscriberId" text="Subscriber ID"/>
+            <TableColumn fx:id="colEmail" text="Email"/>
+            <TableColumn fx:id="colPhoneNumber" text="Phone Number"/>
+            <TableColumn fx:id="colOrderDateTime" text="Order Date Time"/>
+        </columns>
 
-            <columns>
-                <TableColumn fx:id="colNumberOfGuests" text="Number Of Guests" />
-                <TableColumn fx:id="colSubscriberId" text="Subscriber ID" />
-                <TableColumn fx:id="colEmail" text="Email" />
-                <TableColumn fx:id="colPhoneNumber" text="Phone Number" />
-                <TableColumn fx:id="colOrderDateTime" text="Order Date Time" />
-            </columns>
+        <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+        </columnResizePolicy>
 
-            <columnResizePolicy>
-                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-            </columnResizePolicy>
+    </TableView>
 
-        </TableView>
-
-    </children>
 </AnchorPane>
