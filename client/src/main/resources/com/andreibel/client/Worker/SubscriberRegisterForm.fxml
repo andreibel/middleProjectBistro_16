@@ -1,51 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.SubscriberRegisterFormGUIController">
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<AnchorPane prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.SubscriberRegisterFormGUIController">
 
-   <children>
+    <children>
+        <!-- Full page container -->
+        <VBox alignment="TOP_CENTER" spacing="60.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+                <children>
+                    <!-- Top bar (also uses .card, so must override width too) -->
+                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity" minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0" style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+                        <children>
+                            <Label fx:id="lblTitle" styleClass="title" text="Register New Subscriber" wrapText="true" />
+                            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/logo.png" />
+                                </image>
+                                <viewport>
+                                    <Rectangle2D minX="1.0" />
+                                </viewport>
+                            </ImageView>
+                        </children>
+                    </HBox>
+                    <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+                        <children>
 
-      <!-- Title -->
-      <Label layoutX="72.0" layoutY="26.0" text="Please enter the details below to register a new subscriber">
-         <font>
-            <Font size="19.0" />
-         </font>
-      </Label>
+                            <!-- Back button moved here -->
+                            <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onButtonGoBackClicked" prefHeight="70.0" prefWidth="70.0" styleClass="action-btn" textOverrun="CLIP">
+                                <padding>
+                                    <Insets top="10.0" />
+                                </padding>
+                                <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                        <image>
+                                            <Image url="@../../../../img/back.png" />
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </children>
+                        <HBox.margin>
+                            <Insets />
+                        </HBox.margin>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </padding>
+                    </Pane>
+                </children>
+                <VBox.margin>
+                    <Insets top="10.0" />
+                </VBox.margin>
+            </HBox>
 
-      <!-- Name -->
-      <Label fx:id="lblName" layoutX="163.0" layoutY="112.0" text="Name:">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
+            <VBox alignment="CENTER" maxWidth="700.0" minWidth="700.0" prefWidth="700.0" styleClass="card">
+                <Label styleClass="subtitle" text="Please enter the details to register a new subscriber:" wrapText="true" />
+                <HBox alignment="CENTER" spacing="30.0">
+                    <Label fx:id="lblName" alignment="CENTER_RIGHT" prefWidth="100.0" text="Name:" textAlignment="RIGHT" />
+                    <TextField fx:id="txtFieldName" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" promptText="Enter full name here..." />
+                </HBox>
 
-      <TextField fx:id="txtFieldName" layoutX="220.0" layoutY="110.0" prefHeight="28.0" prefWidth="230.0" promptText="Enter full name here..." style="-fx-font-size: 13px;" />
+                <HBox alignment="CENTER" spacing="30.0">
+                    <Label fx:id="lblEmail" alignment="CENTER_RIGHT" maxWidth="100.0" minWidth="100.0" prefHeight="16.0" prefWidth="100.0" text="Email:" textAlignment="RIGHT" />
+                    <TextField fx:id="txtFieldEmail" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" promptText="Enter email here..." />
+                </HBox>
 
-      <!-- Email -->
-      <Label fx:id="lblEmail" layoutX="163.0" layoutY="169.0" text="Email:">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
+                <HBox alignment="CENTER" spacing="30.0">
+                    <Label fx:id="lblPhoneNumber" alignment="CENTER_RIGHT" maxWidth="100.0" minWidth="100.0" prefWidth="100.0" text="Phone Number:" />
+                    <TextField fx:id="txtFieldPhoneNumber" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" promptText="Enter phone number here..." />
+                </HBox>
 
-      <TextField fx:id="txtFieldEmail" layoutX="220.0" layoutY="167.0" prefHeight="28.0" prefWidth="230.0" promptText="Enter email here..." style="-fx-font-size: 13px;" />
-
-      <!-- Phone -->
-      <Label fx:id="lblPhoneNumber" layoutX="102.0" layoutY="221.0" text="Phone Number:">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
-
-      <TextField fx:id="txtFieldPhoneNumber" layoutX="220.0" layoutY="219.0" prefHeight="28.0" prefWidth="230.0" promptText="Enter phone number here..." style="-fx-font-size: 13px;" />
-
-      <!-- Register -->
-      <Button fx:id="btnRegister" layoutX="251.0" layoutY="270.0" mnemonicParsing="false" onAction="#onRegisterButtonClicked" prefHeight="39.0" prefWidth="168.0" style="-fx-background-color: #4CAF50;                      -fx-text-fill: white;                      -fx-font-size: 14px;                      -fx-font-weight: bold;" text="Register New Subscriber" />
-
-      <!-- Go Back -->
-      <Button fx:id="btnGoBack" layoutX="17.0" layoutY="347.0" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="39.0" prefWidth="111.0" style="-fx-background-color: #607D8B;                      -fx-text-fill: white;                      -fx-font-size: 13px;" text="Go Back" />
-
-   </children>
+                <!-- Primary Action -->
+                <Button fx:id="btnRegister" minHeight="50.0" onAction="#onRegisterButtonClicked" prefHeight="50.0" prefWidth="300.0" text="Register New Subscriber">
+                    <tooltip>
+                        <Tooltip text="Review reservation schedules and table availability." wrapText="true" />
+                    </tooltip>
+                    <styleClass>
+                        <String fx:value="action-btn" />
+                        <String fx:value="outline" />
+                    </styleClass>
+                    <graphic>
+                        <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@../../../../img/newSub.png" />
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+            </VBox>
+        </VBox>
+    </children>
 </AnchorPane>

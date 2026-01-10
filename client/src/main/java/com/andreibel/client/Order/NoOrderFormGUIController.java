@@ -15,35 +15,21 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.awt.*;
 import java.io.IOException;
 
 public class NoOrderFormGUIController implements IServerResponseListener {
 
-    @FXML
-    private Label lblGuest;
-    @FXML
-    private Label lblEmail;
-    @FXML
-    private Label lblPhoneNumber;
-    @FXML
-    private Label lblOR;
+    @FXML public VBox EmailPhoneVBOX;
     @FXML
     private TextField txtFieldEmail;
     @FXML
     private TextField txtFieldPhoneNumber;
     @FXML
     private TextField txtFieldNumberOfPeople;
-    @FXML
-    private Button btnSubmit;
-    @FXML
-    private Button btnGoBack;
-    @FXML
-    private AnchorPane rootPane;
-
-    private static final Point BUTTON_GUEST_LOCATION = new Point(318, 264);
-    private static final Point BUTTON_SUBSCRIBER_LOCATION = new Point(318, 150);
 
     private BistroClientController controller;
 
@@ -53,7 +39,7 @@ public class NoOrderFormGUIController implements IServerResponseListener {
         controller.addListener(this);
 
         adjustElementsBasedOnUserType();
-        setupSceneListener();
+
     }
 
     @Override
@@ -133,31 +119,9 @@ public class NoOrderFormGUIController implements IServerResponseListener {
     private void adjustElementsBasedOnUserType() {
         boolean isSubscriber = CustomerStateManager.getInstance().getSubscriber() != null;
 
-        lblOR.setVisible(!isSubscriber);
-        lblGuest.setVisible(!isSubscriber);
-        lblEmail.setVisible(!isSubscriber);
-        lblPhoneNumber.setVisible(!isSubscriber);
-        txtFieldEmail.setVisible(!isSubscriber);
-        txtFieldPhoneNumber.setVisible(!isSubscriber);
-
-        if (isSubscriber) {
-            btnSubmit.setLayoutX(BUTTON_SUBSCRIBER_LOCATION.getX());
-            btnSubmit.setLayoutY(BUTTON_SUBSCRIBER_LOCATION.getY());
-        } else {
-            btnSubmit.setLayoutX(BUTTON_GUEST_LOCATION.getX());
-            btnSubmit.setLayoutY(BUTTON_GUEST_LOCATION.getY());
-        }
+        EmailPhoneVBOX.setVisible(!isSubscriber);
+        EmailPhoneVBOX.setManaged(!isSubscriber);
     }
 
-    private void setupSceneListener() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                    if (newWindow != null) {
-                        newWindow.setOnShown(event -> adjustElementsBasedOnUserType());
-                    }
-                });
-            }
-        });
-    }
+
 }

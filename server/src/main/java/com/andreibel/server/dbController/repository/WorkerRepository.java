@@ -79,7 +79,7 @@ public class WorkerRepository {
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerRequest.getWorkerName());
             stmt.setString(2, workerRequest.getWorkerPassword());
-            stmt.setBoolean(4, workerRequest.isManager());
+            stmt.setBoolean(3, workerRequest.isManager());
             stmt.executeUpdate();
         }
 

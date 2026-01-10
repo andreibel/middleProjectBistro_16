@@ -1,52 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.DatePicker?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<AnchorPane prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css"
+            xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.andreibel.client.Order.OrderFormGUIController">
 
-<AnchorPane prefHeight="450.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.OrderFormGUIController"> <!-- warm solid background -->
+    <children>
 
-   <children>
+        <!-- Full page container -->
+        <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+                <children>
+                    <!-- Top bar (also uses .card, so must override width too) -->
+                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity"
+                          minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0"
+                          style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+                        <children>
+                            <Label fx:id="lblTitle" styleClass="title" text="Place your order now!" wrapText="true"/>
+                            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/logo.png"/>
+                                </image>
+                                <viewport>
+                                    <Rectangle2D minX="1.0"/>
+                                </viewport>
+                            </ImageView>
+                        </children>
+                    </HBox>
+                    <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+                        <children>
 
-      <!-- Number of People -->
-      <Label fx:id="lblNumberOfPeople" layoutX="137.0" layoutY="121.0" style="-fx-font-size: 14px;" text="Number of People:" />
-      <!-- Title Label -->
-      <Label fx:id="lblTitle" layoutX="196.0" layoutY="14.0" text="Place your order now!" textAlignment="CENTER">
-         <font>
-            <Font size="23.0" />
-         </font>
-      </Label>
+                            <!-- Back button moved here -->
+                            <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false"
+                                    onAction="#onGoBackButtonClick" prefHeight="70.0" prefWidth="70.0"
+                                    styleClass="action-btn" textOverrun="CLIP">
+                                <padding>
+                                    <Insets top="10.0"/>
+                                </padding>
+                                <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <image>
+                                            <Image url="@../../../../img/back.png"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </children>
+                        <HBox.margin>
+                            <Insets/>
+                        </HBox.margin>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                    </Pane>
+                </children>
+                <VBox.margin>
+                    <Insets top="10.0"/>
+                </VBox.margin>
+            </HBox>
 
-      <!-- Date Label & Picker -->
-      <Label fx:id="lblDate" layoutX="164.0" layoutY="182.0" style="-fx-font-size: 14px;" text="Date of Order:" />
-      <DatePicker fx:id="datePickerOrder" layoutX="257.0" layoutY="177.0" prefHeight="28.0" prefWidth="195.0" promptText="Choose your preferred date" />
-      <ComboBox fx:id="comboBoxTime" layoutX="271.0" layoutY="116.0" prefHeight="28.0" prefWidth="195.0" promptText="Select available times" />
-      <TextField fx:id="txtFieldNumberOfPeople" layoutX="258.0" layoutY="116.0" prefHeight="28.0" prefWidth="195.0" promptText="# of people (including yourself)" />
+            <VBox alignment="CENTER" maxWidth="700.0" minWidth="700.0" prefWidth="700.0" styleClass="card">
+                <Label styleClass="subtitle" text="Create New Order:" wrapText="true"/>
+                <ProgressBar fx:id="wizardProgrtes" prefWidth="500.0" progress="0.0"/>
+                <VBox fx:id="DateNUmberVBOX" maxHeight="80.0" minHeight="80.0" prefHeight="80.0" prefWidth="100.0"
+                      spacing="10.0">
+                    <children>
+                        <HBox fx:id="DateHbox" alignment="CENTER" spacing="30.0">
+                            <!-- Date Label & Picker -->
+                            <Label fx:id="lblDate" minWidth="120.0" text="Date of Order:"/>
+                            <DatePicker fx:id="datePickerOrder" minWidth="300.0"
+                                        promptText="Choose your preferred date"/>
+                        </HBox>
 
-      <Label fx:id="lblEmail" layoutX="188.0" layoutY="149.0" style="-fx-font-size: 14px;" text="Email:" />
-      <TextField fx:id="txtFieldEmail" layoutX="253.0" layoutY="144.0" prefHeight="28.0" prefWidth="195.0" promptText="Enter your email here" />
+                        <HBox fx:id="NumberOfPeopleHbox" alignment="CENTER" spacing="30.0">
+                            <!-- Number of People -->
+                            <Label fx:id="lblNumberOfPeople" minWidth="120.0" text="Number of People:"/>
+                            <TextField fx:id="txtFieldNumberOfPeople" minWidth="300.0"
+                                       promptText="# of people (including yourself)"/>
+                        </HBox>
+                    </children>
+                </VBox>
 
-      <!-- Phone Number -->
-      <Label fx:id="lblPhoneNumber" layoutX="152.0" layoutY="216.0" style="-fx-font-size: 14px;" text="Phone Number:" />
-      <TextField fx:id="txtFieldPhoneNumber" layoutX="253.0" layoutY="211.0" prefHeight="28.0" prefWidth="195.0" promptText="Enter your phone number here" />
+                <HBox fx:id="TimeHbox" alignment="CENTER" minHeight="80.0" spacing="30.0">
+                    <!-- Time Label & ComboBox -->
+                    <Label fx:id="lblTime" minWidth="120.0" text="Time of Order:"/>
+                    <ComboBox fx:id="comboBoxTime" minWidth="300.0" promptText="Select available times"/>
+                </HBox>
+                <VBox fx:id="EmailPhoneVBOX" alignment="CENTER" minHeight="80.0">
+                    <HBox alignment="CENTER" spacing="30.0">
+                        <Label fx:id="lblEmail" minWidth="120.0" text="Email:"/>
+                        <TextField fx:id="txtFieldEmail" minWidth="300.0" promptText="Enter your email here"/>
+                    </HBox>
+                    <Label fx:id="lblOR" layoutX="339.0" layoutY="183.0" text="OR"/>
 
-      <!-- Buttons -->
-      <Button fx:id="btnOrderNow" layoutX="473.0" layoutY="401.0" mnemonicParsing="false" onAction="#onOrderNowButtonClicked" prefHeight="35.0" prefWidth="113.0" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px;" text="Next" />
+                    <HBox alignment="CENTER" spacing="30.0">
+                        <Label fx:id="lblPhoneNumber" minWidth="120.0" text="Phone Number:"/>
+                        <TextField fx:id="txtFieldPhoneNumber" minWidth="300.0"
+                                   promptText="Enter your phone number here"/>
+                    </HBox>
+                </VBox>
 
-      <Button fx:id="btnGoBack" layoutX="14.0" layoutY="398.0" mnemonicParsing="false" onAction="#onGoBackButtonClick" prefHeight="35.0" prefWidth="77.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;" text="Go Back" />
-      <Label fx:id="lblOR" layoutX="339.0" layoutY="183.0" text="OR" />
-      <Label fx:id="lblWizardTitle" layoutX="21.0" layoutY="63.0" text="ORDER_WIZARD_PART">
-         <font>
-            <Font size="17.0" />
-         </font>
-      </Label>
-      <Button fx:id="btnPrevious" layoutX="347.0" layoutY="401.0" mnemonicParsing="false" onAction="#onPreviousButtonClicked" prefHeight="35.0" prefWidth="113.0" text="Previous" />
 
-      <!-- Time Label & ComboBox -->
-      <Label fx:id="lblTime" layoutX="163.0" layoutY="121.0" style="-fx-font-size: 14px;" text="Time of Order:" />
-   </children>
+                <HBox alignment="CENTER" spacing="30.0">
+                    <!-- Primary Action -->
+                    <Button fx:id="btnPrevious" minHeight="50.0" onAction="#onPreviousButtonClicked" prefHeight="50.0"
+                            prefWidth="200.0" text="Previous">
+                        <tooltip>
+                            <Tooltip text="Review reservation schedules and table availability." wrapText="true"/>
+                        </tooltip>
+                        <styleClass>
+                            <String fx:value="action-btn"/>
+                            <String fx:value="outline"/>
+                        </styleClass>
+                        <graphic>
+                            <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/arrowBack.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    <!-- Primary Action -->
+                    <Button fx:id="btnOrderNow" minHeight="50.0" onAction="#onOrderNowButtonClicked" prefHeight="50.0"
+                            prefWidth="200.0" text="Next">
+                        <tooltip>
+                            <Tooltip text="Review reservation schedules and table availability." wrapText="true"/>
+                        </tooltip>
+                        <styleClass>
+                            <String fx:value="action-btn"/>
+                            <String fx:value="danger"/>
+                        </styleClass>
+                        <graphic>
+                            <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/arrowNext.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                </HBox>
+            </VBox>
+        </VBox>
+    </children>
 </AnchorPane>

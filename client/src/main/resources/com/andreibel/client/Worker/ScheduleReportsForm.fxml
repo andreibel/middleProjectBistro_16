@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
 <?import javafx.geometry.*?>
-<?import javafx.scene.*?>
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-
+<?import java.lang.String?>
 <AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.ScheduleReportsFormGUIController">
 
     <styleClass>
@@ -61,14 +61,18 @@
                <Insets top="20.0" />
             </VBox.margin>
          </HBox>
-
+            <ScrollPane prefHeight="500.0" prefWidth="200.0" styleClass="ghost-scroll" vbarPolicy="NEVER">
+            <VBox.margin>
+                <Insets left="10.0" />
+            </VBox.margin>
+            <content>
             <!-- MAIN CARD (charts) -->
             <VBox alignment="TOP_CENTER" spacing="10.0" style="-fx-min-width: 1040; -fx-pref-width: 1040; -fx-max-width: 1040;">
-            <Pane prefHeight="340.0" prefWidth="200.0" styleClass="card">
+            <Pane styleClass="card">
                <children>
       
                       <!-- Line chart -->
-                      <LineChart fx:id="lineChartArrivalsDepartures" prefHeight="240.0" prefWidth="1040.0" title="Customers Arrivals and Departures">
+                      <LineChart fx:id="lineChartArrivalsDepartures" prefHeight="287.0" prefWidth="1040.0" title="Customers Arrivals and Departures">
                           <xAxis>
                               <CategoryAxis fx:id="xAxis" />
                           </xAxis>
@@ -79,7 +83,7 @@
                         <Cursor fx:constant="DEFAULT" />
                      </cursor>
                      <padding>
-                        <Insets top="30.0" />
+                        <Insets bottom="-50.0" top="30.0" />
                      </padding>
                       </LineChart>
    
@@ -92,18 +96,24 @@
                      </padding>
                        </HBox>
                </children>
+                     <padding>
+                        <Insets top="-20.0" />
+                     </padding>
             </Pane>
             <Pane prefHeight="300.0" prefWidth="200.0" styleClass="card">
                <children>
       
                       <!-- Bar chart -->
-                      <BarChart fx:id="barChartLatesDelays" prefHeight="200.0" prefWidth="1040.0" title="Customers Lates and Delays">
+                      <BarChart fx:id="barChartLatesDelays" prefHeight="300.0" prefWidth="1040.0" title="Customers Lates and Delays">
                           <xAxis>
                               <CategoryAxis fx:id="xDayAxis" />
                           </xAxis>
                           <yAxis>
                               <NumberAxis fx:id="yPeopleAxis" />
                           </yAxis>
+                           <padding>
+                              <Insets bottom="-50.0" top="10.0" />
+                           </padding>
                       </BarChart>
                </children>
                <VBox.margin>
@@ -112,6 +122,8 @@
             </Pane>
 
             </VBox>
+            </content>
+            </ScrollPane>
 
         </VBox>
 

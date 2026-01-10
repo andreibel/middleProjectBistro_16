@@ -1,7 +1,6 @@
 package com.andreibel.client;
 
 import com.andreibel.client.Client.BistroClientController;
-import com.andreibel.message.APICallType;
 import com.andreibel.message.DTO.OrderResponse;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

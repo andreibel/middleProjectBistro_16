@@ -92,7 +92,7 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
     }
 
     @FXML
-    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+    private void onButtonGoBackClicked(ActionEvent event) throws IOException {
         clearForm();
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }

@@ -11,6 +11,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -19,6 +21,11 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class OrderFormGUIController implements IServerResponseListener {
+
+    @FXML public HBox TimeHbox;
+    @FXML public VBox EmailPhoneVBOX;
+    @FXML public ProgressBar wizardProgrtes;
+    @FXML public VBox DateNUmberVBOX;
 
     private enum WizardStep { PART1, PART2_TIME, PART3_USER_INFO }
 
@@ -32,8 +39,6 @@ public class OrderFormGUIController implements IServerResponseListener {
     private TextField txtFieldEmail;
     @FXML
     private TextField txtFieldPhoneNumber;
-    @FXML
-    private Label lblWizardTitle, lblDate, lblNumberOfPeople, lblTime, lblEmail, lblPhoneNumber, lblOR;
     @FXML
     private Button btnOrderNow, btnPrevious, btnGoBack;
 
@@ -115,33 +120,31 @@ public class OrderFormGUIController implements IServerResponseListener {
         int totalSteps = isSubscriber ? 2 : 3;
 
         // Reset visibility
-        datePickerOrder.setVisible(false); lblDate.setVisible(false);
-        txtFieldNumberOfPeople.setVisible(false); lblNumberOfPeople.setVisible(false);
-        comboBoxTime.setVisible(false); lblTime.setVisible(false);
-        txtFieldEmail.setVisible(false); lblEmail.setVisible(false);
-        txtFieldPhoneNumber.setVisible(false); lblPhoneNumber.setVisible(false);
-        lblOR.setVisible(false);
+        DateNUmberVBOX.setVisible(false); DateNUmberVBOX.setManaged(false);
+        TimeHbox.setVisible(false); TimeHbox.setManaged(false);
+        EmailPhoneVBOX.setVisible(false); EmailPhoneVBOX.setManaged(false);
+
+
         btnPrevious.setVisible(wizardStep != WizardStep.PART1);
 
         switch (wizardStep) {
             case PART1 -> {
-                lblWizardTitle.setText("Step 1 / " + totalSteps + " - Number of People and Date");
-                datePickerOrder.setVisible(true); lblDate.setVisible(true);
-                txtFieldNumberOfPeople.setVisible(true); lblNumberOfPeople.setVisible(true);
+                DateNUmberVBOX.setVisible(true); DateNUmberVBOX.setManaged(true);
+
                 btnOrderNow.setText("Next");
+                wizardProgrtes.setProgress(0);
+
             }
             case PART2_TIME -> {
-                lblWizardTitle.setText("Step 2 / " + totalSteps + " - Select Order Time");
-                comboBoxTime.setVisible(true); lblTime.setVisible(true);
+                TimeHbox.setVisible(true); TimeHbox.setManaged(true);
                 btnOrderNow.setText(isSubscriber ? "Order Now" : "Next");
+                wizardProgrtes.setProgress(0.3);
             }
             case PART3_USER_INFO -> {
                 if (!isSubscriber) {
-                    lblWizardTitle.setText("Step 3 / 3 - Customer Info");
-                    txtFieldEmail.setVisible(true); lblEmail.setVisible(true);
-                    txtFieldPhoneNumber.setVisible(true); lblPhoneNumber.setVisible(true);
-                    lblOR.setVisible(true);
+                    EmailPhoneVBOX.setVisible(true); EmailPhoneVBOX.setManaged(true);
                     btnOrderNow.setText("Order Now");
+                    wizardProgrtes.setProgress(0.6);
                 }
             }
         }

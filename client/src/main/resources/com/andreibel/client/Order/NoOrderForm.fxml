@@ -1,43 +1,117 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import java.lang.String?>
+<AnchorPane prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css"
+            xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.andreibel.client.Order.NoOrderFormGUIController"> <!-- soft warm background -->
 
-<AnchorPane fx:id="rootPane" prefHeight="344.0" prefWidth="600.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Order.NoOrderFormGUIController"> <!-- soft warm background -->
+    <children>
+        <!-- Full page container -->
+        <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+                <children>
+                    <!-- Top bar (also uses .card, so must override width too) -->
+                    <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity"
+                          minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0"
+                          style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+                        <children>
+                            <Label fx:id="lblTitle" styleClass="title" text="Dining in without ordering"
+                                   wrapText="true"/>
+                            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/logo.png"/>
+                                </image>
+                                <viewport>
+                                    <Rectangle2D minX="1.0"/>
+                                </viewport>
+                            </ImageView>
+                        </children>
+                    </HBox>
+                    <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+                        <children>
 
-   <children>
-      <!-- Title Label -->
-      <Label fx:id="lblTitle" layoutX="14.0" layoutY="14.0" text="Dining in without ordering">
-         <font>
-            <Font size="21.0" />
-         </font>
-      </Label>
+                            <!-- Back button moved here -->
+                            <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false"
+                                    onAction="#onGoBackButtonClicked" prefHeight="70.0" prefWidth="70.0"
+                                    styleClass="action-btn" textOverrun="CLIP">
+                                <padding>
+                                    <Insets top="10.0"/>
+                                </padding>
+                                <graphic>
+                                    <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <image>
+                                            <Image url="@../../../../img/back.png"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </Button>
+                        </children>
+                        <HBox.margin>
+                            <Insets/>
+                        </HBox.margin>
+                        <padding>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                        </padding>
+                    </Pane>
+                </children>
+                <VBox.margin>
+                    <Insets top="10.0"/>
+                </VBox.margin>
+            </HBox>
 
-      <!-- Guest Info Label -->
-      <Label fx:id="lblGuest" layoutX="172.0" layoutY="60.0" prefHeight="20.0" prefWidth="293.0" style="-fx-font-size: 16px; -fx-text-fill: #333;" text="Guests may enter email or phone number" />
+            <VBox alignment="CENTER" maxWidth="700.0" minWidth="700.0" prefWidth="700.0" styleClass="card">
+                <Label styleClass="subtitle" text="Enter to Waiting List" wrapText="true"/>
+                <Label fx:id="lblGuest" text="Guests may enter email or phone number"/>
+                <HBox alignment="CENTER" spacing="30.0">
+                    <!-- Number of People -->
+                    <Label fx:id="lblNumberOfPeople" minWidth="120.0" text="Number of People:"/>
+                    <TextField fx:id="txtFieldNumberOfPeople" minWidth="300.0"
+                               promptText="# of people (including yourself)"/>
+                </HBox>
 
-      <!-- Number of People -->
-      <Label fx:id="lblNumberOfPeople" layoutX="126.0" layoutY="98.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Number of People:" />
-      <TextField fx:id="txtFieldNumberOfPeople" layoutX="250.0" layoutY="95.0" prefHeight="26.0" prefWidth="224.0" promptText="Number of people (Including yourself)" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
+                <VBox fx:id="EmailPhoneVBOX" alignment="CENTER" minHeight="80.0">
+                    <HBox alignment="CENTER" spacing="30.0">
+                        <Label fx:id="lblEmail" minWidth="120.0" text="Email:"/>
+                        <TextField fx:id="txtFieldEmail" minWidth="300.0" promptText="Enter your email here"/>
+                    </HBox>
+                    <Label fx:id="lblOR" layoutX="339.0" layoutY="183.0" text="OR"/>
 
-      <!-- Email -->
-      <Label fx:id="lblEmail" layoutX="205.0" layoutY="151.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Email:" />
-      <TextField fx:id="txtFieldEmail" layoutX="250.0" layoutY="148.0" prefHeight="26.0" prefWidth="224.0" promptText="Enter your email here..." style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
+                    <HBox alignment="CENTER" spacing="30.0">
+                        <Label fx:id="lblPhoneNumber" minWidth="120.0" text="Phone Number:"/>
+                        <TextField fx:id="txtFieldPhoneNumber" minWidth="300.0"
+                                   promptText="Enter your phone number here"/>
+                    </HBox>
+                </VBox>
 
-      <!-- OR Label -->
-      <Label fx:id="lblOR" layoutX="353.0" layoutY="178.0" style="-fx-font-size: 17px; -fx-text-fill: #555;" text="OR" />
 
-      <!-- Phone Number -->
-      <Label fx:id="lblPhoneNumber" layoutX="145.0" layoutY="209.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Phone Number:" />
-      <TextField fx:id="txtFieldPhoneNumber" layoutX="250.0" layoutY="206.0" prefHeight="26.0" prefWidth="224.0" promptText="Enter your phone number here..." style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
+                <HBox alignment="CENTER" spacing="30.0">
+                    <!-- Primary Action -->
+                    <Button fx:id="btnSubmit" minHeight="50.0" onAction="#onSubmitButtonClicked" prefHeight="50.0"
+                            prefWidth="200.0" text="Submit">
+                        <tooltip>
+                            <Tooltip text="Review reservation schedules and table availability." wrapText="true"/>
+                        </tooltip>
+                        <styleClass>
+                            <String fx:value="action-btn"/>
+                            <String fx:value="outline"/>
+                        </styleClass>
+                        <graphic>
+                            <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/newWating.png"/>
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
 
-      <!-- Submit Button -->
-      <Button fx:id="btnSubmit" layoutX="318.0" layoutY="264.0" mnemonicParsing="false" onAction="#onSubmitButtonClicked" prefHeight="41.0" prefWidth="88.0" style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px;" text="Submit" />
-
-      <!-- Go Back Button -->
-      <Button fx:id="btnGoBack" layoutX="14.0" layoutY="289.0" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="41.0" prefWidth="88.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 6px;" text="Go Back" />
-   </children>
+                </HBox>
+            </VBox>
+        </VBox>
+    </children>
 </AnchorPane>

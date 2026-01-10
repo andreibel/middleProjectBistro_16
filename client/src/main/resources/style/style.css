@@ -1,7 +1,5 @@
 /* ===== Electric Indigo palette ===== */
-:root {
-    /* (JavaFX doesn't use CSS vars everywhere, but keeping palette here is nice for reference) */
-}
+
 
 /* App root */
 .root {
@@ -128,3 +126,257 @@
 }
 .axis-label { -fx-text-fill: #420099; -fx-font-weight: 700; }
 .axis-tick-label { -fx-text-fill: #420099; }
+
+/* ===== CheckBox (Electric Indigo) ===== */
+.check-box {
+    -fx-text-fill: #2C0066;
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-cursor: hand;
+}
+
+/* the square box */
+.check-box .box {
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-border-color: #C599FF;
+    -fx-border-width: 1.4;
+
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+
+    /* size */
+    -fx-min-width: 22;
+    -fx-min-height: 22;
+    -fx-pref-width: 22;
+    -fx-pref-height: 22;
+
+    /* subtle depth */
+    -fx-effect: dropshadow(gaussian, rgba(15,0,36,0.12), 6, 0.20, 0, 1);
+}
+
+/* hover */
+.check-box:hover .box {
+    -fx-background-color: #F1E5FF;
+    -fx-border-color: #A866FF;
+}
+
+/* focus ring */
+.check-box:focused .box {
+    -fx-border-color: #8B33FF;
+    -fx-border-width: 1.8;
+}
+
+/* selected */
+.check-box:selected .box {
+    -fx-background-color: #6E00FF;
+    -fx-border-color: transparent;
+}
+
+.check-box:selected:hover .box { -fx-background-color: #5800CC; }
+.check-box:selected:pressed .box { -fx-background-color: #420099; }
+
+/* check mark */
+.check-box .mark {
+    -fx-background-color: transparent;
+}
+
+.check-box:selected .mark {
+    -fx-background-color: white;
+}
+
+/* disabled */
+.check-box:disabled {
+    -fx-opacity: 0.55;
+}
+
+/* ===== ScrollPane transparent (no "panel" look) ===== */
+.ghost-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.ghost-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.ghost-scroll > .corner {
+    -fx-background-color: transparent;
+}
+
+/* (Optional) if content region still paints something */
+.ghost-scroll .content {
+    -fx-background-color: transparent;
+}
+
+/* =========================================================
+   ComboBox (Electric Indigo) - field + arrow + popup list
+   ========================================================= */
+.combo-box {
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #C599FF;
+    -fx-border-width: 1.2;
+    -fx-padding: 0;
+}
+
+.combo-box .list-cell {
+    -fx-text-fill: #2C0066;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+    -fx-background-color: transparent;
+    -fx-padding: 8 12 8 12;
+}
+
+/* arrow area */
+.combo-box .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 12 12 0;
+    -fx-padding: 0 12 0 10;
+}
+
+.combo-box .arrow {
+    -fx-background-color: #6E00FF;
+}
+
+/* hover / focus */
+.combo-box:hover {
+    -fx-background-color: #F1E5FF;
+    -fx-border-color: #A866FF;
+}
+
+.combo-box:focused {
+    -fx-border-color: #8B33FF;
+    -fx-border-width: 1.6;
+}
+
+/* popup list */
+.combo-box-popup .list-view {
+    -fx-background-color: rgba(255,255,255,0.98);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: rgba(197,153,255,0.7);
+    -fx-effect: dropshadow(gaussian, rgba(15,0,36,0.18), 18, 0.18, 0, 8);
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: rgba(241,229,255,0.85);
+}
+
+.combo-box-popup .list-view .list-cell:filled:selected,
+.combo-box-popup .list-view .list-cell:filled:selected:hover {
+    -fx-background-color: #6E00FF;
+    -fx-text-fill: white;
+}
+
+
+/* =========================================================
+   DatePicker (Electric Indigo) - field + calendar popup
+   ========================================================= */
+.date-picker {
+    -fx-background-color: rgba(255,255,255,0.95);
+    -fx-background-radius: 12;
+    -fx-border-radius: 12;
+    -fx-border-color: #C599FF;
+    -fx-border-width: 1.2;
+}
+
+.date-picker:hover {
+    -fx-background-color: #F1E5FF;
+    -fx-border-color: #A866FF;
+}
+
+.date-picker:focused {
+    -fx-border-color: #8B33FF;
+    -fx-border-width: 1.6;
+}
+
+/* text inside */
+.date-picker .text-field {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #2C0066;
+    -fx-font-size: 14px;
+    -fx-font-weight: 600;
+}
+
+/* calendar button */
+.date-picker .arrow-button {
+    -fx-background-color: transparent;
+    -fx-background-radius: 0 12 12 0;
+    -fx-padding: 0 12 0 10;
+}
+.date-picker .arrow-button .arrow {
+    -fx-background-color: #6E00FF;
+}
+
+/* popup calendar */
+.date-picker-popup {
+    -fx-background-color: rgba(255,255,255,0.98);
+    -fx-background-radius: 16;
+    -fx-border-radius: 16;
+    -fx-border-color: rgba(197,153,255,0.7);
+    -fx-effect: dropshadow(gaussian, rgba(15,0,36,0.18), 22, 0.18, 0, 10);
+}
+
+/* header area (month/year bar) */
+.date-picker-popup .month-year-pane {
+    -fx-background-color: rgba(241,229,255,0.85);
+    -fx-background-radius: 16 16 0 0;
+}
+
+/* day names (Mon/Tue/...) */
+.date-picker-popup .day-name-cell {
+    -fx-text-fill: #420099;
+    -fx-font-weight: 800;
+}
+
+/* normal days */
+.date-picker-popup .day-cell {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2C0066;
+    -fx-font-weight: 600;
+    -fx-background-radius: 10;
+}
+
+/* hover day */
+.date-picker-popup .day-cell:hover {
+    -fx-background-color: rgba(241,229,255,0.9);
+}
+
+/* selected day */
+.date-picker-popup .day-cell:selected {
+    -fx-background-color: #6E00FF;
+    -fx-text-fill: white;
+}
+
+/* today highlight */
+.date-picker-popup .today {
+    -fx-border-color: #8B33FF;
+    -fx-border-width: 1.4;
+    -fx-border-radius: 10;
+}
+
+
+/* =========================================================
+   ProgressBar (Electric Indigo)
+   ========================================================= */
+.progress-bar {
+    -fx-accent: #6E00FF; /* fill color */
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+}
+
+.progress-bar .track {
+    -fx-background-color: rgba(241,229,255,0.95);
+    -fx-background-radius: 999;
+    -fx-border-radius: 999;
+    -fx-border-color: rgba(197,153,255,0.8);
+    -fx-border-width: 1.1;
+}
+
+.progress-bar .bar {
+    -fx-background-radius: 999;
+    -fx-padding: 6; /* thickness */
+}

@@ -69,8 +69,7 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         if (CustomerStateManager.getInstance().getSubscriber() != null) {
             lblSubscriber.setText(
                     "Hi, " +
-                            CustomerStateManager.getInstance().getSubscriber().getName() +
-                            ", here is your orders history:"
+                            CustomerStateManager.getInstance().getSubscriber().getName()
             );
         } else {
             lblSubscriber.setText("Orders History:");

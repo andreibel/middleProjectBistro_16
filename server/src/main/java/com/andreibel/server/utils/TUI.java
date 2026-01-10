@@ -65,19 +65,19 @@ public class TUI {
     }
 
     public static void serverOutputLog(Message message) {
-
-        String ERROR_LINE = buildErrorLine105();
+        if(message == null) return;
+        String ERROR_LINE = buildErrorLine101();
         String messageString;
         if (!message.getType().toString().contains("ERROR"))
-            messageString = String.format("%-105s", shorten(message.getData().toString(), 105));
+            messageString = String.format("%-101s", shorten(message.getData().toString(), 101));
         else
             messageString = ERROR_LINE;
         System.out.printf(
                 """
-       │ ┌───── response: to --> client ─────┐                                                                                                             │
-       │ ├───────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
-       │ │ %-37s │ %s │ │
-       │ └───────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+       │ ┌─────── response: to --> client ───────┐                                                                                                         │
+       │ ├───────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+       │ │ %-41s │ %s │ │
+       │ └───────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
         """, message.getType().toString(),
                 messageString
         );
@@ -94,8 +94,8 @@ public class TUI {
         return ANSI.matcher(s).replaceAll("").length();
     }
 
-    private static String buildErrorLine105() {
-        final int total = 105;
+    private static String buildErrorLine101() {
+        final int total = 101;
         final String centerPlain = " ERROR ";
         final String center = "\u001B[38;2;255;0;0m" + centerPlain + RESET;
 
