@@ -5,6 +5,7 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.OrderResponse;
+import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -39,6 +41,9 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
     @FXML
     private TableColumn<OrderHistory, Integer> colNumberOfPeople;
 
+    @FXML
+    private AnchorPane rootPane;
+
     private ObservableList<OrderHistory> orderHistoryList;
     private BistroClientController controller;
 
@@ -55,8 +60,6 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         updateSubscriberLabel();
 
         requestOrdersWhenSceneIsShown();
-        Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
-        controller.requestAllSubscriberOrders(subscriberId);
     }
 
     private void initializeTableColumns() {
@@ -81,8 +84,9 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
     public void onServerResponse(Message message) {
         switch (message.getType()) {
             case GET_SUBSCRIBER_ORDERS_RESPONSE -> {
-                List<OrderResponse> orders = (List<OrderResponse>) message.getData();
+                List<OrderResponse> orders = ((SubscriberResponse)message.getData()).getOrders();
                 if (orders != null) populateTable(orders);
+                else BistroUtilities.showMessage("Bistro Restaurant", "No orders where found");
             }
             case GET_SUBSCRIBER_ORDERS_ERROR -> BistroUtilities.showMessage(
                     "Bistro Restaurant",
@@ -102,16 +106,14 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
     }
 
     private void requestOrdersWhenSceneIsShown() {
-        tblViewOrderHistory.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
-                            if (subscriberId != null) {
-                                controller.requestAllSubscriberOrders(subscriberId);
-                            }
-                        });
+                        Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
+                        if (subscriberId != null) {
+                            controller.requestAllSubscriberOrders(subscriberId);
+                        }
                     }
                 });
             }
@@ -125,7 +127,7 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         BistroUtilities.switchScreen(
                 (Node) event.getSource(),
                 "/Subscriber/SubscriberZoneForm.fxml",
-                "Bistro Restaurant - Subscriber Zone"
+                "Bistro Restaurant - Subscriber Area"
         );
     }
 

@@ -290,8 +290,8 @@ public class WaitingListService {
 
             return SchedulesReportResponse.builder()
                     .customerArriveDeparture(customerArriveDeparture)
-                    .customerLate(customerLate)
-                    .customerDelay(customerDelay)
+                    .CustomerLate(customerLate)
+                    .CustomerDelay(customerDelay)
                     .openingTime(openingTime)
                     .closingTime(closingTime)
                     .interval(30) // 30-minute intervals (configurable)

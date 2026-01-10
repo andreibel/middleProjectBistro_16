@@ -3,6 +3,7 @@ package com.andreibel.client.Main;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.client.util.WorkerStateManager;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -32,6 +33,8 @@ public class MainFormGUIController {
     private AnchorPane rootPane;
     @FXML
     private Button btnSubscriber;
+    @FXML
+    private Button btnWorker;
     /**
      * Initializes the main form controller after the FXML has been loaded.
      *
@@ -42,15 +45,10 @@ public class MainFormGUIController {
     private void initialize() {
 //        CustomerStateManager.getInstance().setSubscriber(new SubscriberResponse());
 //        WorkerStateManager.getInstance().setManager(true);
+        System.out.println(WorkerStateManager.getInstance().toString());
         updateMainFormWhenSceneIsShown();
-        if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
-            btnSubscriber.setText("Subscriber Area");
     }
 
-    private static String ms(String hex) {
-        int code = Integer.parseInt(hex, 16);
-        return new String(Character.toChars(code));
-    }
     /**
      * Navigates to the order creation form.
      *
@@ -146,18 +144,25 @@ public class MainFormGUIController {
         BistroUtilities.switchScreen((Node) event.getSource(), "/Order/NoOrderForm.fxml", "Bistro Restaurant - Dine-In without Order");
     }
 
+    @FXML
+    private void onPayOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Table/LeaveTableForm.fxml", "Bistro Restaurant - Pay for order");
+    }
+
     private void updateMainFormWhenSceneIsShown() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> {
-                            if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
-                                btnSubscriber.setText("Subscriber Area");
-                        });
+                        if (CustomerStateManager.getInstance() != null && CustomerStateManager.hasSubscriberLoggedIn())
+                            btnSubscriber.setText("Subscriber Area");
+                        if (WorkerStateManager.getInstance() != null && WorkerStateManager.hasWorkerLoggedIn())
+                            btnWorker.setText("Staff Area");
                     }
                 });
             }
         });
     }
 }
+
+

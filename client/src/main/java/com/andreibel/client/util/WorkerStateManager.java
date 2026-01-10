@@ -1,5 +1,6 @@
 package com.andreibel.client.util;
 
+import com.andreibel.message.DTO.WorkerResponse;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -38,15 +39,7 @@ public class WorkerStateManager {
      */
     private static WorkerStateManager instance;
 
-    /**
-     * The name of the currently logged-in worker.
-     */
-    private String workerName;
-
-    /**
-     * Whether the currently logged-in worker is a manager.
-     */
-    private boolean isManager;
+    private WorkerResponse worker;
 
     /**
      * Returns the singleton instance of {@link WorkerStateManager}.
@@ -68,6 +61,6 @@ public class WorkerStateManager {
      * @return {@code true} if a worker has logged in, {@code false} otherwise
      */
     public static boolean hasWorkerLoggedIn() {
-        return instance != null;
+        return instance != null && instance.worker != null;
     }
 }

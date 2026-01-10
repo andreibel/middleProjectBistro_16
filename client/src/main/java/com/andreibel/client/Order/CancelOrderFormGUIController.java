@@ -126,6 +126,7 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
      */
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        txtFieldConfirmationCode.clear();
         BistroUtilities.switchScreen(
                 (Node)event.getSource(),
                 "/Main/MainForm.fxml",

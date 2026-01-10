@@ -22,8 +22,8 @@ public class WorkerFormGUIController {
 
     @FXML
     private void initialize() {
-        String workerName = WorkerStateManager.getInstance().getWorkerName();
-        lblTitle.setText("Hello " + (workerName != null ? workerName : "") + ", select an option below to proceed.");
+        String workerName = WorkerStateManager.getInstance().getWorker().getWorkerName();
+        lblTitle.setText("Hello " + (workerName != null ? workerName : "") + ", select an option below to proceed");
         adjustFormWhenSceneIsShown();
         adjustFormBasedOnWorkerType();
     }
@@ -117,7 +117,7 @@ public class WorkerFormGUIController {
      * Show or hide manager-specific options based on current worker type.
      */
     private void adjustFormBasedOnWorkerType() {
-        boolean isManager = WorkerStateManager.getInstance().isManager();
+        boolean isManager = WorkerStateManager.getInstance().getWorker().isManager();
         vBoxManager.setVisible(isManager);
         vBoxManager.setManaged(isManager);
     }

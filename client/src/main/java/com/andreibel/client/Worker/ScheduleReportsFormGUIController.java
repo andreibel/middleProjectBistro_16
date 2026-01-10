@@ -3,7 +3,9 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.SchedulesReportResponse;
+import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
@@ -65,7 +67,6 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         controller.addListener(this);
         lblTitle.setText("Schedules Report for Month: " + getCurrentMonth());
         requestScheduleReportWhenSceneIsShown();
-        controller.requestSchedulesReport();
     }
 
     @Override
@@ -73,18 +74,19 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
         switch (message.getType()){
             case SCHEDULES_REPORT_RESPONSE -> {
                 SchedulesReportResponse data = (SchedulesReportResponse) message.getData();
-                if (data == null) return;
+                try{
+                    customerArriveDeparture = data.getCustomerArriveDeparture();
+                    customerLate = data.getCustomerLate();
+                    customerDelay = data.getCustomerDelay();
+                    openingTime = data.getOpeningTime();
+                    closingTime = data.getClosingTime();
+                    interval = data.getInterval();
 
-                customerArriveDeparture = data.getCustomerArriveDeparture();
-                customerLate = data.getCustomerLate();
-                customerDelay = data.getCustomerDelay();
-                openingTime = data.getOpeningTime();
-                closingTime = data.getClosingTime();
-                interval = data.getInterval();
-
-                clearCharts();
-                setupLineChart();
-                setupBarChart();
+                    clearCharts();
+                    setupLineChart();
+                    setupBarChart();
+                }
+                catch (Exception e){ BistroUtilities.showMessage("Bistro Restaurant", "No data to show.");}
             }
             case SCHEDULES_REPORT_ERROR -> {
                 BistroUtilities.showMessage("Bistro Restaurant", "Due to server error, it was unable to get the report.");
@@ -199,11 +201,11 @@ public class ScheduleReportsFormGUIController implements IServerResponseListener
     }
 
     private void requestScheduleReportWhenSceneIsShown() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> controller.requestSchedulesReport());
+                        controller.requestSchedulesReport();
                     }
                 });
             }
