@@ -72,15 +72,15 @@
                   <VBox alignment="TOP_CENTER">
                   <HBox alignment="CENTER" prefWidth="200.0" spacing="50.0">
                      <children>
-            
-                  
+
+
                                   <!-- Order Number Label -->
                             <Label fx:id="lblConfrimationCode" text="Confirmation Code:">
                                 <font>
                                     <Font size="16.0" />
                                 </font>
                             </Label>
-            
+
                                   <!-- Order Number TextField -->
                             <TextField fx:id="txtFieldConfirmationCode" prefHeight="28.0" prefWidth="180.0" promptText="Enter your confrimation code ..." />
                      </children>
@@ -88,7 +88,7 @@
                         <Insets bottom="30.0" left="30.0" right="30.0" />
                      </VBox.margin>
                   </HBox>
-      
+
                             <!-- Cancel Order Button -->
                       <!-- Cancel -->
                       <Button fx:id="btnCancelOrder" minHeight="60.0" mnemonicParsing="false" onAction="#onCancelOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Cancel my order">
@@ -110,7 +110,7 @@
                       <!--                        style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px;"-->
                       <!--                        text="Go Back">-->
                       <!--                </Button>-->
-      
+
                         </VBox>
             </children>
          </VBox>

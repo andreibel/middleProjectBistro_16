@@ -72,7 +72,6 @@ public class TableRepository {
                 SELECT *
                 FROM bistro.`Table`
                 """;
-        //"SELECT * FROM bistro.`Table`";
         List<Table> tables = new ArrayList<>();
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
