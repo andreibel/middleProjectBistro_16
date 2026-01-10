@@ -3,7 +3,9 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.OrderResponse;
+import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -38,6 +41,8 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
     private TableColumn<OrderResponse, String> colPhoneNumber;
     @FXML
     private TableColumn<OrderResponse, String> colOrderDateTime;
+    @FXML
+    private AnchorPane rootPane;
 
     private ObservableList<OrderResponse> activeList;
     private BistroClientController controller;
@@ -54,7 +59,8 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
         tblActiveOrders.setEditable(false);
 
         initializeTableColumns();
-        controller.requestActiveOrders();
+        requestActiveOrdersWhenSceneIsShown();
+
     }
 
     @SuppressWarnings("unchecked")
@@ -91,6 +97,18 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
         colOrderDateTime.setCellValueFactory(new PropertyValueFactory<>("orderDateTime"));
+    }
+
+    private void requestActiveOrdersWhenSceneIsShown() {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        controller.requestActiveOrders();
+                    }
+                });
+            }
+        });
     }
 
     private String getCurrentDate() {

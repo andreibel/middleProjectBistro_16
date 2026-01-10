@@ -80,7 +80,7 @@ public class WorkerFormGUIController {
     @FXML
     private void onViewCurrentWaitingButtonClicked(ActionEvent event) throws IOException {
         BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/CurrentWaitingForm.fxml",
+                "/Worker/CurrentWaitingListForm.fxml",
                 "Bistro Restaurant - Current on Waiting List");
     }
 
@@ -96,6 +96,11 @@ public class WorkerFormGUIController {
         BistroUtilities.switchScreen((Node) event.getSource(),
                 "/Worker/ChangeBistroTimeForm.fxml",
                 "Bistro Restaurant - Change Bistro Time / Add Special Event");
+    }
+
+    @FXML
+    private void onSubListButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/RegisteredSubscribersForm.fxml", "Bistro Restaurant - Subscriber List");
     }
 
     /**

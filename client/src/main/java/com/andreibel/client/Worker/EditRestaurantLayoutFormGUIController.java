@@ -14,7 +14,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.layout.AnchorPane;
+import javafx.util.converter.IntegerStringConverter;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,11 +28,11 @@ import java.util.List;
 public class EditRestaurantLayoutFormGUIController implements IServerResponseListener {
 
     @FXML
-    private TableView<TableResponse> tblViewRestaurantLayout;
+    private TableView<Table> tblViewRestaurantLayout;
     @FXML
-    private TableColumn<TableResponse, Integer> colCapacity;
+    private TableColumn<Table, Integer> colCapacity;
     @FXML
-    private TableColumn<TableResponse, Integer> colQuantity;
+    private TableColumn<Table, Integer> colQuantity;
     @FXML
     private Button btnAddTable;
     @FXML
@@ -35,9 +40,11 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
     @FXML
     private Button btnConfirmChanges;
     @FXML
+    private AnchorPane rootPane;
+    @FXML
     private Button btnGoBack;
 
-    private ObservableList<TableResponse> tableList = FXCollections.observableArrayList();
+    private ObservableList<Table> tableList = FXCollections.observableArrayList();
     private BistroClientController controller;
 
     @FXML
@@ -52,8 +59,8 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         setTableView();
         setupRowSelection();
         tblViewRestaurantLayout.setItems(tableList);
+        enableEditing();
         requestTablesWhenSceneIsShown();
-        controller.requestTables();
     }
 
     @Override
@@ -62,7 +69,11 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         switch (message.getType()) {
             case GET_ALL_TABLES_RESPONSE -> {
                 List<TableResponse> tables = (List<TableResponse>) message.getData();
-                tableList.setAll(tables);
+                tableList.clear();
+                // Convert TableResponse -> Table for editable TableView
+                for (TableResponse t : tables) {
+                    tableList.add(new Table(t.getCapacity(), t.getQuantity()));
+                }
                 btnAddTable.setDisable(false);
                 btnRemoveTable.setDisable(tableList.isEmpty());
                 btnConfirmChanges.setDisable(tableList.isEmpty());
@@ -78,7 +89,7 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
 
     @FXML
     private void onAddTableButtonClicked(ActionEvent event) {
-        TableResponse newTable = new TableResponse(0, 0);
+        Table newTable = new Table(0, 0);
         tableList.add(newTable);
         tblViewRestaurantLayout.getSelectionModel().select(newTable);
         tblViewRestaurantLayout.scrollTo(newTable);
@@ -87,7 +98,7 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
 
     @FXML
     private void onRemoveTableButtonClicked(ActionEvent event) {
-        TableResponse selectedTable = tblViewRestaurantLayout.getSelectionModel().getSelectedItem();
+        Table selectedTable = tblViewRestaurantLayout.getSelectionModel().getSelectedItem();
         if (selectedTable != null) {
             tableList.remove(selectedTable);
             tblViewRestaurantLayout.getSelectionModel().clearSelection();
@@ -104,8 +115,8 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         }
 
         List<TableRequest> reqs = new ArrayList<>();
-        for (TableResponse table : tableList) {
-            //reqs.add(new TableRequest(table.getCapacity(), table.getQuantity()));
+        for (Table table : tableList) {
+            reqs.add(new TableRequest(table.getCapacity(), table.getQuantity()));
         }
         controller.requestApplyLayoutChanges(reqs);
     }
@@ -116,14 +127,27 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }
 
-    private void onSelectedTableFromTableView(TableResponse t) {
+    private void onSelectedTableFromTableView(Table t) {
         btnRemoveTable.setDisable(t == null);
         btnConfirmChanges.setDisable(tableList.isEmpty());
     }
 
     private void setTableView() {
-        colCapacity.setCellValueFactory(new PropertyValueFactory<>("capacity"));
-        colQuantity.setCellValueFactory(new PropertyValueFactory<>("quantity"));
+        colCapacity.setCellValueFactory(cell -> cell.getValue().capacityProperty().asObject());
+        colQuantity.setCellValueFactory(cell -> cell.getValue().quantityProperty().asObject());
+    }
+
+    private void enableEditing() {
+        tblViewRestaurantLayout.setEditable(true);
+
+        colCapacity.setEditable(true);
+        colQuantity.setEditable(true);
+
+        colCapacity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        colQuantity.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+
+        colCapacity.setOnEditCommit(event -> event.getRowValue().setCapacity(event.getNewValue()));
+        colQuantity.setOnEditCommit(event -> event.getRowValue().setQuantity(event.getNewValue()));
     }
 
     private void clearForm() {
@@ -133,7 +157,9 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
     }
 
     private void setupRowSelection() {
-        tblViewRestaurantLayout.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> onSelectedTableFromTableView(newVal));
+        tblViewRestaurantLayout.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldVal, newVal) -> onSelectedTableFromTableView(newVal)
+        );
     }
 
     private boolean isAllTablesValid() {
@@ -141,14 +167,38 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
     }
 
     private void requestTablesWhenSceneIsShown() {
-        tblViewRestaurantLayout.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> controller.requestTables());
+                        controller.requestTables();
                     }
                 });
             }
         });
+    }
+
+    public static class Table {
+        private final javafx.beans.property.IntegerProperty capacity =
+                new javafx.beans.property.SimpleIntegerProperty();
+        private final javafx.beans.property.IntegerProperty quantity =
+                new javafx.beans.property.SimpleIntegerProperty();
+
+        public Table(int capacity, int quantity) {
+            this.capacity.set(capacity);
+            this.quantity.set(quantity);
+        }
+
+        public javafx.beans.property.IntegerProperty capacityProperty() {return capacity;}
+
+        public javafx.beans.property.IntegerProperty quantityProperty() {return quantity;}
+
+        public int getCapacity() {return capacity.get();}
+
+        public void setCapacity(int capacity) {this.capacity.set(capacity);}
+
+        public int getQuantity() {return quantity.get();}
+
+        public void setQuantity(int quantity) {this.quantity.set(quantity);}
     }
 }

@@ -3,6 +3,7 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
@@ -76,11 +77,11 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
     }
 
     private void requestSubscribersWhenSceneIsShown() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> controller.requestAllSubscribersInfo());
+                        controller.requestAllSubscribersInfo();
                     }
                 });
             }

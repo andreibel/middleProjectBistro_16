@@ -152,7 +152,7 @@ public class OrderFormGUIController implements IServerResponseListener {
 
 
     private boolean validatePart1() {
-        if (txtFieldNumberOfPeople.getText().isEmpty() || !BistroUtilities.isNumeric(txtFieldNumberOfPeople.getText())) {
+        if (txtFieldNumberOfPeople.getText().isEmpty() || !BistroUtilities.isNumeric(txtFieldNumberOfPeople.getText()) || Integer.parseInt(txtFieldNumberOfPeople.getText()) <= 0) {
             BistroUtilities.showMessage("Bistro Restaurant", "Enter valid number of people.");
             return false;
         }

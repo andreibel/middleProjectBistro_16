@@ -54,8 +54,6 @@ public class BistroClientController {
         });
     }
 
-
-
     //=======================Order Request==========================
     public void requestCompleteOrder(UUID confirmationCode) {
         if (!isClientAvailable()) return;

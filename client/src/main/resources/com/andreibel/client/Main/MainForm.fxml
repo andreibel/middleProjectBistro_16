@@ -174,7 +174,7 @@
                      <String fx:value="outline" />
                   </styleClass>
                   <tooltip>
-                     <Tooltip text="Enter the restaurant without a prior order and get seated." wrapText="true" />
+                     <Tooltip text="Pay for your current order." wrapText="true" />
                   </tooltip>
                   <graphic>
                      <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">

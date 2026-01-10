@@ -3,8 +3,10 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.BistroTimeDTO;
 import com.andreibel.message.DTO.SpecialDayRequest;
+import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -61,7 +63,6 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
 
         setDatePicker();
         requestBistroTimesWhenSceneIsShown();
-        controller.requestBistroTimes();
     }
 
     @Override
@@ -121,14 +122,14 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
     }
 
     private void requestBistroTimesWhenSceneIsShown() {
-        rootPane.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
-            if (newScene == null) return;
-
-            newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
-                if (newWindow != null) {
-                    newWindow.setOnShown(e -> controller.requestBistroTimes());
-                }
-            });
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        controller.requestBistroTimes();
+                    }
+                });
+            }
         });
     }
 
