@@ -96,4 +96,5 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
     private String getCurrentDate() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
+
 }
