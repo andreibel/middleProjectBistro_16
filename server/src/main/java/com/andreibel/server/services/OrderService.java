@@ -219,10 +219,11 @@ public class OrderService {
      * @param conformationCode confirmation code identifying the order
      * @return updated order as DTO (completed state)
      */
-    public void completeOrder(UUID conformationCode) {
-        tx.inTransaction(() -> {
+    public OrderResponse completeOrder(UUID conformationCode) {
+        return tx.inTransaction(() -> {
             orderRepository.completeOrder(conformationCode);
-            return null;
+
+            return OrderMapper.mapOrderToOrderResponse(orderRepository.findByConformationCode(conformationCode));
         });
     }
 

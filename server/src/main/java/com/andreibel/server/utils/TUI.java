@@ -1,5 +1,6 @@
 package com.andreibel.server.utils;
 
+import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
 
 public class TUI {
@@ -61,6 +62,35 @@ public class TUI {
        │ │ %-145s │ │
        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
         """, shorten(message, 145)
+        );
+    }
+    public static void printPrice(OrderResponse printOrder) {
+        double totalPrice = printOrder.getNumberOfGuests() * 100;
+        if (printOrder.getSubscriberId() != null) totalPrice =  totalPrice * 0.9;
+
+        System.out.printf(
+                """
+       │                                                         ┌─────── Bistro--invoice ───────┐                                                         │
+       │ ┌───────────────────────────────────────────────────────┴───────────────────────────────────┴───────────────────────────────────────────────────────┐ │
+       │ │                                        ┌────────────────────────────────────────────────────────────────┐                                         │ │
+       │ │                                        │          thank you for choosing our bistro restaurant          │                                         │ │
+       │ │                                        │             this is invoice for conformation code:             │                                         │ │
+       │ │                                        │             ───────────────────────────────────────            │                                         │ │
+       │ │                                        │              %-36s              │                                         │ │
+       │ │                                        ├────────────────────────────────────────────────────────────────┤                                         │ │
+       │ │                                        │             order date: %-39s│                                         │ │
+       │ │                                        ├────────────────────────────────────────────────────────────────┤                                         │ │
+       │ │                                        │             every meal is 100$  X  %3d guests                  │                                         │ │
+       │ │                                        │             subtotal price: $%4d                              │                                         │ │
+       │ │                                        │             ───────────────────────────────────────            │                                         │ │
+       │ │                                        │             total price: $%4.0f                                 │                                         │ │
+       │ │                                        └────────────────────────────────────────────────────────────────┘                                         │ │
+       │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+       """, printOrder.getConformationCode().toString(),
+                printOrder.getOrderDateTime().toString(),
+                printOrder.getNumberOfGuests(),
+                printOrder.getNumberOfGuests() * 100,
+                totalPrice
         );
     }
 
@@ -129,4 +159,6 @@ public class TUI {
         // (optional) System.out.println("visible=" + visibleLen(result));
         return result;
     }
+
 }
+

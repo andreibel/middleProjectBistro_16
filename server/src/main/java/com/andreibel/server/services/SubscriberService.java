@@ -45,7 +45,7 @@ public class SubscriberService {
     public SubscriberResponse getSubscriber(Integer data) {
         return tx.inTransaction(
                 () -> {
-                    Subscriber subscriber = subscriberRepository.getSubscriberById(data);
+                    Subscriber subscriber = subscriberRepository.findById(data);
                     return SubscriberMapper.mapSubscriberToSubscriberResponse(subscriber);
                 }
         );

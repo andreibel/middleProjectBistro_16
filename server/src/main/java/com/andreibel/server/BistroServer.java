@@ -1,9 +1,7 @@
 package com.andreibel.server;
 
-import com.andreibel.message.DTO.WorkerAuth;
-import com.andreibel.message.Message;
+import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.server.controller.Serve;
-import com.andreibel.server.controller.WorkerController;
 import com.andreibel.server.services.OrderClosingScheduler;
 import com.andreibel.server.services.OrderTimeoutScheduler;
 import javafx.application.Application;
@@ -14,16 +12,16 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
-import static com.andreibel.message.APICallType.WORKER_LOGIN;
 import static com.andreibel.server.utils.TUI.*;
 
 public class BistroServer extends Application {
 
     public static String PORT = "8080";
     public static String DB_URL = "jdbc:mysql://localhost:3306/bistro";
-    public static String DB_USER = "";
-    public static String DB_PASSWORD = "";
+    public static String DB_USER = "root";
+    public static String DB_PASSWORD = "tikraetzeM4!";
 
 
     public void startScheduler() {
@@ -37,11 +35,12 @@ public class BistroServer extends Application {
     public void start(Stage stage) throws IOException {
 
 
+
         var params = getParameters().getNamed();
-        PORT = params.getOrDefault("port", PORT);
-        DB_URL = params.getOrDefault("db_url", DB_URL);
-        DB_USER = params.getOrDefault("db_user", "root");
-        DB_PASSWORD = params.getOrDefault("db_password", "tikraetzeM4!");
+        PORT = System.getenv().getOrDefault("PORT",PORT);
+        DB_URL = System.getenv().getOrDefault("DB_URL",DB_URL);
+        DB_USER = System.getenv().getOrDefault("DB_USER",DB_USER);
+        DB_PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", DB_PASSWORD);
         conf(PORT, DB_URL, DB_USER, DB_PASSWORD);
         startLog();
         FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));

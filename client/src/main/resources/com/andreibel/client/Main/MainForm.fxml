@@ -142,14 +142,14 @@
                               </image></ImageView>
                         </graphic>
                           </Button>
-      
+
                           <!-- Cancel -->
                           <Button fx:id="btnCancel" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onCancelButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Cancel order">
                               <styleClass>
                                   <String fx:value="action-btn" />
                                   <String fx:value="danger" />
                               </styleClass>
-      
+
                               <tooltip>
                                   <Tooltip text="Changed your mind? Cancel your order here." wrapText="true" />
                               </tooltip>
