@@ -1,6 +1,6 @@
 package com.andreibel.server.dbController;
 
-import com.andreibel.server.BistroServer;
+import com.andreibel.server.main.BistroServer;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
