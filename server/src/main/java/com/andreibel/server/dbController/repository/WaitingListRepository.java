@@ -412,7 +412,7 @@ public class WaitingListRepository {
         String sql = """
                 SELECT *
                 FROM bistro.`Waiting`
-                ORDER BY waitingDateTime DESC
+                ORDER BY waitingDateTime ASC
                 """;
 
         List<Waiting> waitingList = new ArrayList<>();

@@ -287,7 +287,6 @@ public class WaitingListService {
             // Set default opening/closing times (can be made configurable from bistro settings)
             LocalTime openingTime = LocalTime.of(11, 0);
             LocalTime closingTime = LocalTime.of(23, 0);
-
             return SchedulesReportResponse.builder()
                     .customerArriveDeparture(customerArriveDeparture)
                     .customerLate(customerLate)
