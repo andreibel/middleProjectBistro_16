@@ -127,7 +127,7 @@ public class WorkerController {
      */
     public Message addSpecialDay(Message message) {
         openTimeService.addSpecialDay((SpecialDayRequest) message.getData());
-        return new Message(ADD_SPECIAL_DAY_RESPONSE, null);
+        return new Message(ADD_SPECIAL_DAY_RESPONSE, "Added");
     }
 
     /**
