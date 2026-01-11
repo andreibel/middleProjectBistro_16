@@ -93,29 +93,29 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
      * @param message the message received from the server
      */
     @Override
-    public void onServerResponse(Message message) {
+    public void onServerResponse(Message message) throws IOException {
         switch (message.getType()) {
             case WORKER_LOGIN_RESPONSE -> {
-                WorkerStateManager.getInstance().setWorker((WorkerResponse) message.getData());
-                Platform.runLater(() -> {
-                    try {
-                        // Same as go-back, just without ActionEvent
-                        BistroUtilities.switchScreen(
-                                btnLogin, // or btnGoBack
-                                "/Worker/WorkerForm.fxml",
-                                "Bistro Restaurant"
-                        );
-                    } catch (IOException e) {
-                        BistroUtilities.showMessage("Bistro Restaurant", "Failed to open main screen.");
-                        e.printStackTrace();
-                    }
-                });
-            }
-            case WORKER_LOGIN_ERROR ->
+                WorkerResponse worker = (WorkerResponse) message.getData();
+                if (worker == null) {
                     BistroUtilities.showMessage(
-                            "Bistro Restaurant",
-                            "Worker name or password not current please try again"
+                            "Bistro Restaurant", "Invalid worker credentials."
                     );
+                    return;
+                }
+
+                WorkerStateManager.getInstance().setWorker(worker);
+
+                BistroUtilities.switchScreen(
+                        btnLogin,
+                        "/Worker/WorkerForm.fxml",
+                        "Bistro Restaurant"
+                );
+            }
+            case WORKER_LOGIN_ERROR -> BistroUtilities.showMessage(
+                    "Bistro Restaurant",
+                    "Due to server error, we were unable to log you in. Please try again later."
+            );
         }
     }
 

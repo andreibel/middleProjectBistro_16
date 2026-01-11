@@ -81,7 +81,7 @@ public class CustomerStateManager {
      * @return {@code true} if a subscriber has logged in, {@code false} otherwise
      */
     public static boolean hasSubscriberLoggedIn() {
-        return instance.getSubscriber() != null;
+        return instance != null && instance.getSubscriber() != null;
     }
     /**
      * Retrieves the subscriber ID of the currently logged-in subscriber.

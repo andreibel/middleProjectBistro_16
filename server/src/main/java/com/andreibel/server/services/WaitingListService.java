@@ -329,7 +329,7 @@ public class WaitingListService {
 
             // Get all orders and count subscriber orders by date
             try {
-                List<Order> allOrders = orderRepository.findAll();
+                List<Order> allOrders = orderRepository.findAllSubscribersOrders();
                 if (allOrders != null) {
                     for (Order order : allOrders) {
                         // Count only if this is a subscriber order (subscriberId not null)

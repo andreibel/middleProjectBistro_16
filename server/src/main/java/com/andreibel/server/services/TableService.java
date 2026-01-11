@@ -26,12 +26,12 @@ public class TableService {
     }
 
     public void editTables(List<TableRequest> tableRequest) {
-        for (TableRequest table : tableRequest) {
-            tx.inTransaction(() -> {
-                tableRepository.editTable(table.getCapacity(), table.getQuantity());
-                return null;
-            });
-        }
+
+        tx.inTransaction(() -> {
+            tableRepository.syncTables(tableRequest);
+            return null;
+        });
+
     }
     public List<TableResponse> getAllTables() {
         return tx.inTransaction(tableRepository::findAll)

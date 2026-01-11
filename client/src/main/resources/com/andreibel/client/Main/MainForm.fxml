@@ -1,19 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
-<?import javafx.geometry.Insets?>
-<?import javafx.geometry.Rectangle2D?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Main.MainFormGUIController">
+<AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Main.MainFormGUIController">
 
     <styleClass>
         <String fx:value="root" />
@@ -42,7 +36,7 @@
             </HBox>
 
             <!-- MAIN CARD -->
-            <VBox alignment="TOP_CENTER" fillWidth="false" spacing="18" style="-fx-min-width: 800; -fx-pref-width: 800; -fx-max-width: 800;" styleClass="card">
+            <VBox alignment="TOP_CENTER" fillWidth="false" prefHeight="422.0" spacing="18" style="-fx-min-width: 800; -fx-pref-width: 800; -fx-max-width: 800;" styleClass="card">
 
                 <!-- Header -->
                 <VBox alignment="CENTER" spacing="8">
@@ -62,12 +56,12 @@
                     <styleClass>
                         <String fx:value="actions" />
                     </styleClass>
-
+                    <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0">
                     <!-- Order Now -->
-                    <Button fx:id="btnOrder" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false" onAction="#onOrderButtonClicked" prefHeight="60.0" prefWidth="620.0" text="Order Now">
+                    <Button fx:id="btnOrder" minHeight="60.0" mnemonicParsing="false" onAction="#onOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Order Now">
                         <styleClass>
                             <String fx:value="action-btn" />
-                            <String fx:value="primary" />
+                            <String fx:value="danger" />
                         </styleClass>
 
                         <tooltip>
@@ -79,12 +73,30 @@
                   <graphic>
                      <ImageView fitHeight="75.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                         <image>
-                           <Image url="@../../../../img/table.png" />
+                           <Image url="@../../../../img/tableLayout.png" />
                         </image>
                      </ImageView>
                   </graphic>
                         
                     </Button>
+
+                    <Button fx:id="btnPayOrder" minHeight="60.0" mnemonicParsing="false" onAction="#onPayOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Pay your order" wrapText="true">
+                        <styleClass>
+                            <String fx:value="action-btn" />
+                            <String fx:value="outline" />
+                        </styleClass>
+                        <tooltip>
+                            <Tooltip text="Pay for your current order." wrapText="true" />
+                        </tooltip>
+                        <graphic>
+                            <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../img/pay.png" />
+                                </image>
+                            </ImageView>
+                        </graphic>
+                    </Button>
+                    </HBox>
                <HBox alignment="TOP_CENTER" prefHeight="60.0" prefWidth="200.0" spacing="20.0">
                   <children>
       
@@ -168,22 +180,7 @@
                           </Button>
                   </children>
                </HBox>
-               <Button fx:id="btnPayOrder" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onPayOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Pay your order" wrapText="true">
-                  <styleClass>
-                     <String fx:value="action-btn" />
-                     <String fx:value="outline" />
-                  </styleClass>
-                  <tooltip>
-                     <Tooltip text="Enter the restaurant without a prior order and get seated." wrapText="true" />
-                  </tooltip>
-                  <graphic>
-                     <ImageView fitHeight="150.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-                        <image>
-                           <Image url="@../../../../img/pay.png" />
-                        </image>
-                     </ImageView>
-                  </graphic>
-               </Button>
+
                 </VBox>
 
                 <!-- Footer row -->

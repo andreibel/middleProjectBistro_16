@@ -8,35 +8,39 @@ import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 
+/**
+ * GUI controller for registering new subscribers in the Bistro system.
+ *
+ * <p>This form allows staff to input subscriber details (name, email, phone number),
+ * validate them, and submit a request to the server. Feedback messages are displayed
+ * upon success or failure.</p>
+ */
 public class SubscriberRegisterFormGUIController implements IServerResponseListener {
 
-    @FXML
-    private Label lblName;
-    @FXML
-    private Label lblEmail;
-    @FXML
-    private Label lblPhoneNumber;
+    /** TextField for entering subscriber name. */
     @FXML
     private TextField txtFieldName;
+
+    /** TextField for entering subscriber email. */
     @FXML
     private TextField txtFieldEmail;
+
+    /** TextField for entering subscriber phone number. */
     @FXML
     private TextField txtFieldPhoneNumber;
-    @FXML
-    private Button btnRegister;
-    @FXML
-    private Button btnGoBack;
-    @FXML private AnchorPane rootPane;
 
+    /** Singleton instance of the Bistro client controller for server communication. */
     private BistroClientController controller;
 
+    /**
+     * Initializes the controller after FXML is loaded.
+     *
+     * <p>Registers this controller as a server listener and clears the input form.</p>
+     */
     @FXML
     private void initialize() {
         controller = BistroClientController.getInstance();
@@ -44,6 +48,11 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
         clearForm();
     }
 
+    /**
+     * Handles responses from the server related to subscriber creation.
+     *
+     * @param message the server message
+     */
     @Override
     public void onServerResponse(Message message) {
         switch (message.getType()) {
@@ -56,6 +65,14 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
         }
     }
 
+    /**
+     * Handles the Register button click.
+     *
+     * <p>Validates the input fields and sends a registration request to the server
+     * if all inputs are valid.</p>
+     *
+     * @param event the action event
+     */
     @FXML
     private void onRegisterButtonClicked(ActionEvent event) {
         String name = txtFieldName.getText();
@@ -91,12 +108,23 @@ public class SubscriberRegisterFormGUIController implements IServerResponseListe
         controller.requestRegisterNewSubscriber(new SubscriberRequest(null, email, name, phone));
     }
 
+    /**
+     * Handles the Go Back button click.
+     *
+     * <p>Clears the form and navigates back to the staff main screen.</p>
+     *
+     * @param event the action event
+     * @throws IOException if FXML cannot be loaded
+     */
     @FXML
     private void onButtonGoBackClicked(ActionEvent event) throws IOException {
         clearForm();
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }
 
+    /**
+     * Clears all input fields in the form.
+     */
     private void clearForm() {
         txtFieldName.clear();
         txtFieldEmail.clear();

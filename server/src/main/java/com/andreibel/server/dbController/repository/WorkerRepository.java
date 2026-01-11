@@ -74,7 +74,7 @@ public class WorkerRepository {
         String sql = """
                 INSERT INTO bistro.`worker`
                 (`workerName`, `workerPassword`, `isManager`)
-                VALUES (?,?,?)
+                VALUES (?,?,?);
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerRequest.getWorkerName());
@@ -97,8 +97,8 @@ public class WorkerRepository {
         String sql = """
                 SELECT *
                 FROM bistro.`worker`
-                WHERE `workerName` = ?
-            """;
+                WHERE `workerName` = ?;
+                """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerName);

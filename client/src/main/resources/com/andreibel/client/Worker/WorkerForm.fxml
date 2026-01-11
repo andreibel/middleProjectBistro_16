@@ -88,10 +88,31 @@
                             <tooltip>
                                 <Tooltip text="View detailed information and statistics about subscribers." wrapText="true" />
                             </tooltip>
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
                             <graphic>
                                 <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
                                         <Image url="@../../../../img/report.png" />
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                        </Button>
+                        <Button fx:id="btnSubList" minHeight="60.0" onAction="#onSubListButtonClicked"
+                                prefHeight="60.0" prefWidth="270.0" styleClass="action-btn" text="Subscribers List">
+                            <tooltip>
+                                <Tooltip text="View subscribers list" wrapText="true" />
+                            </tooltip>
+                            <styleClass>
+                                <String fx:value="action-btn" />
+                                <String fx:value="outline" />
+                            </styleClass>
+                            <graphic>
+                                <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image url="@../../../../img/watingList.png" />
                                     </image>
                                 </ImageView>
                             </graphic>
