@@ -26,16 +26,19 @@ import java.util.UUID;
  * <h3>DDL</h3>
  * <blockquote>
  *     <pre>
- * create table Waiting(
- *     waitingNumber      int auto_increment
+ * create table Waiting
+ * (
+ *     waitingNumber         int auto_increment
  *         primary key,
- *     waitingDateTime    datetime   default CURRENT_TIMESTAMP null,
- *     isCurrentlyWaiting tinyint(1) default 1                 null,
- *     conformationCode   varchar(36)                          not null,
- *     orderNumber        int                                  null,
- *     subscriberId       int                                  null,
- *     email              varchar(30)                          null,
- *     phoneNumber        varchar(10)                          null,
+ *     numberOfGuests        int                                  not null,
+ *     waitingDateTime       datetime   default CURRENT_TIMESTAMP null,
+ *     isCurrentlyWaiting    tinyint(1) default 1                 null,
+ *     conformationCode      varchar(36)                          not null,
+ *     waitingArriveDateTime datetime                             null,
+ *     orderNumber           int                                  null,
+ *     subscriberId          int                                  null,
+ *     email                 varchar(30)                          null,
+ *     phoneNumber           varchar(10)                          null,
  *     constraint Waiting_Order_orderNumber_fk
  *         foreign key (orderNumber) references `Order` (orderNumber),
  *     constraint Waiting_Subscriber_subscriberId_fk
@@ -60,14 +63,28 @@ import java.util.UUID;
 public class Waiting {
     // PK
     private int waitingNumber;
+    private int numberOfGuests;
     private LocalDateTime waitingDateTime;
     private boolean isCurrentlyWaiting;
     private UUID conformationCode;
+    private LocalDateTime waitingArriveDateTime;
     // FK
     private Integer orderNumber; // Optional
     // FK
     private Integer subscriberId; // Optional
     private String email; // Optional
     private String phoneNumber; // Optional
+
+
+    public static final String WAITING_NUMBER = "waitingNumber";
+    public static final String NUMBER_OF_GUESTS = "numberOfGuests";
+    public static final String WAITING_DATE_TIME = "waitingDateTime";
+    public static final String IS_CURRENTLY_WAITING = "isCurrentlyWaiting";
+    public static final String CONFIRMATION_CODE = "conformationCode";
+    public static final String WAITING_ARRIVE_DATE_TIME = "waitingArriveDateTime";
+    public static final String ORDER_NUMBER = "orderNumber";
+    public static final String SUBSCRIBER_ID = "subscriberId";
+    public static final String EMAIL = "email";
+    public static final String PHONE_NUMBER = "phoneNumber";
 
 }

@@ -1,142 +1,287 @@
 package com.andreibel.client.Main;
 
-import com.andreibel.client.Client.BistroClientController;
+import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.client.util.WorkerStateManager;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tooltip;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.Parent;
-import javafx.stage.Stage;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 
+/**
+ * GUI controller for the main application screen.
+ *
+ * <p>This controller acts as the central navigation hub of the Bistro client
+ * application. It allows customers, subscribers, and workers to navigate
+ * to the appropriate areas of the system.</p>
+ *
+ * <p>The controller dynamically updates the UI based on the current
+ * authentication state of subscribers and workers.</p>
+ *
+ * <p>All navigation between screens is performed via
+ * {@link BistroUtilities#switchScreen(Node, String, String)},
+ * which handles scene switching and caching.</p>
+ */
 public class MainFormGUIController {
 
+    /**
+     * Root pane of the main form.
+     */
     @FXML
-    private Label lblMainTitle;
-    @FXML
-    private Label lblHoverDetails;
-    @FXML
-    private Button btnOrder;
-    @FXML
-    private Button btnArrived;
-    @FXML
-    private Button btnCancel;
+    private AnchorPane rootPane;
+
+    /**
+     * Button for subscriber access (login or subscriber area).
+     */
     @FXML
     private Button btnSubscriber;
+
+    /**
+     * Button for worker access (login or staff area).
+     */
     @FXML
     private Button btnWorker;
-    private BistroClientController controller;
+    @FXML
+    private Button btnWorkerLogout;
 
     @FXML
-    public void initialize() {
-    }
+    private HBox hBoxWorker;
 
-    public void setController(BistroClientController controller) {
-        this.controller = controller;
-    }
+    /**
+     * Initializes the controller after the FXML has been loaded.
+     *
+     * <p>This method registers listeners to update the UI when the scene
+     * is shown, ensuring that button labels reflect the current login
+     * state of subscribers and workers.</p>
+     */
     @FXML
-    public void onOrderButtonClicked(ActionEvent event) throws IOException {
-        // Load the new FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Order/OrderForm.fxml"));
-        Parent root = (Parent) loader.load();
-
-        // Get current stage (window) from the event source
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        // Set new scene
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("OrderFromGUIController");
-        stage.show();
-
+    private void initialize() {
+        updateMainFormWhenSceneIsShown();
     }
 
-    public void onArrivedButtonClicked(ActionEvent event) throws IOException{
-        // Load the new FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Table/GetTableForm.fxml"));
-        Parent root = (Parent) loader.load();
-        // Get current stage (window) from the event source
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        // Set new scene
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("GetTableForm");
-        stage.show();
-
-    }
+    /**
+     * Navigates to the order creation form.
+     *
+     * @param event the action event triggered by clicking the order button
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @FXML
-    public void onCancelButtonClicked(ActionEvent event) throws IOException{
-        // Load the new FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Order/CancelOrderForm.fxml"));
-        Parent root = (Parent) loader.load();
-
-        // Get current stage (window) from the event source
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        // Set new scene
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("CancelOrderForm");
-        stage.show();
-
-    }
-    public void onSubscriberButtonClicked(ActionEvent event) throws IOException{
-        // Load the new FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Subscriber/SubscriberLoginForm.fxml"));
-        Parent root = (Parent) loader.load();
-
-        // Get current stage (window) from the event source
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        // Set new scene
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("SubscriberLoginForm");
-        stage.show();
-
-    }
-    public void onWorkerButtonClicked(ActionEvent event) throws IOException{
-        // Load the new FXML
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/Worker/WorkerLoginForm.fxml"));
-        Parent root = (Parent) loader.load();
-
-        // Get current stage (window) from the event source
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-        // Set new scene
-        Scene scene = new Scene(root);
-        stage.setScene(scene);
-        stage.setTitle("WorkerLoginForm");
-        stage.show();
-
+    private void onOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Order/OrderForm.fxml",
+                "Bistro Restaurant - Create your Order"
+        );
     }
 
+    /**
+     * Navigates to the table arrival confirmation form.
+     *
+     * @param event the action event triggered by clicking the arrived button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onArrivedButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Table/GetTableForm.fxml",
+                "Bistro Restaurant - Confirm Arrival"
+        );
+    }
+
+    /**
+     * Navigates to the order cancellation form.
+     *
+     * @param event the action event triggered by clicking the cancel button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onCancelButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Order/CancelOrderForm.fxml",
+                "Bistro Restaurant - Cancel Order"
+        );
+    }
+
+    /**
+     * Navigates to the subscriber login form or subscriber area,
+     * depending on the current authentication state.
+     *
+     * @param event the action event triggered by clicking the subscriber button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onSubscriberButtonClicked(ActionEvent event) throws IOException {
+        if (CustomerStateManager.hasSubscriberLoggedIn()) {
+            BistroUtilities.switchScreen(
+                    (Node) event.getSource(),
+                    "/Subscriber/SubscriberZoneForm.fxml",
+                    "Bistro Restaurant - Subscriber Area"
+            );
+        } else {
+            BistroUtilities.switchScreen(
+                    (Node) event.getSource(),
+                    "/Subscriber/SubscriberLoginForm.fxml",
+                    "Bistro Restaurant - Subscriber Login"
+            );
+        }
+    }
+
+    /**
+     * Navigates to the worker login form or staff area,
+     * depending on the current authentication state.
+     *
+     * @param event the action event triggered by clicking the worker button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onWorkerButtonClicked(ActionEvent event) throws IOException {
+        if (WorkerStateManager.hasWorkerLoggedIn()) {
+            BistroUtilities.switchScreen(
+                    (Node) event.getSource(),
+                    "/Worker/WorkerForm.fxml",
+                    "Bistro Restaurant - Staff Area"
+            );
+        } else {
+            BistroUtilities.switchScreen(
+                    (Node) event.getSource(),
+                    "/Worker/WorkerLoginForm.fxml",
+                    "Bistro Restaurant - Worker Login"
+            );
+        }
+    }
+
+    /**
+     * Navigates to the "Dine-In without Order" form.
+     *
+     * <p>This option allows guests to be seated without placing
+     * an order in advance.</p>
+     *
+     * @param event the action event triggered by clicking the button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onNoOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Order/NoOrderForm.fxml",
+                "Bistro Restaurant - Dine-In without Order"
+        );
+    }
+
+    /**
+     * Navigates to the payment form for completing an order.
+     *
+     * @param event the action event triggered by clicking the payment button
+     * @throws IOException if the FXML file cannot be loaded
+     */
+    @FXML
+    private void onPayOrderButtonClicked(ActionEvent event) throws IOException {
+        BistroUtilities.switchScreen(
+                (Node) event.getSource(),
+                "/Table/LeaveTableForm.fxml",
+                "Bistro Restaurant - Pay for Order"
+        );
+    }
+
+    /**
+     * Handles the action of logging out the currently authenticated worker.
+     *
+     * <p>This method performs the following steps:</p>
+     * <ul>
+     *     <li>Clears the current worker session by setting the worker in
+     *         {@link WorkerStateManager} to {@code null}.</li>
+     *     <li>Updates the UI components to reflect the logged-out state by
+     *         calling {@link #updateFormBasedOnUserType()}.</li>
+     *     <li>Requests a layout pass on the root pane to ensure proper
+     *         visibility and layout of all elements.</li>
+     * </ul>
+     *
+     * @param event the action event triggered by clicking the worker logout button
+     * @throws IOException if switching UI components causes an input/output error
+     */
+    @FXML
+    private void onWorkerLogoutButtonClicked(ActionEvent event) throws IOException {
+        WorkerStateManager.getInstance().setWorker(null);
+        updateFormBasedOnUserType();
+        rootPane.layout();
+    }
+
+    /**
+     * Updates the visibility and labels of UI components based on the currently
+     * logged-in user type.
+     *
+     * <p>This method adjusts the main form elements to reflect the user's
+     * authentication state:</p>
+     * <ul>
+     *     <li>If no subscriber or worker is logged in, shows worker login options
+     *         and subscriber buttons appropriately.</li>
+     *     <li>If a subscriber is logged in, hides worker-related elements and
+     *         updates the subscriber button to indicate access to the subscriber area.</li>
+     *     <li>If a worker is logged in, shows worker-related buttons, hides
+     *         subscriber buttons, and enables the worker logout button.</li>
+     * </ul>
+     *
+     * <p>All visibility changes also update the managed property to ensure proper
+     * layout behavior in the UI.</p>
+     */
+    private void updateFormBasedOnUserType(){
+        if (!CustomerStateManager.hasSubscriberLoggedIn() && !WorkerStateManager.hasWorkerLoggedIn()) {
+            btnWorker.setText("I'm a Staff");
+            btnSubscriber.setText("Subscriber Login");
+            hBoxWorker.setVisible(true);
+            hBoxWorker.setManaged(true);
+            btnWorkerLogout.setVisible(false);
+            btnWorkerLogout.setManaged(false);
+            btnSubscriber.setVisible(true);
+            btnSubscriber.setManaged(true);
+        }
+        else{
+            if (CustomerStateManager.hasSubscriberLoggedIn()) {
+                btnSubscriber.setText("Subscriber Area");
+                hBoxWorker.setVisible(false);
+                hBoxWorker.setManaged(false);
+            }
+            else{
+                hBoxWorker.setVisible(true);
+                hBoxWorker.setManaged(true);
+                btnWorkerLogout.setVisible(false);
+                btnWorkerLogout.setManaged(false);
+            }
+            if (WorkerStateManager.hasWorkerLoggedIn()) {
+                btnWorker.setText("Staff Area");
+                btnWorkerLogout.setVisible(true);
+                btnWorkerLogout.setManaged(true);
+                btnSubscriber.setVisible(false);
+                btnSubscriber.setManaged(false);
+            }
+            else{
+                btnSubscriber.setVisible(true);
+                btnSubscriber.setManaged(true);
+            }
+        }
+    }
+
+    /**
+     * Updates the main form UI when the scene becomes visible.
+     *
+     * <p>This method ensures that button labels reflect the current
+     * login state of subscribers and workers.</p>
+     */
+    private void updateMainFormWhenSceneIsShown() {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
+                    if (newWindow != null) {
+                        updateFormBasedOnUserType();
+                    }
+                });
+            }
+        });
+    }
 }
-
-
-/* Pattern to switch between forms
-// Inside your controller or wherever you handle the button click
-@FXML
-private void goToNextForm(ActionEvent event) throws IOException {
-    // Load the new FXML
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/Main/NextForm.fxml"));
-    Parent root = loader.load();
-
-    // Get current stage (window) from the event source
-    Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
-    // Set new scene
-    Scene scene = new Scene(root);
-    stage.setScene(scene);
-    stage.setTitle("Next Form");
-    stage.show();
-}
- */

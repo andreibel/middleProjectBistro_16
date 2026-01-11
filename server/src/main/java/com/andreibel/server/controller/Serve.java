@@ -1,133 +1,154 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.Message;
-import com.andreibel.server.controller.BistroServerGUIController;
 import com.lloseng.ocsf.server.AbstractServer;
 import com.lloseng.ocsf.server.ConnectionToClient;
 
 import java.io.IOException;
 
+import static com.andreibel.server.utils.TUI.serverInputLog;
+import static com.andreibel.server.utils.TUI.serverOutputLog;
+
 /**
- * OCSF-based server implementation for the Bistro system.
+ * Main OCSF server implementation for the Bistro system.
  *
- * <p>
- * This class extends {@link AbstractServer} and acts as the main networking layer:
- * it receives incoming objects from clients, validates they are {@link Message} instances,
- * routes them by {@code message.getType()} to the appropriate controller, and sends a
- * response back to the client.
- * </p>
+ * <p>This class extends {@link AbstractServer} and provides the networking entry point for the server:
+ * it receives objects from clients, expects them to be {@link Message} instances, routes them by
+ * {@link Message#getType()} to the appropriate controller, and sends a response back to the client.</p>
  *
- * <p>
- * The server also reports connection lifecycle events (connect/disconnect/exceptions)
- * to the {@link BistroServerGUIController} to allow the GUI to reflect current client state.
- * </p>
- *
- * <h3>Responsibilities</h3>
+ * <h2>Routing</h2>
+ * <p>Requests are dispatched using a {@code switch} on the message type, delegating to:</p>
  * <ul>
- *   <li>Initialize controllers used to handle requests.</li>
- *   <li>Dispatch incoming client messages using a switch on message type.</li>
- *   <li>Send response {@link Message} objects back to the client.</li>
- *   <li>Notify GUI controller about connection changes.</li>
+ *   <li>{@link OrderController} - orders and availability-related requests</li>
+ *   <li>{@link SubscriberController} - subscriber login, CRUD and order history</li>
+ *   <li>{@link WorkerController} - worker login, restaurant configuration and layout</li>
+ *   <li>{@link WaitingController} - waiting list flows and reports</li>
  * </ul>
  *
- * @see AbstractServer
- * @see ConnectionToClient
- * @see Message
- * @see OrderController
- * @see SubscriberController
+ * <h2>GUI integration</h2>
+ * <p>If a {@link BistroServerGUIController} is attached via {@link #setGUIController(BistroServerGUIController)},
+ * connection lifecycle events are forwarded to the GUI so it can display current client states.</p>
+ *
+ * <h2>Threading note</h2>
+ * <p>OCSF callbacks may run on non-JavaFX threads. If the GUI controller updates JavaFX UI controls,
+ * it should wrap the updates using {@code javafx.application.Platform.runLater(...)}.</p>
  *
  * @author Andrei Beloziyorove
  */
 public class Serve extends AbstractServer {
 
     /** Controller responsible for order-related operations. */
-    OrderController orderController;
+    private final OrderController orderController;
 
     /** Controller responsible for subscriber-related operations. */
-    SubscriberController subscriberController;
+    private final SubscriberController subscriberController;
+
+    /** Controller responsible for worker-related operations. */
+    private final WorkerController workerController;
+
+    /** Controller responsible for waiting-list flows and reports. */
+    private final WaitingController waitingController;
 
     /**
-     * GUI controller reference (optional).
-     * Used to update UI on client connect/disconnect/exception events.
+     * Optional GUI controller reference used to reflect connection state in the server UI.
+     * Can be {@code null} if the server is run without GUI.
      */
     private BistroServerGUIController controller;
 
     /**
-     * Constructs a server that listens on the given port.
-     *
-     * <p>
-     * Initializes internal controllers (Singleton instances) used for handling requests.
-     * </p>
+     * Constructs a server that listens on the given port and initializes controllers.
      *
      * @param port server port to listen on
      */
     public Serve(int port) {
         super(port);
-        orderController = OrderController.getInstance();
-        subscriberController = SubscriberController.getInstance();
+        this.orderController = OrderController.getInstance();
+        this.subscriberController = SubscriberController.getInstance();
+        this.workerController = WorkerController.getInstance();
+        this.waitingController = WaitingController.getInstance();
     }
 
     /**
-     * Attaches the GUI controller used for displaying and updating connection state.
+     * Attaches a GUI controller used to display and update connection state.
      *
-     * @param controller GUI controller instance
+     * <p>If not set, connection lifecycle hooks will still run but will not update any UI.</p>
+     *
+     * @param controller GUI controller instance (may be {@code null})
      */
     public void setGUIController(BistroServerGUIController controller) {
         this.controller = controller;
     }
 
     /**
-     * Handles an incoming message received from a specific client connection.
+     * Handles an incoming object received from a specific client connection.
      *
-     * <p>
-     * The OCSF framework calls this method whenever the client sends an object.
-     * This implementation:
-     * </p>
+     * <p>The OCSF framework calls this method whenever a client sends an object.
+     * This implementation:</p>
      * <ol>
-     *   <li>Validates that {@code msg} is a {@link Message}.</li>
-     *   <li>Routes the request by {@code message.getType()} to the correct controller method.</li>
-     *   <li>Sends a {@link Message} response back to the client.</li>
+     *   <li>Validates the object is a {@link Message}.</li>
+     *   <li>Logs the request via {@link com.andreibel.server.utils.TUI#serverInputLog(Message)}.</li>
+     *   <li>Routes by {@code message.getType()} to the corresponding controller handler.</li>
+     *   <li>Logs the response via {@link com.andreibel.server.utils.TUI#serverOutputLog(Message)}.</li>
+     *   <li>Sends the response back to the client with {@link ConnectionToClient#sendToClient(Object)}.</li>
      * </ol>
      *
-     * <p>
-     * If the incoming object is not a {@link Message}, an {@link IllegalArgumentException} is thrown.
-     * IO failures while responding are converted into a {@link RuntimeException}.
-     * </p>
+     * <p><b>Important:</b> some handlers may return {@code null} (for example, if the request is treated
+     * as a server-side-only action). In that case, sending {@code null} may not be desirable. Consider
+     * guarding with {@code if (response != null) sendToClient(response)}.</p>
      *
-     * @param msg the object received from the client (expected to be {@link Message})
-     * @param client the client connection that sent the object
-     *
-     * @throws RuntimeException if an {@link IOException} occurs while sending the response
-     *                          or if the message type is invalid
+     * @param msg    object received from the client (expected to be a {@link Message})
+     * @param client client connection that sent the object
+     * @throws RuntimeException if the incoming object is not a {@link Message} or an {@link IOException}
+     *                          occurs while sending the response
      */
     @Override
     protected void handleMessageFromClient(Object msg, ConnectionToClient client) {
         try {
             if (!(msg instanceof Message message)) {
-                throw new IllegalArgumentException("Invalid message type");
+                throw new IllegalArgumentException("Invalid message type: expected Message");
             }
 
+            serverInputLog(message);
+
             Message response = switch (message.getType()) {
-                // orders calls
-                case GET_ALL_ORDERS -> orderController.getAllOrders();
-                case UPDATE_ORDER -> orderController.updateOrder(message);
                 case CREATE_ORDER -> orderController.createOrder(message);
-                case GET_ONE_ORDER -> orderController.getOrder(message);
                 case DELETE_ORDER -> orderController.deleteOrder(message);
+                case GET_ONE_ORDER -> orderController.getOrder(message);
+                case ORDER_ARRIVED -> orderController.updateArrives(message);
+                case ORDER_LOST_CONFORMATION_CODE -> orderController.lostCode(message);
+                case COMPLETE_ORDER -> orderController.closeOrder(message);
+                case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
 
-                // workers calls
-                case LOGIN_WORKER -> null; // TODO: implement login for workers
-
-                // subscribers calls
                 case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();
-                case GET_ONE_SUBSCRIBER -> subscriberController.getSub(message);
+                case SUBSCRIBER_LOGIN -> subscriberController.getSub(message);
                 case GET_SUBSCRIBER_ORDERS -> subscriberController.getSubOrders(message);
+                case UPDATE_SUBSCRIBER -> subscriberController.updateSub(message);
                 case CREATE_SUBSCRIBER -> subscriberController.createSub(message);
 
-                // unknown / unsupported
+                case WORKER_LOGIN -> workerController.login(message);
+                case WORKER_CREATE -> workerController.createWorker(message);
+                case ADD_SPECIAL_DAY -> workerController.addSpecialDay(message);
+                case CHANGE_BISTRO_TIME -> workerController.editRegulaDay(message);
+                case GET_ALL_TABLES -> workerController.getAllTables();
+                case EDIT_BISTRO_LAYOUT -> workerController.updateTables(message);
+                case GET_REGULAR_OPEN_TIME -> workerController.getRegularDate();
+
+                case SCHEDULES_REPORT -> waitingController.scheduleReport(message);
+                case SUBSCRIBER_REPORT -> waitingController.subscriberReport(message);
+                case GET_WAITING_LIST -> waitingController.getWaitingList(message);
+                case ADD_TO_WAITING_LIST -> waitingController.addWaitingList(message);
+                case REMOVE_FROM_WAITING_LIST -> waitingController.removeFromWaitingList(message);
+                case ARRIVE_WAITING_LIST -> waitingController.arriveWaitingList(message);
+
+                case GET_ALL_ACTIVE_ORDER -> orderController.getAllActiveOrder();
+                case GET_ALL_ARRIVED_AND_NOT_COMPLETE -> orderController.getNowEating();
+
                 default -> null;
             };
 
+            serverOutputLog(response);
+
+            // If response can be null, prefer guarding to avoid sending null over OCSF.
             client.sendToClient(response);
 
         } catch (IllegalArgumentException | IOException e) {
@@ -136,49 +157,46 @@ public class Serve extends AbstractServer {
     }
 
     /**
-     * Hook method called by OCSF when a client successfully connects.
+     * OCSF hook invoked when a client successfully connects.
      *
-     * <p>
-     * This implementation notifies the GUI controller (if set) to record/display
-     * the new connection.
-     * </p>
+     * <p>If a GUI controller is attached, the connection is added to the GUI table.</p>
      *
      * @param client the connected client
      */
     @Override
     protected void clientConnected(ConnectionToClient client) {
-        controller.addNewConnection(client);
+        if (controller != null) {
+            controller.addNewConnection(client);
+        }
     }
 
     /**
-     * Hook method called by OCSF when a client disconnects.
+     * OCSF hook invoked when a client disconnects.
      *
-     * <p>
-     * This implementation notifies the GUI controller (if set) to update the
-     * displayed connection status.
-     * </p>
+     * <p>If a GUI controller is attached, the corresponding connection status is marked closed.</p>
      *
      * @param client the disconnected client
      */
     @Override
     protected void clientDisconnected(ConnectionToClient client) {
-        controller.editConnection(client);
+        if (controller != null) {
+            controller.editConnection(client);
+        }
     }
 
     /**
-     * Hook method called by OCSF when an exception occurs for a client connection.
+     * OCSF hook invoked when an exception occurs for a client connection.
      *
-     * <p>
-     * Logs the exception and updates the GUI controller (if set) to reflect
-     * that the client encountered an error / disconnected unexpectedly.
-     * </p>
+     * <p>This typically indicates an abnormal disconnection. If a GUI controller is attached,
+     * the corresponding connection status is updated.</p>
      *
-     * @param client the client connection where the exception occurred
-     * @param exception the thrown exception
+     * @param client     the client connection where the exception occurred
+     * @param exception  the thrown exception
      */
     @Override
     protected void clientException(ConnectionToClient client, Throwable exception) {
-        System.out.println("Client exception: " + client.getId() + " - " + exception.getMessage());
-        controller.editConnection(client);
+        if (controller != null) {
+            controller.editConnection(client);
+        }
     }
 }
