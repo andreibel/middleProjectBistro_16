@@ -145,7 +145,10 @@ public class OrderController {
      * @return completion response message
      */
     public Message closeOrder(Message message) {
-         OrderResponse closed = orderService.completeOrder((UUID) message.getData());
+        OrderResponse closed = orderService.completeOrder((UUID) message.getData());
+        if(closed == null)  return new Message(COMPLETE_ORDER_ERROR, null);
+        if (closed.getConformationCode() == null)
+            return new Message(COMPLETE_ORDER_ERROR, "cant close the order due to order was candled or completed");
         printPrice(closed);
         return new Message(COMPLETE_ORDER_RESPONSE, null);
     }
