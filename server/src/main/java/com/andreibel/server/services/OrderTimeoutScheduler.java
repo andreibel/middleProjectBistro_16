@@ -32,13 +32,16 @@ public class OrderTimeoutScheduler {
 
     private static OrderTimeoutScheduler instance;
     private final OrderRepository orderRepository;
+    private final ScheduledExecutorService scheduler;
     private final TransactionManager tx = TransactionManager.getInstance();
 
     /**
      * Private constructor for Singleton initialization.
      */
     private OrderTimeoutScheduler() {
+
         orderRepository = OrderRepository.getInstance();
+        scheduler = Executors.newSingleThreadScheduledExecutor();
     }
 
     /**
@@ -57,9 +60,6 @@ public class OrderTimeoutScheduler {
      * </p>
      */
     public void start() {
-        ScheduledExecutorService scheduler =
-                Executors.newSingleThreadScheduledExecutor();
-
         scheduler.scheduleAtFixedRate(
                 this::cancelLateOrders,
                 0,
@@ -67,6 +67,8 @@ public class OrderTimeoutScheduler {
                 TimeUnit.MINUTES
         );
     }
+
+    public void stop() { scheduler.shutdownNow(); }
 
     /**
      * Cancels orders that exceeded the allowed arrival grace period.

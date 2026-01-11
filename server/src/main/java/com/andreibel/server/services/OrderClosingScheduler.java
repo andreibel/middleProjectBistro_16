@@ -66,6 +66,7 @@ public class OrderClosingScheduler {
     public void start() {
         scheduler.scheduleAtFixedRate(this::scanAndNotify, 0, 1, TimeUnit.MINUTES);
     }
+    public void stop() { scheduler.shutdownNow(); }
 
     /**
      * Scans for orders that should be closed and prints a notification.

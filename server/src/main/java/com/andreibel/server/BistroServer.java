@@ -53,6 +53,15 @@ public class BistroServer extends Application {
         Scene scene = new Scene(load, 320, 240);
         stage.setTitle("Server");
         stage.setScene(scene);
+        stage.setOnCloseRequest(event -> {
+            try {
+                sv.close();
+                OrderClosingScheduler.getInstance().stop();
+                OrderTimeoutScheduler.getInstance().stop();
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to close client connection", e);
+            }
+        });
         stage.show();
     }
 }
