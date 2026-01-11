@@ -26,16 +26,18 @@ import java.util.UUID;
  * <hr/>
  * <h3>DDL</h3>
  * <blockquote> <pre>
- * create table `Order`(
+ * create table `Order`
+ * (
  *     orderNumber         int auto_increment
  *         primary key,
  *     numberOfGuests      int                        not null,
  *     conformationCode    char(36)                   not null,
  *     orderDateTime       datetime                   not null,
  *     placedOrderDateTime datetime   default (now()) not null,
+ *     orderArriveDateTime datetime                   null,
  *     orderCancelled      tinyint(1) default 0       not null,
+ *     orderArrive         int        default 0       not null,
  *     orderCompleted      tinyint(1) default 0       not null,
- *     orderPaid           int        default 0       not null,
  *     subscriberId        int                        null,
  *     email               varchar(30)                null,
  *     phoneNumber         varchar(10)                null,
@@ -61,9 +63,10 @@ public class Order {
     private UUID conformationCode;
     private LocalDateTime orderDateTime;
     private LocalDateTime placedOrderDateTime;
+    private LocalDateTime orderArriveDateTime;
     private boolean orderCancelled;
+    private boolean orderArrive;
     private boolean orderCompleted;
-    private boolean orderPaid;
     // FK
     private Integer subscriberId; // optional
     private String email; // optional
@@ -77,9 +80,10 @@ public class Order {
     public static final String CONFIRMATION_CODE = "conformationCode";
     public static final String ORDER_DATE_TIME = "orderDateTime";
     public static final String PLACED_ORDER_DATE_TIME = "placedOrderDateTime";
+    public static final String ORDER_ARRIVE_DATE_TIME = "orderArriveDateTime";
     public static final String ORDER_CANCELLED = "orderCancelled";
+    public static final String ORDER_ARRIVED = "orderArrive";
     public static final String ORDER_COMPLETED = "orderCompleted";
-    public static final String ORDER_PAID = "orderPaid";
     public static final String SUBSCRIBER_ID = "subscriberId";
     public static final String EMAIL = "email";
     public static final String PHONE_NUMBER = "phoneNumber";

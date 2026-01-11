@@ -23,7 +23,6 @@ import lombok.NoArgsConstructor;
  * create table Worker (
  *     workerName     varchar(30)          not null,
  *     workerPassword varchar(70)          not null,
- *     workerEmail    varchar(30)          not null,
  *     isManager      tinyint(1) default 0 not null
  * );
  * </blockquote>
@@ -39,14 +38,12 @@ public class Worker {
     // PK
     private String workerName;
     private String workerPassword;
-    private String workerEmail;
     private boolean isManager;
 
 
     // Database Column Names
     public static final String WORKER_NAME = "workerName";
     public static final String WORKER_PASSWORD = "workerPassword";
-    public static final String WORKER_EMAIL = "workerEmail";
     public static final String IS_MANAGER = "isManager";
 
 }

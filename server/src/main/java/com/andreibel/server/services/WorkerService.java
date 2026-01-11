@@ -19,7 +19,7 @@ public class WorkerService {
 
     // TODO: move to config or ENV file
     private static final String SECRET =
-            "TOKEN";
+            "8b6de9f7c15fa54fd4fb30e5fc583fa237e0b39bc24264c4c93426a1a4b585ab";
 
     private WorkerService() {
         this.workerRepository = WorkerRepository.getInstance();
@@ -35,7 +35,7 @@ public class WorkerService {
         Worker worker = tx.inTransaction(() ->
                 workerRepository.findByWorkerName(request.getWorkerName())
         );
-
+        System.out.println(worker);
         if (worker == null) return null;
 
         if (verifyPassword(request.getWorkerPassword(), worker.getWorkerPassword())) {
@@ -50,7 +50,7 @@ public class WorkerService {
         return tx.inTransaction(() -> {
             // prevent duplicates
             Worker existing = workerRepository.findByWorkerName(request.getName());
-            if (existing != null) return null; // or throw "already exists"
+            if (existing != null) return null;
 
             String passwordHmacHex = HmacUtil.hmacSha256Hex(
                     request.getPassword().getBytes(StandardCharsets.UTF_8),
@@ -60,7 +60,6 @@ public class WorkerService {
             Worker toInsert = Worker.builder()
                     .workerName(request.getName())
                     .workerPassword(passwordHmacHex)
-                    .workerEmail(request.getEmail())
                     .isManager(request.isManager())
                     .build();
             Worker saved = workerRepository.addWorker(toInsert);
@@ -75,7 +74,8 @@ public class WorkerService {
                 password.getBytes(StandardCharsets.UTF_8),
                 SECRET
         );
-
+        System.out.println(hashedPasswordHex);
+        System.out.println(expectedHex);
         return HmacUtil.constantTimeEqualsHex(expectedHex, hashedPasswordHex);
     }
 }

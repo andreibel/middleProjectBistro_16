@@ -1,10 +1,10 @@
 package com.andreibel.server.dbController.repository;
 
-import com.andreibel.message.DTO.OrderRequest;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.entity.Order;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,17 +13,23 @@ import java.util.UUID;
 import static com.andreibel.server.utils.OrderMapper.mapRelToOrder;
 
 /**
- * JDBC repository for {@link Order} entities.
+ * JDBC repository for {@link Order} persistence and retrieval.
  *
- * <p>
- * Uses {@link TransactionManager} to access the current transactional
- * {@link java.sql.Connection}. All methods must be executed inside
- * an active transaction.
- * </p>
+ * <p>This repository encapsulates all SQL access to the {@code bistro.Order} table using
+ * plain JDBC. It relies on {@link TransactionManager} for obtaining the current transactional
+ * {@link Connection} via {@link TransactionManager#currentConnection()}.</p>
  *
- * <p>
- * Implemented as a Singleton.
- * </p>
+ * <p><b>Transaction requirement:</b> all methods are expected to run inside an active transaction
+ * (for example via {@code tx.inTransaction(...)}). Calling these methods without a transaction
+ * may result in {@code null} connections or unexpected behavior.</p>
+ *
+ * <p><b>Order lifecycle flags:</b> the repository uses soft state flags rather than deleting rows:
+ * {@code orderCancelled}, {@code orderArrive}, and {@code orderCompleted}. Some methods update these
+ * flags (e.g., arrival, cancellation, completion) and scheduler-related methods perform batch updates
+ * based on time conditions.</p>
+ *
+ * <p>Implemented as a thread-unsafe singleton (sufficient for typical single-instance server usage).
+ * If you use multiple class loaders or need concurrency-safe lazy init, adjust {@link #getInstance()}.</p>
  *
  * @author Andrei Beloziyorove
  */
@@ -37,38 +43,87 @@ public class OrderRepository {
     }
 
     /**
-     * @return singleton instance of OrderRepository
+     * Returns the singleton instance of {@link OrderRepository}.
+     *
+     * @return singleton repository instance
      */
     public static OrderRepository getInstance() {
-        if (instance == null) {
-            instance = new OrderRepository();
-        }
+        if (instance == null) instance = new OrderRepository();
         return instance;
     }
 
     /**
-     * @return all orders in the database
+     * Loads all orders that belong to a subscriber (i.e., {@code subscriberId IS NOT NULL}).
+     *
+     * <p>This method is useful for subscriber history/report screens. If you want truly "all orders",
+     * remove the {@code subscriberId IS NOT NULL} filter.</p>
+     *
+     * @return list of subscriber orders (possibly empty)
+     * @throws SQLException if a database access error occurs
      */
-    public List<Order> findAll() throws SQLException {
-        String sql = "SELECT * FROM bistro.`order`;";
+    public List<Order> findAllSubscribersOrders() throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE subscriberId IS NOT NULL;
+                """;
         List<Order> orders = new ArrayList<>();
-
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
-            while (rs.next()) {
-                orders.add(mapRelToOrder(rs));
-            }
+            while (rs.next()) orders.add(mapRelToOrder(rs));
+        }
+        return orders;
+    }
+    public List<Order> findActiveOrdersByTableCapacity(int num) throws SQLException {
+        String sql = """
+                SELECT o FROM Order o " +
+                           "WHERE o.orderArrive = 1 " +
+                           "AND o.orderCompleted = false " +
+                           "AND o.orderCancelled = false;
+                """;
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) orders.add(mapRelToOrder(rs));
+        }
+        return orders;
+    }
+    /**
+     * Loads all orders.
+     *
+     * <p>This method is useful for subscriber history/report screens. If you want truly "all orders",
+     * remove the {@code subscriberId IS NOT NULL} filter.</p>
+     *
+     * @return list of subscriber orders (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findAll() throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`;
+                """;
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) orders.add(mapRelToOrder(rs));
         }
         return orders;
     }
 
     /**
-     * @param orderNumber order primary key
-     * @return matching order or {@code null}
+     * Finds an order by its primary key ({@code orderNumber}).
+     *
+     * @param orderNumber primary key value
+     * @return matching {@link Order} or {@code null} if not found
+     * @throws SQLException if a database access error occurs
      */
+
     public Order findById(int orderNumber) throws SQLException {
-        String sql = "SELECT * FROM bistro.`order` WHERE " + Order.ORDER_NUMBER + " = ?;";
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE orderNumber = ?;
+                """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setInt(1, orderNumber);
@@ -79,11 +134,18 @@ public class OrderRepository {
     }
 
     /**
-     * @param conformationCode order confirmation code
-     * @return matching order or {@code null}
+     * Finds an order by its confirmation code.
+     *
+     * @param conformationCode confirmation code (UUID)
+     * @return matching {@link Order} or {@code null} if not found
+     * @throws SQLException if a database access error occurs
      */
     public Order findByConformationCode(UUID conformationCode) throws SQLException {
-        String sql = "SELECT * FROM bistro.`order` WHERE " + Order.CONFIRMATION_CODE + " = ?;";
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE conformationCode = ?;
+                """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, conformationCode.toString());
@@ -94,95 +156,133 @@ public class OrderRepository {
     }
 
     /**
-     * Updates number of guests and reservation time for an existing order.
+     * Returns all orders that overlap the fixed reservation window {@code [date, date + 2h)}.
      *
-     * @throws SQLException if the order does not exist
-     */
-    public void update(OrderRequest order) throws SQLException {
-        String sql = "UPDATE bistro.`order` SET "
-                + Order.NUMBER_OF_GUESTS + " = ?, "
-                + Order.ORDER_DATE_TIME + " = ? "
-                + "WHERE " + Order.CONFIRMATION_CODE + " = ?;";
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, order.getNumberOfGuests());
-            stmt.setTimestamp(2, Timestamp.valueOf(order.getOrderDateTime()));
-            stmt.setString(3, order.getConformationCode().toString());
-
-            if (stmt.executeUpdate() == 0) {
-                throw new SQLException("Order not found: " + order.getConformationCode());
-            }
-        }
-    }
-
-    /**
-     * Finds orders that overlap a 2-hour reservation window.
+     * <p>Only active orders are considered: not cancelled and not completed. This method is typically
+     * used during availability checks in order creation logic.</p>
      *
-     * @param date reservation start time
-     * @return colliding orders
+     * @param date requested reservation start date-time
+     * @return list of colliding orders (possibly empty)
+     * @throws SQLException if a database access error occurs
      */
     public List<Order> findOrdersCollideByDateTime(LocalDateTime date) throws SQLException {
         Timestamp start = Timestamp.valueOf(date);
         Timestamp end = Timestamp.valueOf(date.plusHours(2));
 
-        String sql = "SELECT * FROM bistro.`order` o "
-                + "WHERE o." + Order.ORDER_CANCELLED + " = 0 "
-                + "AND o." + Order.ORDER_COMPLETED + " = 0 "
-                + "AND o." + Order.ORDER_DATE_TIME + " < ? "
-                + "AND DATE_ADD(o." + Order.ORDER_DATE_TIME + ", INTERVAL 2 HOUR) > ? "
-                + "ORDER BY o." + Order.ORDER_DATE_TIME + " ASC;";
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE orderCancelled = 0
+                  AND orderCompleted = 0
+                  AND orderDateTime < ?
+                  AND DATE_ADD(orderDateTime, INTERVAL 2 HOUR) > ?
+                ORDER BY orderDateTime ASC;
+                """;
 
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setTimestamp(1, end);
             stmt.setTimestamp(2, start);
-
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    orders.add(mapRelToOrder(rs));
-                }
+                while (rs.next()) orders.add(mapRelToOrder(rs));
             }
         }
         return orders;
     }
 
     /**
+     * Loads all orders belonging to a subscriber id.
+     *
      * @param subscriberId subscriber identifier
-     * @return orders belonging to the subscriber
+     * @return list of subscriber orders (possibly empty)
+     * @throws SQLException if a database access error occurs
      */
     public List<Order> findBySubscriberId(int subscriberId) throws SQLException {
-        String sql = "SELECT * FROM bistro.`order` WHERE " + Order.SUBSCRIBER_ID + " = ?;";
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE subscriberId = ?;
+                """;
 
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setInt(1, subscriberId);
             try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    orders.add(mapRelToOrder(rs));
-                }
+                while (rs.next()) orders.add(mapRelToOrder(rs));
             }
         }
         return orders;
     }
 
     /**
-     * Inserts a new order and returns the persisted entity.
+     * Loads all orders by customer email.
+     *
+     * <p>Used for guest flows where orders are not associated with a subscriber id.</p>
+     *
+     * @param email customer email address
+     * @return list of orders with the given email (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findByEmail(String email) throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE email = ?;
+                """;
+
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, email);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) orders.add(mapRelToOrder(rs));
+            }
+        }
+        return orders;
+    }
+
+    /**
+     * Loads all orders by customer phone number.
+     *
+     * @param phone customer phone number (string, as stored in DB)
+     * @return list of orders with the given phone number (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findByPhone(String phone) throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE phoneNumber = ?;
+                """;
+
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, phone);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) orders.add(mapRelToOrder(rs));
+            }
+        }
+        return orders;
+    }
+
+    /**
+     * Persists a new {@link Order} row and returns the stored entity reloaded from the database.
+     *
+     * <p>Nullable fields ({@code subscriberId}, {@code email}, {@code phoneNumber}) are inserted as SQL
+     * {@code NULL} when missing. After insertion, the method reads the generated primary key and calls
+     * {@link #findById(int)} to return a fully mapped object.</p>
      *
      * @param newOrder order to persist
-     * @return stored order
+     * @return stored order (reloaded by generated key)
+     * @throws SQLException if insert fails or no generated key is returned
      */
     public Order save(Order newOrder) throws SQLException {
-        String sql = "INSERT INTO bistro.`order` ("
-                + Order.NUMBER_OF_GUESTS + ","
-                + Order.CONFIRMATION_CODE + ","
-                + Order.ORDER_DATE_TIME + ","
-                + Order.SUBSCRIBER_ID + ","
-                + Order.EMAIL + ","
-                + Order.PHONE_NUMBER + ") VALUES (?,?,?,?,?,?);";
+        String sql = """
+                INSERT INTO bistro.`Order`
+                (numberOfGuests, conformationCode, orderDateTime, subscriberId, email, phoneNumber)
+                values (?,?,?,?,?,?)
+                """;
 
-        try (PreparedStatement stmt =
-                     tx.currentConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, newOrder.getNumberOfGuests());
             stmt.setString(2, newOrder.getConformationCode().toString());
             stmt.setTimestamp(3, Timestamp.valueOf(newOrder.getOrderDateTime()));
@@ -199,26 +299,161 @@ public class OrderRepository {
             stmt.executeUpdate();
 
             try (ResultSet keys = stmt.getGeneratedKeys()) {
-                if (!keys.next()) {
-                    throw new SQLException("Insert succeeded but no generated key returned");
-                }
+                if (!keys.next()) throw new SQLException("Insert succeeded but no generated key returned");
                 return findById(keys.getInt(1));
             }
         }
     }
 
     /**
-     * Deletes an order by confirmation code.
+     * Soft-cancels an order by confirmation code.
+     *
+     * <p>The row is not removed from the database. This method sets {@code orderCancelled = 1} and
+     * returns the number of affected rows (typically 0 or 1).</p>
      *
      * @param conformationCode order confirmation code
-     * @return number of deleted rows
+     * @return number of updated rows
+     * @throws SQLException if a database access error occurs
      */
     public int deleteByConformationCode(UUID conformationCode) throws SQLException {
-        String sql = "DELETE FROM bistro.`order` WHERE " + Order.CONFIRMATION_CODE + " = ?;";
-
+        String sql = """
+                UPDATE bistro.`Order`
+                SET orderCancelled = 1
+                WHERE conformationCode = ?;
+                """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, conformationCode.toString());
             return stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Marks an order as arrived (check-in) and stores arrival time.
+     *
+     * <p>Updates {@code orderArrive = 1} and sets {@code orderArriveDateTime = NOW()} for the given
+     * confirmation code.</p>
+     *
+     * @param conformationCode order confirmation code
+     * @return number of updated rows (typically 0 or 1)
+     * @throws SQLException if a database access error occurs
+     */
+    public int setArrived(UUID conformationCode) throws SQLException {
+        String sql = """
+                UPDATE bistro.`Order`
+                SET orderArrive = 1, orderArriveDateTime = NOW()
+                WHERE conformationCode = ?;
+                """;
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            return stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Marks an order as completed (closed) by confirmation code.
+     *
+     * <p>This method sets {@code orderCompleted = 1}. It does not cancel the order and does not
+     * modify arrival state.</p>
+     *
+     * @param conformationCode order confirmation code
+     * @throws SQLException if a database access error occurs
+     */
+    public void completeOrder(UUID conformationCode) throws SQLException {
+        String sql = """
+                UPDATE bistro.`Order`
+                SET orderCompleted = 1
+                WHERE conformationCode = ?;
+                """;
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            stmt.executeUpdate();
+        }
+    }
+
+    /**
+     * Loads all not-cancelled orders that start within the given calendar date.
+     *
+     * <p>The filter uses a half-open interval:
+     * {@code [date 00:00, (date+1) 00:00)}. Only orders with {@code orderCancelled = 0} are returned.</p>
+     *
+     * @param date day to fetch (local date)
+     * @return list of orders for the given day (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findAllDateOrders(LocalDate date) throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`order`
+                WHERE orderDateTime >= ?
+                  AND orderDateTime <  ?
+                  AND orderCancelled = 0
+                """;
+
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(date.atStartOfDay()));
+            ps.setTimestamp(2, Timestamp.valueOf(date.plusDays(1).atStartOfDay()));
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) orders.add(mapRelToOrder(rs));
+            }
+        }
+        return orders;
+    }
+
+    /**
+     * Batch-cancels late orders (no arrival within a grace period).
+     *
+     * <p>An order is considered late if it is not cancelled, not completed, not arrived, and its
+     * {@code orderDateTime} is earlier than {@code now - graceMinutes}. The method updates rows by
+     * setting {@code orderCancelled = 1}.</p>
+     *
+     * <p><b>Recommendation:</b> return {@code ps.executeUpdate()} to expose how many orders were cancelled.</p>
+     *
+     * @param graceMinutes allowed lateness window in minutes (e.g., 10–20)
+     * @return currently always {@code 1} (consider returning affected rows count)
+     * @throws SQLException if a database access error occurs
+     */
+    public int cancelLateOrders(int graceMinutes) throws SQLException {
+        String sql = """
+                UPDATE bistro.`Order`
+                SET orderCancelled = 1
+                WHERE orderCancelled = 0
+                  AND orderCompleted = 0
+                  AND orderArrive = 0
+                  AND orderDateTime < ?
+                """;
+
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+            ps.executeUpdate();
+        }
+        return 1;
+    }
+
+    /**
+     * Batch-completes arrived orders that should be closed now (fixed 2-hour duration).
+     *
+     * <p>This method is intended for a scheduler. It marks orders as completed when:
+     * they are not cancelled, arrived, and their {@code orderDateTime} is earlier than {@code now - 2 hours}.</p>
+     *
+     * @param now reference time used to compute the cutoff {@code now.minusHours(2)}
+     * @throws SQLException if a database access error occurs
+     */
+    public void findOrdersDueToClose(LocalDateTime now) throws SQLException {
+        String sql = """
+                UPDATE bistro.`Order`
+                SET orderCompleted = 1
+                WHERE orderCancelled = 0
+                  AND orderArrive = 1
+                  AND orderDateTime <= ?
+                """;
+
+        LocalDateTime cutoff = now.minusHours(2);
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+            ps.executeUpdate();
         }
     }
 }

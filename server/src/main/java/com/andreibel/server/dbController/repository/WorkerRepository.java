@@ -71,14 +71,15 @@ public class WorkerRepository {
      * @see #findByWorkerName(String)
      */
     public Worker addWorker(Worker workerRequest) throws SQLException {
-        String sql =
-                "INSERT INTO bistro.worker (" + Worker.WORKER_NAME + "," + Worker.WORKER_PASSWORD + ", " +
-                        Worker.WORKER_EMAIL + ", " + Worker.IS_MANAGER + ") VALUES (?,?,?,?)";
+        String sql = """
+                INSERT INTO bistro.`worker`
+                (`workerName`, `workerPassword`, `isManager`)
+                VALUES (?,?,?);
+                """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerRequest.getWorkerName());
             stmt.setString(2, workerRequest.getWorkerPassword());
-            stmt.setString(3, workerRequest.getWorkerEmail());
-            stmt.setBoolean(4, workerRequest.isManager());
+            stmt.setBoolean(3, workerRequest.isManager());
             stmt.executeUpdate();
         }
 
@@ -93,9 +94,11 @@ public class WorkerRepository {
      * @throws SQLException if a database error occurs
      */
     public Worker findByWorkerName(String workerName) throws SQLException {
-        String sql = "SELECT * " +
-                "FROM bistro.worker " +
-                "WHERE " + Worker.WORKER_NAME + "= ?";
+        String sql = """
+                SELECT *
+                FROM bistro.`worker`
+                WHERE `workerName` = ?;
+                """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, workerName);

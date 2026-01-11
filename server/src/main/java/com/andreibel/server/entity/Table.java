@@ -20,9 +20,8 @@ import lombok.NoArgsConstructor;
  * <pre>
  * create table `Table`
  * (
- *     tableId  int auto_increment
- *         primary key,
  *     capacity int not null,
+ *     primary key,
  *     quantity int null
  * );
  * </pre>
@@ -37,11 +36,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Table {
     //PK
-    private int tableId;
     private int capacity;
     private int quantity;
 
-    public static final String TABLE_ID = "tableId";
     public static final String CAPACITY = "capacity";
     public static final String QUANTITY = "quantity";
 }
