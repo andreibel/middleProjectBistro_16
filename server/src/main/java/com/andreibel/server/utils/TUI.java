@@ -66,7 +66,7 @@ public class TUI {
     }
     public static void printPrice(OrderResponse printOrder) {
         double totalPrice = printOrder.getNumberOfGuests() * 100;
-        if (printOrder.getSubscriberId() != null) totalPrice =  totalPrice * 0.9;
+        if (printOrder.getSubscriberId() != 0) totalPrice =  totalPrice * 0.9;
 
         System.out.printf(
                 """

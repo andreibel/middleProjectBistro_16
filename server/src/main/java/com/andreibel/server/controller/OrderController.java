@@ -145,9 +145,10 @@ public class OrderController {
      * @return completion response message
      */
     public Message closeOrder(Message message) {
-         OrderResponse closed = orderService.completeOrder((UUID) message.getData());
+        OrderResponse closed = orderService.completeOrder((UUID) message.getData());
+        double price = closed.getNumberOfGuests() * 100 * ( closed.getSubscriberId() == 0 ? 1 : 0.9);
         printPrice(closed);
-        return new Message(COMPLETE_ORDER_RESPONSE, null);
+        return new Message(COMPLETE_ORDER_RESPONSE, "the close this is what you need to pay: " + price);
     }
 
     /**

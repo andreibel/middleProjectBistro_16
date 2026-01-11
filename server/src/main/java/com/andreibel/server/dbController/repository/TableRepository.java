@@ -1,5 +1,6 @@
 package com.andreibel.server.dbController.repository;
 
+import com.andreibel.message.DTO.TableRequest;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.entity.Table;
 
@@ -84,17 +85,58 @@ public class TableRepository {
         return tables;
     }
 
-    public void editTable(int capacity, int quantity)throws SQLException {
-        String sql = """
-                UPDATE bistro.`Table`
-                SET quantity = ?
-                WHERE capacity = ?
-                """;
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, quantity);
-            stmt.setInt(2, capacity);
-            stmt.executeUpdate();
+    private void upsertAll(List<TableRequest> newState) throws SQLException {
+        if (newState.isEmpty()) return;
 
+        String sql = """
+        INSERT INTO bistro.`Table` (capacity, quantity)
+        VALUES (?, ?)
+        ON DUPLICATE KEY UPDATE quantity = VALUES(quantity)
+        """;
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            for (TableRequest t : newState) {
+                stmt.setInt(1, t.getCapacity());
+                stmt.setInt(2, t.getQuantity());
+                stmt.addBatch();
+            }
+            stmt.executeBatch();
         }
+    }
+    private void deleteMissingCapacities(List<TableRequest> newState) throws SQLException {
+        // If UI sends empty list => means "no capacities exist" => delete all
+        if (newState.isEmpty()) {
+            String sql = "DELETE FROM bistro.`Table`";
+            try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+                stmt.executeUpdate();
+            }
+            return;
+        }
+
+        // Build: DELETE ... WHERE capacity NOT IN (?, ?, ?)
+        StringBuilder sb = new StringBuilder("DELETE FROM bistro.`Table` WHERE capacity NOT IN (");
+        for (int i = 0; i < newState.size(); i++) {
+            if (i > 0) sb.append(", ");
+            sb.append("?");
+        }
+        sb.append(")");
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sb.toString())) {
+            int idx = 1;
+            for (TableRequest t : newState) {
+                stmt.setInt(idx++, t.getCapacity());
+            }
+            stmt.executeUpdate();
+        }
+    }
+    public void syncTables(List<TableRequest> newState) throws SQLException {
+        if (newState == null) newState = List.of();
+
+
+        // 1) UPSERT all rows (MySQL syntax)
+        upsertAll(newState);
+
+        // 2) Delete capacities that are not present in newState
+        deleteMissingCapacities(newState);
     }
 }
