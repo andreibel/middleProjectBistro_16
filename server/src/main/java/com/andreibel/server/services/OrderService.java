@@ -264,8 +264,9 @@ public class OrderService {
      */
     public OrderResponse completeOrder(UUID conformationCode) {
         return tx.inTransaction(() -> {
+            Order order = orderRepository.findByConformationCode(conformationCode);
+            if (order.isOrderCancelled() || order.isOrderCompleted() || !order.isOrderArrive()) return new OrderResponse();
             orderRepository.completeOrder(conformationCode);
-
             return OrderMapper.mapOrderToOrderResponse(orderRepository.findByConformationCode(conformationCode));
         });
     }

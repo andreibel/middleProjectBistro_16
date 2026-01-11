@@ -146,9 +146,12 @@ public class OrderController {
      */
     public Message closeOrder(Message message) {
         OrderResponse closed = orderService.completeOrder((UUID) message.getData());
+        if(closed == null)  return new Message(COMPLETE_ORDER_ERROR, null);
+        if (closed.getConformationCode() == null)
+            return new Message(COMPLETE_ORDER_ERROR, "cant close the order due to order was candled or completed");
         double price = closed.getNumberOfGuests() * 100 * ( closed.getSubscriberId() == 0 ? 1 : 0.9);
         printPrice(closed);
-        return new Message(COMPLETE_ORDER_RESPONSE, "the close this is what you need to pay: " + price);
+        return new Message(COMPLETE_ORDER_RESPONSE, "the order is closed. pay this price: $" + price);
     }
 
     /**
