@@ -1,6 +1,5 @@
-package com.andreibel.server;
+package com.andreibel.server.main;
 
-import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.server.controller.Serve;
 import com.andreibel.server.services.OrderClosingScheduler;
 import com.andreibel.server.services.OrderTimeoutScheduler;
@@ -11,8 +10,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static com.andreibel.server.utils.TUI.*;
 

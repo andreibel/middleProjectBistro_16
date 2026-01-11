@@ -1,4 +1,4 @@
-package com.andreibel.server;
+package com.andreibel.server.main;
 
 import javafx.application.Application;
 
