@@ -203,10 +203,10 @@ public class OrderService {
         return tx.inTransaction(() -> {
             // 1. Get order by confirmation code
             Order order = orderRepository.findByConformationCode(conformationCode);
-            if (order == null) throw new RuntimeException("Order not found");
+            if (order == null) return null;
 
             // 2. Validate not cancelled
-            if (order.isOrderCancelled()) throw new RuntimeException("Order cancelled");
+            if (order.isOrderCancelled() || order.isOrderCompleted()) return new OrderResponse();
 
             // 3. Mark as arrived
             orderRepository.setArrived(conformationCode);

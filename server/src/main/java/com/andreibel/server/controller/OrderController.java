@@ -130,6 +130,8 @@ public class OrderController {
     public Message updateArrives(Message message) {
         OrderResponse orderResponse = orderService.orderArrives((UUID) message.getData());
         if (orderResponse == null) return new Message(ORDER_ARRIVED_ERROR, null);
+        if (orderResponse.getConformationCode() == null)
+            return new Message(ORDER_ARRIVED_ERROR, "can't arrive to order that was deleted");
         return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 
