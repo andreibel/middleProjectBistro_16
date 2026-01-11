@@ -83,6 +83,12 @@ public class SubscriberZoneFormGUIController {
         );
     }
 
+    @FXML
+    private void onLogoutButtonClicked(ActionEvent event) throws IOException {
+        CustomerStateManager.getInstance().setSubscriber(null);
+        BistroUtilities.switchScreen((Node)event.getSource(), "/Main/MainForm.fxml", "Bistro Restaurant");
+    }
+
     /**
      * Updates the greeting label with the subscriber's name
      * when the scene is first displayed.

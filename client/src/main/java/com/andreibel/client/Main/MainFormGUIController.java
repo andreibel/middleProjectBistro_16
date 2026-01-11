@@ -8,6 +8,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
 
 import java.io.IOException;
 
@@ -44,6 +45,11 @@ public class MainFormGUIController {
      */
     @FXML
     private Button btnWorker;
+    @FXML
+    private Button btnWorkerLogout;
+
+    @FXML
+    private HBox hBoxWorker;
 
     /**
      * Initializes the controller after the FXML has been loaded.
@@ -184,6 +190,84 @@ public class MainFormGUIController {
     }
 
     /**
+     * Handles the action of logging out the currently authenticated worker.
+     *
+     * <p>This method performs the following steps:</p>
+     * <ul>
+     *     <li>Clears the current worker session by setting the worker in
+     *         {@link WorkerStateManager} to {@code null}.</li>
+     *     <li>Updates the UI components to reflect the logged-out state by
+     *         calling {@link #updateFormBasedOnUserType()}.</li>
+     *     <li>Requests a layout pass on the root pane to ensure proper
+     *         visibility and layout of all elements.</li>
+     * </ul>
+     *
+     * @param event the action event triggered by clicking the worker logout button
+     * @throws IOException if switching UI components causes an input/output error
+     */
+    @FXML
+    private void onWorkerLogoutButtonClicked(ActionEvent event) throws IOException {
+        WorkerStateManager.getInstance().setWorker(null);
+        updateFormBasedOnUserType();
+        rootPane.layout();
+    }
+
+    /**
+     * Updates the visibility and labels of UI components based on the currently
+     * logged-in user type.
+     *
+     * <p>This method adjusts the main form elements to reflect the user's
+     * authentication state:</p>
+     * <ul>
+     *     <li>If no subscriber or worker is logged in, shows worker login options
+     *         and subscriber buttons appropriately.</li>
+     *     <li>If a subscriber is logged in, hides worker-related elements and
+     *         updates the subscriber button to indicate access to the subscriber area.</li>
+     *     <li>If a worker is logged in, shows worker-related buttons, hides
+     *         subscriber buttons, and enables the worker logout button.</li>
+     * </ul>
+     *
+     * <p>All visibility changes also update the managed property to ensure proper
+     * layout behavior in the UI.</p>
+     */
+    private void updateFormBasedOnUserType(){
+        if (!CustomerStateManager.hasSubscriberLoggedIn() && !WorkerStateManager.hasWorkerLoggedIn()) {
+            btnWorker.setText("I'm a Staff");
+            btnSubscriber.setText("Subscriber Login");
+            hBoxWorker.setVisible(true);
+            hBoxWorker.setManaged(true);
+            btnWorkerLogout.setVisible(false);
+            btnWorkerLogout.setManaged(false);
+            btnSubscriber.setVisible(true);
+            btnSubscriber.setManaged(true);
+        }
+        else{
+            if (CustomerStateManager.hasSubscriberLoggedIn()) {
+                btnSubscriber.setText("Subscriber Area");
+                hBoxWorker.setVisible(false);
+                hBoxWorker.setManaged(false);
+            }
+            else{
+                hBoxWorker.setVisible(true);
+                hBoxWorker.setManaged(true);
+                btnWorkerLogout.setVisible(false);
+                btnWorkerLogout.setManaged(false);
+            }
+            if (WorkerStateManager.hasWorkerLoggedIn()) {
+                btnWorker.setText("Staff Area");
+                btnWorkerLogout.setVisible(true);
+                btnWorkerLogout.setManaged(true);
+                btnSubscriber.setVisible(false);
+                btnSubscriber.setManaged(false);
+            }
+            else{
+                btnSubscriber.setVisible(true);
+                btnSubscriber.setManaged(true);
+            }
+        }
+    }
+
+    /**
      * Updates the main form UI when the scene becomes visible.
      *
      * <p>This method ensures that button labels reflect the current
@@ -194,12 +278,7 @@ public class MainFormGUIController {
             if (newScene != null) {
                 newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        if (CustomerStateManager.hasSubscriberLoggedIn()) {
-                            btnSubscriber.setText("Subscriber Area");
-                        }
-                        if (WorkerStateManager.hasWorkerLoggedIn()) {
-                            btnWorker.setText("Staff Area");
-                        }
+                        updateFormBasedOnUserType();
                     }
                 });
             }

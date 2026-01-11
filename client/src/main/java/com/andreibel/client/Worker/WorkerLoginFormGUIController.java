@@ -150,10 +150,21 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
      */
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        clearFields();
         BistroUtilities.switchScreen(
                 (Node) event.getSource(),
                 "/Main/MainForm.fxml",
                 "Bistro Restaurant"
         );
+    }
+    /**
+     * Clears the input fields in the login form.
+     *
+     * <p>Specifically, it resets the text fields for staff name and password,
+     * allowing the user to enter new credentials without manually deleting previous input.</p>
+     */
+    private void clearFields() {
+        txtFieldStaffName.clear();
+        txtFieldPassword.clear();
     }
 }
