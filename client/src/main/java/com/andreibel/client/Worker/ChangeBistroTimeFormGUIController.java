@@ -60,7 +60,6 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-
         setDatePicker();
         requestBistroTimesWhenSceneIsShown();
     }
@@ -93,8 +92,8 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
 
     @FXML
     private void onCreateNewEventButtonClicked(ActionEvent event) {
-        if (!BistroUtilities.isValidFullName(txtFieldEventName.getText())) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Please enter a valid event name");
+        if (txtFieldEventName.getText().isEmpty()) {
+            BistroUtilities.showMessage("Bistro Restaurant", "Please enter event name");
             return;
         }
 
@@ -126,6 +125,7 @@ public class ChangeBistroTimeFormGUIController implements IServerResponseListene
             if (newScene != null) {
                 newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
+                        System.out.println("New window is shown");
                         controller.requestBistroTimes();
                     }
                 });

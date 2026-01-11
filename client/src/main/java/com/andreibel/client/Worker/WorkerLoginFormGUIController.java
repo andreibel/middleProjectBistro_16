@@ -97,24 +97,22 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
         switch (message.getType()) {
             case WORKER_LOGIN_RESPONSE -> {
                 WorkerStateManager.getInstance().setWorker((WorkerResponse) message.getData());
-                Platform.runLater(() -> {
-                    try {
-                        // Same as go-back, just without ActionEvent
-                        BistroUtilities.switchScreen(
-                                btnLogin, // or btnGoBack
-                                "/Worker/WorkerForm.fxml",
-                                "Bistro Restaurant"
-                        );
-                    } catch (IOException e) {
-                        BistroUtilities.showMessage("Bistro Restaurant", "Failed to open main screen.");
-                        e.printStackTrace();
-                    }
-                });
+                try {
+                    // Same as go-back, just without ActionEvent
+                    BistroUtilities.switchScreen(
+                            btnLogin, // or btnGoBack
+                            "/Worker/WorkerForm.fxml",
+                            "Bistro Restaurant"
+                    );
+                } catch (IOException e) {
+                    BistroUtilities.showMessage("Bistro Restaurant", "Failed to open main screen.");
+                    e.printStackTrace();
+                }
             }
             case WORKER_LOGIN_ERROR ->
                     BistroUtilities.showMessage(
                             "Bistro Restaurant",
-                            "Worker name or password not current please try again"
+                            "Due to server error, we we're unable to log you in, please try again later."
                     );
         }
     }
