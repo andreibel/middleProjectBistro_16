@@ -142,7 +142,7 @@ public class WorkerController {
      */
     public Message editRegulaDay(Message message) {
         openTimeService.editRegulaDay((BistroTimeDTO) message.getData());
-        return new Message(CHANGE_BISTRO_TIME_RESPONSE, null);
+        return new Message(CHANGE_BISTRO_TIME_RESPONSE, "Edited");
     }
 
     /**

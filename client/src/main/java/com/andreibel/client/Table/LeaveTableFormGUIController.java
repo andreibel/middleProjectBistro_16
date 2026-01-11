@@ -52,7 +52,8 @@ public class LeaveTableFormGUIController implements IServerResponseListener {
             case COMPLETE_ORDER_RESPONSE -> {
                 BistroUtilities.showMessage(
                         "Bistro Restaurant",
-                        "Thank you for dining at Bistro Restaurant. See you soon!"
+                        "Thank you for dining at Bistro Restaurant. See you soon!\n"
+                        + (String)message.getData()
                 );
                 BistroUtilities.switchScreen(
                         btnPay,
