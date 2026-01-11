@@ -40,7 +40,7 @@ public class BistroServer extends Application {
         DB_PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", DB_PASSWORD);
         conf(PORT, DB_URL, DB_USER, DB_PASSWORD);
         startLog();
-        FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("../BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();
         startScheduler();

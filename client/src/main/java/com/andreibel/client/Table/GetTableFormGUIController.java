@@ -63,10 +63,15 @@ public class GetTableFormGUIController implements IServerResponseListener {
                     "Thank you for confirming your arrival. Unfortunately, we currently don't have a table ready for you.\n" +
                             "You'll be entering a waiting list and we'll notify you when your table is ready. We apologize for the inconvenience."
             );
-            case ORDER_ARRIVED_ERROR -> BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Due to server error, it was unable to confirm your arrival. Please contact staff for help."
-            );
+            case ORDER_ARRIVED_ERROR -> {
+                if (message.getData() == null)
+                    BistroUtilities.showMessage(
+                        "Bistro Restaurant",
+                        "Due to server error, it was unable to confirm your arrival. Please contact staff for help."
+                    );
+                else
+                    BistroUtilities.showMessage("Bistro Restaurant", (String) message.getData());
+            }
         }
     }
 

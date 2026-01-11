@@ -6,6 +6,7 @@ import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -131,7 +132,9 @@ public class OrderController {
         OrderResponse orderResponse = orderService.orderArrives((UUID) message.getData());
         if (orderResponse == null) return new Message(ORDER_ARRIVED_ERROR, null);
         if (orderResponse.getConformationCode() == null)
-            return new Message(ORDER_ARRIVED_ERROR, "can't arrive to order that was deleted");
+            return new Message(ORDER_ARRIVED_ERROR, "Cannot arrive to order that was cancelled.");
+        if (orderResponse.getOrderDateTime().toLocalDate().isBefore(LocalDate.now()) || orderResponse.getOrderDateTime().toLocalDate().isAfter(LocalDate.now()))
+            return new Message(ORDER_ARRIVED_ERROR, "Order's date do not match to the current date.");
         return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 

@@ -76,10 +76,10 @@ public class OrderRepository {
     }
     public List<Order> findActiveOrdersByTableCapacity(int num) throws SQLException {
         String sql = """
-                SELECT o FROM Order o " +
-                           "WHERE o.orderArrive = 1 " +
-                           "AND o.orderCompleted = false " +
-                           "AND o.orderCancelled = false;
+                SELECT * FROM bistro.`Order`
+                WHERE orderArrive = 1
+                AND orderCompleted = 0
+                AND orderCancelled = 0;
                 """;
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
