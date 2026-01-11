@@ -105,14 +105,14 @@ public class OrderService {
      *
      * <p>
      * Transactional read operation:
-     * calls {@link OrderRepository#findAll()} and maps each {@link Order} to {@link OrderResponse}
+     * calls {@link OrderRepository#findAllSubscribersOrders()} and maps each {@link Order} to {@link OrderResponse}
      * using {@link OrderMapper#mapOrderToOrderResponse(Order)}.
      * </p>
      *
      * @return list of all orders as DTOs
      */
     public List<OrderResponse> getAllOrders() {
-        return tx.inTransaction(orderRepository::findAll)
+        return tx.inTransaction(orderRepository::findAllSubscribersOrders)
                 .stream()
                 .map(OrderMapper::mapOrderToOrderResponse)
                 .toList();

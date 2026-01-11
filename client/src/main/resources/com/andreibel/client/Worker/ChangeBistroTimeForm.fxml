@@ -1,65 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.text.Font?>
-<AnchorPane fx:id="rootPane" prefHeight="611.0" prefWidth="604.0" style="-fx-background-color: #fff4e0;" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.ChangeBistroTimeFormGUIController"> <!-- soft warm background -->
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="rootPane" prefHeight="600.0" prefWidth="1060.0" stylesheets="@../../../../style/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.andreibel.client.Worker.ChangeBistroTimeFormGUIController"> <!-- soft warm background -->
+
+   <!-- Full page container -->
+   <VBox alignment="TOP_CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <HBox prefHeight="70.0" prefWidth="1556.0" spacing="20.0" style="-fx-min-width: 1040; -fx-max-width: 1040;">
+         <VBox.margin>
+            <Insets top="10.0" />
+         </VBox.margin>
+         <!-- Top bar (also uses .card, so must override width too) -->
+         <HBox alignment="CENTER_RIGHT" fillHeight="false" maxWidth="1000.0" minHeight="-Infinity" minWidth="1000.0" nodeOrientation="RIGHT_TO_LEFT" prefHeight="70.0" prefWidth="1000.0" style="-fx-min-width: 940; -fx-pref-width: 940; -fx-max-width: 940;" styleClass="card">
+            <Label fx:id="lblTitle" styleClass="title" text="Change Bistro Restaurant Settings:" wrapText="true" />
+            <ImageView fitHeight="60.0" fitWidth="60.0" pickOnBounds="true" preserveRatio="true">
+               <viewport>
+                  <Rectangle2D minX="1.0" />
+               </viewport>
+               <Image url="@../../../../img/logo.png" />
+            </ImageView>
+         </HBox>
+         <Pane prefHeight="70.0" prefWidth="70.0" styleClass="card">
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
+            <padding>
+               <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+            </padding>
+
+            <!-- Back button moved here -->
+            <Button fx:id="btnGoBack" alignment="CENTER" contentDisplay="RIGHT" mnemonicParsing="false" onAction="#onGoBackButtonClicked" prefHeight="70.0" prefWidth="70.0" styleClass="action-btn" textOverrun="CLIP">
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
+               <graphic>
+                  <ImageView fitHeight="150.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../../../../img/back.png" />
+                  </ImageView>
+               </graphic>
+            </Button>
+         </Pane>
+      </HBox>
+
+
+      <HBox alignment="CENTER" spacing="30.0">
+         <VBox alignment="TOP_CENTER" styleClass="card">
+            <Label fx:id="lblOpenClose" styleClass="subtitle" text="Edit opening and closing time:" />
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblOpen" alignment="CENTER_RIGHT" minWidth="160.0" text="Opening Time:" />
+               <TextField fx:id="txtFieldOpen" minWidth="220.0" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblClose" alignment="CENTER_RIGHT" minWidth="160.0" text="Closing Time:" />
+               <TextField fx:id="txtFieldClose" minWidth="220.0" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblInterval" alignment="CENTER_RIGHT" minWidth="160.0" text="Interval between orders:" />
+               <TextField fx:id="txtFieldInterval" minWidth="220.0" />
+
+            </HBox>
+            <Label fx:id="lblInfoRange" text="Range between: 15 to 60 minutes" textAlignment="CENTER" wrapText="true" />
+            <Button fx:id="btnUpdateRegular" minHeight="60.0" onAction="#onUpdateRegularButtonClicked" prefHeight="60.0" prefWidth="270.0" styleClass="action-btn" text="Update Regular Time">
+
+               <styleClass>
+                  <String fx:value="action-btn" />
+                  <String fx:value="danger" />
+               </styleClass>
+               <graphic>
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../../../../img/submit.png" />
+                  </ImageView>
+               </graphic>
+            </Button>
+         </VBox>
+         <VBox alignment="TOP_CENTER" styleClass="card">
+            <Label fx:id="lblEvent" styleClass="subtitle" text="Add new special event:" />
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblEventName" alignment="CENTER_RIGHT" minWidth="160.0" text="Event's Name:" />
+               <TextField fx:id="txtFieldEventName" minWidth="220.0" promptText="Enter new event name" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblEventDate" alignment="CENTER_RIGHT" minWidth="160.0" text="Event's Date:" />
+               <DatePicker fx:id="datePickerEvent" minWidth="220.0" promptText="Pick a date for the event" />
+            </HBox>
+            <HBox alignment="CENTER" minWidth="160.0" spacing="10.0">
+               <Label fx:id="lblEventOpen" alignment="CENTER_RIGHT" minWidth="160.0" text="Opening Time:" />
+               <TextField fx:id="txtFieldEventOpen" minWidth="220.0" promptText="HH:MM" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblEventClose" alignment="CENTER_RIGHT" contentDisplay="RIGHT" minWidth="160.0" text="Closing Time:" />
+               <TextField fx:id="txtFieldEventClose" minWidth="220.0" promptText="HH:MM" />
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+               <Label fx:id="lblEventInterval" alignment="CENTER_RIGHT" minWidth="160.0" prefHeight="17.0" prefWidth="138.0" text="Interval between orders:" />
+               <TextField fx:id="txtFieldEventInterval" minWidth="220.0" promptText="Enter interval between orders" />
+            </HBox>
+            <Label fx:id="lblEventInfoRange" text="Range between: 15 to 60 minutes" wrapText="true" />
+            <Button fx:id="btnCreateNewEvent" minHeight="60.0" onAction="#onCreateNewEventButtonClicked" prefHeight="60.0" prefWidth="270.0" styleClass="action-btn" text="Create New Event">
+
+               <styleClass>
+                  <String fx:value="action-btn" />
+                  <String fx:value="danger" />
+               </styleClass>
+               <graphic>
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                     <Image url="@../../../../img/add.png" />
+                  </ImageView>
+               </graphic>
+            </Button>
+         </VBox>
+      </HBox>
+   </VBox>
 
    <children>
-      <!-- Main Title -->
-      <Label layoutX="14.0" layoutY="14.0" style="-fx-font-size: 21px; -fx-text-fill: #333;" text="Change Bistro Restaurant Settings:" />
 
-      <!-- Edit regular times -->
-      <Label fx:id="lblOpenClose" layoutX="68.0" layoutY="75.0" style="-fx-font-size: 16px; -fx-text-fill: #333;" text="Edit opening and closing time:" />
-
-      <Label fx:id="lblOpen" layoutX="47.0" layoutY="140.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Opening Time:" />
-      <TextField fx:id="txtFieldOpen" layoutX="146.0" layoutY="137.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
-
-      <Label fx:id="lblClose" layoutX="321.0" layoutY="140.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Closing Time:" />
-      <TextField fx:id="txtFieldClose" layoutX="413.0" layoutY="137.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
-
-      <Button fx:id="btnUpdateRegular" layoutX="224.0" layoutY="240.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="154.0" style="-fx-background-color: #43A047; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px;" text="Update Regular Time" />
 
       <!-- Add special event -->
-      <Label fx:id="lblEvent" layoutX="64.0" layoutY="310.0" style="-fx-font-size: 16px; -fx-text-fill: #333;" text="Add new special event:" />
 
-      <Label fx:id="lblEventName" layoutX="53.0" layoutY="364.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Event's Name:" />
-      <TextField fx:id="txtFieldEventName" layoutX="158.0" layoutY="361.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
 
-      <Label fx:id="lblEventDate" layoutX="326.0" layoutY="364.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Event's Date:" />
-      <DatePicker fx:id="datePickerEvent" layoutX="422.0" layoutY="361.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 2px;" />
 
-      <Label fx:id="lblEventOpen" layoutX="52.0" layoutY="419.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Opening Time:" />
-      <TextField fx:id="txtFieldEventOpen" layoutX="158.0" layoutY="416.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
 
-      <Label fx:id="lblEventClose" layoutX="325.0" layoutY="419.0" style="-fx-font-size: 15px; -fx-text-fill: #333;" text="Closing Time:" />
-      <TextField fx:id="txtFieldEventClose" layoutX="422.0" layoutY="416.0" prefHeight="26.0" prefWidth="141.0" style="-fx-background-color: white; -fx-border-color: #ccc; -fx-border-radius: 4px; -fx-padding: 4px;" />
 
-      <Button fx:id="btnCreateNewEvent" layoutX="225.0" layoutY="507.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="154.0" style="-fx-background-color: #FF9800; -fx-text-fill: white; -fx-font-size: 14px; -fx-background-radius: 6px;" text="Create New Event" />
+
+
+
+
+
+
 
       <!-- Go Back Button -->
-      <Button fx:id="btnGoBack" layoutX="13.0" layoutY="552.0" mnemonicParsing="false" prefHeight="45.0" prefWidth="103.0" style="-fx-background-color: #607D8B; -fx-text-fill: white; -fx-font-size: 13px; -fx-background-radius: 6px;" text="Go Back" />
-      <Label fx:id="lblInterval" layoutX="87.0" layoutY="192.0" text="Interval between orders:">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
-      <TextField fx:id="txtFieldInterval" layoutX="252.0" layoutY="190.0" prefHeight="25.0" prefWidth="160.0" />
-      <Label fx:id="lblInfoRange" layoutX="88.0" layoutY="207.0" prefHeight="17.0" prefWidth="160.0" text="Range between: 15 to 60 minutes" textAlignment="CENTER" wrapText="true">
-         <font>
-            <Font size="11.0" />
-         </font>
-      </Label>
-      <Label fx:id="lblEventInterval" layoutX="105.0" layoutY="460.0" text="Interval between orders:">
-         <font>
-            <Font size="16.0" />
-         </font>
-      </Label>
-      <TextField fx:id="txtFieldEventInterval" layoutX="270.0" layoutY="458.0" prefHeight="25.0" prefWidth="160.0" />
-      <Label fx:id="lblEventInfoRange" layoutX="106.0" layoutY="475.0" prefHeight="17.0" prefWidth="160.0" text="Range between: 15 to 60 minutes" textAlignment="CENTER" wrapText="true">
-         <font>
-            <Font size="11.0" />
-         </font>
-      </Label>
+
+
+
+
+
    </children>
 </AnchorPane>

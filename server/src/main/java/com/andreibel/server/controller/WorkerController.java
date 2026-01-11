@@ -179,7 +179,7 @@ public class WorkerController {
     public Message updateTables(Message message) {
         if (!(message.getData() instanceof List)) return new Message(EDIT_BISTRO_LAYOUT_ERROR, null);
         tableService.editTables((List<TableRequest>) message.getData());
-        return new Message(EDIT_BISTRO_LAYOUT_RESPONSE, null);
+        return new Message(EDIT_BISTRO_LAYOUT_RESPONSE, "successfully edited");
     }
 
     /**

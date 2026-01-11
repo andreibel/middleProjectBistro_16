@@ -68,12 +68,25 @@
             <VBox alignment="CENTER" maxWidth="500.0" minWidth="500.0" prefWidth="500.0" styleClass="card">
                 <Label styleClass="subtitle" text="Enter new worker details:" wrapText="true" />
                 <HBox alignment="CENTER" spacing="20.0">
-                    <Label fx:id="lblWorkerName" text="Worker Name:                " />
+                    <Label fx:id="lblWorkerName" text="Worker Name:                ">
+                  <tooltip>
+                     <Tooltip text="Full name must follow the examples: John Doe, Alice Mary Smith" />
+                  </tooltip></Label>
                     <TextField fx:id="txtFieldWorkerName" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" promptText="Enter Worker's Full Name..." />
                 </HBox>
 
                 <HBox alignment="CENTER" spacing="20.0">
-                    <Label fx:id="lblPassword" prefHeight="16.0" prefWidth="134.0" text="Create Password:" />
+                    <Label fx:id="lblPassword" prefHeight="16.0" prefWidth="134.0" text="Create Password:">
+                        <tooltip>
+                            <Tooltip text="A valid password must satisfy all of the following rules:&#10;&#10;
+                            • Contains at least 8 characters&#10;
+                            • Contains at least one uppercase letter (A–Z)&#10;
+                            • Contains at least one lowercase letter (a–z)&#10;
+                            • Contains at least one digit (0–9)&#10;
+                            • No special characters are required&#10;
+                            • No spaces are allowed"/>
+                        </tooltip>
+                    </Label>
                     <TextField fx:id="txtFieldPassword" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" promptText="Create new password..." />
                 </HBox>
 
@@ -84,9 +97,6 @@
 
                 <!-- Primary Action -->
                 <Button fx:id="btnRegisterWorker" minHeight="50.0" onAction="#onButtonRegisterWorkerClicked" prefHeight="50.0" prefWidth="270.0" text="Register New Worker">
-                    <tooltip>
-                        <Tooltip text="Review reservation schedules and table availability." wrapText="true" />
-                    </tooltip>
                     <styleClass>
                         <String fx:value="action-btn" />
                         <String fx:value="outline" />

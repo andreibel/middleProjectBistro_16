@@ -13,22 +13,41 @@ import javafx.scene.control.TextField;
 import java.io.IOException;
 import java.util.UUID;
 
+/**
+ * Controller for the "Get Table" form.
+ *
+ * <p>This form allows guests or subscribers to confirm their arrival at the restaurant
+ * by entering a confirmation code. The controller also handles navigation to the
+ * "Lost My Code" form and back to the main screen.</p>
+ */
 public class GetTableFormGUIController implements IServerResponseListener {
+
+    /** Text field for entering confirmation code */
     @FXML
     private TextField txtFieldConfirmation;
+
+    /** Singleton client controller for server communication */
     private BistroClientController controller;
 
+    /** Initializes the controller after FXML has been loaded */
     @FXML
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
     }
 
+    /**
+     * Handles responses from the server regarding arrival confirmation.
+     *
+     * @param message the server message
+     */
     @Override
     public void onServerResponse(Message message) {
         switch (message.getType()) {
             case ORDER_ARRIVED_RESPONSE -> {
                 CustomerStateManager.getInstance().setArrivedToTable(true);
+
+                // Save confirmation code for guest if entered
                 String codeText = txtFieldConfirmation.getText().trim();
                 if (!codeText.isEmpty() && BistroUtilities.isNumeric(codeText)) {
                     CustomerStateManager.getInstance().setConfirmationCode(Integer.parseInt(codeText));
@@ -36,13 +55,13 @@ public class GetTableFormGUIController implements IServerResponseListener {
                 txtFieldConfirmation.clear();
                 BistroUtilities.showMessage(
                         "Bistro Restaurant",
-                        "Thank you for confirming your arrival, please head to your table"
+                        "Thank you for confirming your arrival, please head to your table."
                 );
             }
             case ORDER_ARRIVED_WAITING_RESPONSE -> BistroUtilities.showMessage(
                     "Bistro Restaurant",
                     "Thank you for confirming your arrival. Unfortunately, we currently don't have a table ready for you.\n" +
-                            "You'll be entering a waiting list and we'll let you know when your table is ready. We apologize for the inconvenience."
+                            "You'll be entering a waiting list and we'll notify you when your table is ready. We apologize for the inconvenience."
             );
             case ORDER_ARRIVED_ERROR -> BistroUtilities.showMessage(
                     "Bistro Restaurant",
@@ -51,12 +70,18 @@ public class GetTableFormGUIController implements IServerResponseListener {
         }
     }
 
+    /**
+     * Handles the "Confirm Arrival" button click.
+     * Validates guest input and sends confirmation request to the server.
+     *
+     * @param event the button click event
+     */
     @FXML
     private void onButtonConfirmArrivalClicked(ActionEvent event) {
         boolean isGuest = CustomerStateManager.getInstance().getSubscriber() == null;
 
         if (isGuest && txtFieldConfirmation.getText().isBlank()) {
-            BistroUtilities.showMessage("Bistro Restaurant", "Dear Guest, please enter confirmation code");
+            BistroUtilities.showMessage("Bistro Restaurant", "Dear Guest, please enter confirmation code.");
             return;
         }
 
@@ -64,9 +89,8 @@ public class GetTableFormGUIController implements IServerResponseListener {
         if (!txtFieldConfirmation.getText().isBlank()) {
             try {
                 confirmationUUID = UUID.fromString(txtFieldConfirmation.getText().trim());
-            }
-            catch (IllegalArgumentException e) {
-                BistroUtilities.showMessage("Bistro Restaurant", "Invalid confirmation code format");
+            } catch (IllegalArgumentException e) {
+                BistroUtilities.showMessage("Bistro Restaurant", "Invalid confirmation code format.");
                 return;
             }
         }
@@ -74,6 +98,12 @@ public class GetTableFormGUIController implements IServerResponseListener {
         controller.requestArrivalConfirmation(confirmationUUID);
     }
 
+    /**
+     * Navigates to the "Lost My Code" form.
+     *
+     * @param event the button click event
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @FXML
     private void onLostMyCodeButtonClicked(ActionEvent event) throws IOException {
         BistroUtilities.switchScreen(
@@ -83,6 +113,12 @@ public class GetTableFormGUIController implements IServerResponseListener {
         );
     }
 
+    /**
+     * Navigates back to the main form and clears the confirmation field.
+     *
+     * @param event the button click event
+     * @throws IOException if the FXML file cannot be loaded
+     */
     @FXML
     private void onButtonGoBackClicked(ActionEvent event) throws IOException {
         txtFieldConfirmation.clear();
