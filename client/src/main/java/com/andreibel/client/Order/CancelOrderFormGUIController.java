@@ -98,7 +98,7 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
     private void onCancelOrderButtonClicked(ActionEvent event) {
         if (txtFieldConfirmationCode.getText().isEmpty()) {
             BistroUtilities.showMessage(
-                    "Bistro Restaurant - Order Cancellation Failed",
+                    "Bistro Restaurant",
                     "No confirmation code provided."
             );
             return;
@@ -110,7 +110,7 @@ public class CancelOrderFormGUIController implements IServerResponseListener {
             );
         } catch (IllegalArgumentException e) {
             BistroUtilities.showMessage(
-                    "Bistro Restaurant - Order Cancellation Failed",
+                    "Bistro Restaurant",
                     "Invalid confirmation code format."
             );
         }

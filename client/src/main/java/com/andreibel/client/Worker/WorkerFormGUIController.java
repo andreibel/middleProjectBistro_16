@@ -11,14 +11,17 @@ import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 
+/**
+ * Controller for the main Worker screen.
+ *
+ * <p>Shows options available to the worker and dynamically adjusts visibility
+ * of manager-specific options.</p>
+ */
 public class WorkerFormGUIController {
 
-    @FXML
-    private Label lblTitle;
-    @FXML
-    private VBox vBoxManager;
-    @FXML
-    private AnchorPane rootPane;
+    @FXML private Label lblTitle;
+    @FXML private VBox vBoxManager;
+    @FXML private AnchorPane rootPane;
 
     @FXML
     private void initialize() {
@@ -28,79 +31,59 @@ public class WorkerFormGUIController {
         adjustFormBasedOnWorkerType();
     }
 
-    @FXML
-    private void onRegisterButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/SubscriberRegisterForm.fxml",
-                "Bistro Restaurant - Register new Subscriber");
+    // ---------------- Button Event Handlers ----------------
+
+    @FXML private void onRegisterButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/SubscriberRegisterForm.fxml", "Bistro Restaurant - Register new Subscriber");
     }
 
-    @FXML
-    private void onSubscribersReportButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/SubscriberReportsForm.fxml",
-                "Bistro Restaurant - Subscribers Report");
+    @FXML private void onSubscribersReportButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/SubscriberReportsForm.fxml", "Bistro Restaurant - Subscribers Report");
     }
 
-    @FXML
-    private void onSchedulesReportButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/ScheduleReportsForm.fxml",
-                "Bistro Restaurant - Schedules Report");
+    @FXML private void onSchedulesReportButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/ScheduleReportsForm.fxml", "Bistro Restaurant - Schedules Report");
     }
 
-    @FXML
-    private void onViewCurrentDiningButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/CurrentDiningForm.fxml",
-                "Bistro Restaurant - Dining at this time");
+    @FXML private void onViewCurrentDiningButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/CurrentDiningForm.fxml", "Bistro Restaurant - Dining at this time");
     }
 
-    @FXML
-    private void onRegisterWorkerButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/WorkerRegisterForm.fxml",
-                "Bistro Restaurant - Register new Worker");
+    @FXML private void onRegisterWorkerButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/WorkerRegisterForm.fxml", "Bistro Restaurant - Register new Worker");
     }
 
-    @FXML
-    private void onGoBackButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Main/MainForm.fxml",
-                "Bistro Restaurant");
+    @FXML private void onGoBackButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Main/MainForm.fxml", "Bistro Restaurant");
     }
 
-    @FXML
-    private void onChangeRestaurantLayoutButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/EditRestaurantLayoutForm.fxml",
-                "Bistro Restaurant - Change Layout of Restaurant");
+    @FXML private void onChangeRestaurantLayoutButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/EditRestaurantLayoutForm.fxml", "Bistro Restaurant - Change Layout of Restaurant");
     }
 
-    @FXML
-    private void onViewCurrentWaitingButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/CurrentWaitingListForm.fxml",
-                "Bistro Restaurant - Current on Waiting List");
+    @FXML private void onViewCurrentWaitingButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/CurrentWaitingListForm.fxml", "Bistro Restaurant - Current on Waiting List");
     }
 
-    @FXML
-    private void onViewCurrentOrderButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/ActiveOrdersForm.fxml",
-                "Bistro Restaurant - Current Active Orders");
+    @FXML private void onViewCurrentOrderButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/ActiveOrdersForm.fxml", "Bistro Restaurant - Current Active Orders");
     }
 
-    @FXML
-    private void onChangeBistroButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node) event.getSource(),
-                "/Worker/ChangeBistroTimeForm.fxml",
-                "Bistro Restaurant - Change Bistro Time / Add Special Event");
+    @FXML private void onChangeBistroButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/ChangeBistroTimeForm.fxml", "Bistro Restaurant - Change Bistro Time / Add Special Event");
     }
 
-    @FXML
-    private void onSubListButtonClicked(ActionEvent event) throws IOException {
-        BistroUtilities.switchScreen((Node)event.getSource(), "/Worker/RegisteredSubscribersForm.fxml", "Bistro Restaurant - Subscriber List");
+    @FXML private void onSubListButtonClicked(ActionEvent event) throws IOException {
+        switchScreen(event, "/Worker/RegisteredSubscribersForm.fxml", "Bistro Restaurant - Subscriber List");
+    }
+
+    // ---------------- Helper Methods ----------------
+
+    /**
+     * Switches to a new screen with the given FXML path and title.
+     */
+    private void switchScreen(ActionEvent event, String fxmlPath, String title) throws IOException {
+        BistroUtilities.switchScreen((Node) event.getSource(), fxmlPath, title);
     }
 
     /**

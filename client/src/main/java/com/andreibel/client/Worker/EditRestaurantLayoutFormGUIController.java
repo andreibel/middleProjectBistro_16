@@ -6,6 +6,7 @@ import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.message.DTO.TableRequest;
 import com.andreibel.message.DTO.TableResponse;
 import com.andreibel.message.Message;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -17,36 +18,60 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.util.converter.IntegerStringConverter;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import javafx.beans.property.IntegerProperty;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * GUI controller for editing the restaurant's table layout.
+ *
+ * <p>This controller allows staff to view, add, remove, and edit tables in the restaurant.
+ * Each table has a capacity and quantity. Changes can be applied to the server after validation.</p>
+ */
 public class EditRestaurantLayoutFormGUIController implements IServerResponseListener {
 
+    /** TableView displaying all restaurant tables. */
     @FXML
     private TableView<Table> tblViewRestaurantLayout;
+
+    /** Column displaying table capacity. */
     @FXML
     private TableColumn<Table, Integer> colCapacity;
+
+    /** Column displaying table quantity. */
     @FXML
     private TableColumn<Table, Integer> colQuantity;
+
+    /** Button for adding a new table to the layout. */
     @FXML
     private Button btnAddTable;
+
+    /** Button for removing a selected table from the layout. */
     @FXML
     private Button btnRemoveTable;
+
+    /** Button for confirming all layout changes to the server. */
     @FXML
     private Button btnConfirmChanges;
+
+    /** Root anchor pane of the form. */
     @FXML
     private AnchorPane rootPane;
-    @FXML
-    private Button btnGoBack;
 
+    /** Observable list holding the table data for the TableView. */
     private ObservableList<Table> tableList = FXCollections.observableArrayList();
+
+    /** Singleton instance of the Bistro client controller for server communication. */
     private BistroClientController controller;
 
+    /**
+     * Initializes the controller after the FXML has been loaded.
+     *
+     * <p>Disables buttons initially, sets up the table view, enables editing,
+     * sets row selection behavior, and requests table data from the server when the scene is shown.</p>
+     */
     @FXML
     public void initialize() {
         controller = BistroClientController.getInstance();
@@ -63,6 +88,11 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         requestTablesWhenSceneIsShown();
     }
 
+    /**
+     * Handles server responses related to restaurant tables.
+     *
+     * @param message the message received from the server
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void onServerResponse(Message message) {
@@ -87,6 +117,13 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         }
     }
 
+    /**
+     * Handles clicks on the "Add Table" button.
+     *
+     * <p>Adds a new table with default values (0 capacity, 0 quantity) and selects it in the table view.</p>
+     *
+     * @param event the action event
+     */
     @FXML
     private void onAddTableButtonClicked(ActionEvent event) {
         Table newTable = new Table(0, 0);
@@ -96,6 +133,13 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         btnConfirmChanges.setDisable(false);
     }
 
+    /**
+     * Handles clicks on the "Remove Table" button.
+     *
+     * <p>Removes the selected table from the table view and updates button states.</p>
+     *
+     * @param event the action event
+     */
     @FXML
     private void onRemoveTableButtonClicked(ActionEvent event) {
         Table selectedTable = tblViewRestaurantLayout.getSelectionModel().getSelectedItem();
@@ -107,6 +151,13 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         btnConfirmChanges.setDisable(tableList.isEmpty());
     }
 
+    /**
+     * Handles clicks on the "Confirm Changes" button.
+     *
+     * <p>Validates all tables and sends the updated layout to the server.</p>
+     *
+     * @param event the action event
+     */
     @FXML
     private void onConfirmChangesButtonClicked(ActionEvent event) {
         if (!isAllTablesValid()) {
@@ -121,22 +172,41 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         controller.requestApplyLayoutChanges(reqs);
     }
 
+    /**
+     * Handles clicks on the "Go Back" button.
+     *
+     * <p>Clears the form and navigates back to the staff main screen.</p>
+     *
+     * @param event the action event
+     * @throws IOException if the FXML cannot be loaded
+     */
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
         clearForm();
         BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/WorkerForm.fxml", "Bistro Restaurant - Staff Area");
     }
 
+    /**
+     * Updates button states when a table is selected in the TableView.
+     *
+     * @param t the selected table
+     */
     private void onSelectedTableFromTableView(Table t) {
         btnRemoveTable.setDisable(t == null);
         btnConfirmChanges.setDisable(tableList.isEmpty());
     }
 
+    /**
+     * Sets up the TableView with cell value factories.
+     */
     private void setTableView() {
         colCapacity.setCellValueFactory(cell -> cell.getValue().capacityProperty().asObject());
         colQuantity.setCellValueFactory(cell -> cell.getValue().quantityProperty().asObject());
     }
 
+    /**
+     * Enables editing for table capacity and quantity columns.
+     */
     private void enableEditing() {
         tblViewRestaurantLayout.setEditable(true);
 
@@ -150,22 +220,36 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         colQuantity.setOnEditCommit(event -> event.getRowValue().setQuantity(event.getNewValue()));
     }
 
+    /**
+     * Clears the table view and disables buttons.
+     */
     private void clearForm() {
         tableList.clear();
         btnRemoveTable.setDisable(true);
         btnConfirmChanges.setDisable(true);
     }
 
+    /**
+     * Sets up the listener for row selection changes in the TableView.
+     */
     private void setupRowSelection() {
         tblViewRestaurantLayout.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldVal, newVal) -> onSelectedTableFromTableView(newVal)
         );
     }
 
+    /**
+     * Validates that all tables have capacity and quantity greater than 0.
+     *
+     * @return true if all tables are valid, false otherwise
+     */
     private boolean isAllTablesValid() {
         return tableList.stream().allMatch(t -> t.getCapacity() > 0 && t.getQuantity() > 0);
     }
 
+    /**
+     * Requests the table data from the server when the scene is shown.
+     */
     private void requestTablesWhenSceneIsShown() {
         rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
@@ -178,27 +262,30 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
         });
     }
 
+    /**
+     * Inner class representing a table in the restaurant layout.
+     */
     public static class Table {
-        private final javafx.beans.property.IntegerProperty capacity =
-                new javafx.beans.property.SimpleIntegerProperty();
-        private final javafx.beans.property.IntegerProperty quantity =
-                new javafx.beans.property.SimpleIntegerProperty();
+        private final IntegerProperty capacity =
+                new SimpleIntegerProperty();
+        private final IntegerProperty quantity =
+                new SimpleIntegerProperty();
 
         public Table(int capacity, int quantity) {
             this.capacity.set(capacity);
             this.quantity.set(quantity);
         }
 
-        public javafx.beans.property.IntegerProperty capacityProperty() {return capacity;}
+        public IntegerProperty capacityProperty() { return capacity; }
 
-        public javafx.beans.property.IntegerProperty quantityProperty() {return quantity;}
+        public javafx.beans.property.IntegerProperty quantityProperty() { return quantity; }
 
-        public int getCapacity() {return capacity.get();}
+        public int getCapacity() { return capacity.get(); }
 
-        public void setCapacity(int capacity) {this.capacity.set(capacity);}
+        public void setCapacity(int capacity) { this.capacity.set(capacity); }
 
-        public int getQuantity() {return quantity.get();}
+        public int getQuantity() { return quantity.get(); }
 
-        public void setQuantity(int quantity) {this.quantity.set(quantity);}
+        public void setQuantity(int quantity) { this.quantity.set(quantity); }
     }
 }
