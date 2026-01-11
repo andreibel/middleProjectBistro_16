@@ -149,8 +149,9 @@ public class OrderController {
         if(closed == null)  return new Message(COMPLETE_ORDER_ERROR, null);
         if (closed.getConformationCode() == null)
             return new Message(COMPLETE_ORDER_ERROR, "cant close the order due to order was candled or completed");
+        double price = closed.getNumberOfGuests() * 100 * ( closed.getSubscriberId() == 0 ? 1 : 0.9);
         printPrice(closed);
-        return new Message(COMPLETE_ORDER_RESPONSE, null);
+        return new Message(COMPLETE_ORDER_RESPONSE, "the order is closed. pay this price: $" + price);
     }
 
     /**
