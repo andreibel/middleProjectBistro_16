@@ -6,12 +6,15 @@ import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OpenTimeRepository;
 import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.TableRepository;
+import com.andreibel.server.dbController.repository.WaitingListRepository;
 import com.andreibel.server.entity.OpenTime;
 import com.andreibel.server.entity.Order;
 import com.andreibel.server.entity.Table;
+import com.andreibel.server.entity.Waiting;
 import com.andreibel.server.utils.OrderMapper;
 
 import java.sql.Date;
+import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -197,19 +200,59 @@ public class OrderService {
      * @return updated order as DTO (arrived state)
      */
     public OrderResponse orderArrives(UUID conformationCode) {
-        //TODO: add logic of arriving to bistro but not palace now available,
         return tx.inTransaction(() -> {
-            orderRepository.setArrived(conformationCode);
+            // 1. Get order by confirmation code
             Order order = orderRepository.findByConformationCode(conformationCode);
-            return OrderMapper.mapOrderToOrderResponse(order);
+            if (order == null) throw new RuntimeException("Order not found");
+
+            // 2. Validate not cancelled
+            if (order.isOrderCancelled()) throw new RuntimeException("Order cancelled");
+
+            // 3. Mark as arrived
+            orderRepository.setArrived(conformationCode);
+            order = orderRepository.findByConformationCode(conformationCode);
+
+            // 4. Check table availability
+            if (isTableAvailable(order.getNumberOfGuests())) {
+                // TABLE AVAILABLE - SEAT
+                return OrderMapper.mapOrderToOrderResponse(order);
+            } else {
+                // NO TABLE - ADD TO WAITING
+                Waiting waitingEntry = new Waiting();
+                waitingEntry.setNumberOfGuests(order.getNumberOfGuests());
+                waitingEntry.setWaitingDateTime(LocalDateTime.now());
+                waitingEntry.setOrderNumber(order.getOrderNumber());
+                waitingEntry.setSubscriberId(order.getSubscriberId());
+                waitingEntry.setEmail(order.getEmail());
+                waitingEntry.setPhoneNumber(order.getPhoneNumber());
+                waitingEntry.setConformationCode(order.getConformationCode());
+                waitingEntry.setCurrentlyWaiting(true);
+
+                WaitingListRepository.getInstance().addWaiting(waitingEntry);
+                return OrderMapper.mapOrderToOrderResponse(order);
+            }
         });
     }
+    private boolean isTableAvailable(int numberOfGuests) throws SQLException {
+        List<Table> allTables = tableRepository.findAll();
 
+        for (Table table : allTables) {
+            if (table.getCapacity() < numberOfGuests) continue;  // Too small
+
+            List<Order> activeOrders = orderRepository
+                    .findActiveOrdersByTableCapacity(table.getCapacity());
+
+            if (activeOrders.size() < table.getQuantity()) {
+                return true;  // Found available table
+            }
+        }
+        return false;  // No suitable table
+    }
     /**
      * Marks an order as completed/closed by its confirmation code.
      *
      * <p>
-     * Transactional write operation:
+     * Transactional write operation:D
      * calls {@link OrderRepository#completeOrder(java.util.UUID)} and returns the updated order.
      * </p>
      *

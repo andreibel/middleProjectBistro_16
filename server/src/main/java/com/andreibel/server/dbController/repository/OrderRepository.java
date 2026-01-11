@@ -74,7 +74,20 @@ public class OrderRepository {
         }
         return orders;
     }
-
+    public List<Order> findActiveOrdersByTableCapacity(int num) throws SQLException {
+        String sql = """
+                SELECT o FROM Order o " +
+                           "WHERE o.orderArrive = 1 " +
+                           "AND o.orderCompleted = false " +
+                           "AND o.orderCancelled = false;
+                """;
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) orders.add(mapRelToOrder(rs));
+        }
+        return orders;
+    }
     /**
      * Finds an order by its primary key ({@code orderNumber}).
      *
@@ -82,6 +95,7 @@ public class OrderRepository {
      * @return matching {@link Order} or {@code null} if not found
      * @throws SQLException if a database access error occurs
      */
+
     public Order findById(int orderNumber) throws SQLException {
         String sql = """
                 SELECT *
