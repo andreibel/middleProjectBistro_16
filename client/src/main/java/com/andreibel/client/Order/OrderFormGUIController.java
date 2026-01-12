@@ -287,6 +287,8 @@ public class OrderFormGUIController implements IServerResponseListener {
 
     /** Sends an order creation request to the server. */
     private void createOrder() {
+        String email = txtFieldEmail.getText().isBlank() ? null : txtFieldEmail.getText();
+        String phoneNumber = txtFieldPhoneNumber.getText().isBlank() ? null : txtFieldPhoneNumber.getText();
         controller.requestOrderCreation(
                 new OrderRequest(
                         null,
@@ -296,8 +298,8 @@ public class OrderFormGUIController implements IServerResponseListener {
                                 LocalTime.parse(comboBoxTime.getValue())
                         ),
                         CustomerStateManager.fillSubscriberIDDetails(),
-                        txtFieldEmail.getText(),
-                        txtFieldPhoneNumber.getText()
+                        email,
+                        phoneNumber
                 )
         );
         wizardStep = WizardStep.PART1;
