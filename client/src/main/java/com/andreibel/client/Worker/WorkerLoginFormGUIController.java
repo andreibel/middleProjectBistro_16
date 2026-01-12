@@ -103,7 +103,7 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
                     );
                     return;
                 }
-
+                clearFields();
                 WorkerStateManager.getInstance().setWorker(worker);
 
                 BistroUtilities.switchScreen(
