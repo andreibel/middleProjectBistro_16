@@ -383,7 +383,7 @@ public class OrderRepository {
     public List<Order> findAllDateOrders(LocalDate date) throws SQLException {
         String sql = """
                 SELECT *
-                FROM bistro.`order`
+                FROM bistro.`Order`
                 WHERE orderDateTime >= ?
                   AND orderDateTime <  ?
                   AND orderCancelled = 0

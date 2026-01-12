@@ -25,12 +25,12 @@ public class TUI {
     public static void conf(String PORT, String DB_URL, String DB_USER, String DB_PASSWORD) {
         String maskedPassword = "*".repeat(Math.min(DB_PASSWORD.length(), 8));
         System.out.printf("""
-                                        │                                 ─     BISTRO SERVER CONFIGURATION  ─                              │
+                                        │                                 ─    BISTRO SERVER CONFIGURATION    ─                              │
                                         │                     ┌──────────────────────────────────────────────────────────┐                     │
-                                        │                     │    Port        │ %-38s │                     │
-                                        │                     │    DB URL      │ %-38s │                     │
-                                        │                     │    DB User     │ %-38s │                     │
-                                        │                     │  󰟵  DB Password │ %-38s │                     │
+                                        │                     │  ─  Port        │ %-38s │                     │
+                                        │                     │  ─  DB URL      │ %-38s │                     │
+                                        │                     │  ─  DB User     │ %-38s │                     │
+                                        │                     │  ─  DB Password │ %-38s │                     │
                                         │                     └──────────────────────────────────────────────────────────┘                     │
                                         └──────────────────────────────────────────────────────────────────────────────────────────────────────┘
                 %n""", PORT, shorten(DB_URL, 38), DB_USER, maskedPassword);
@@ -70,7 +70,7 @@ public class TUI {
 
         System.out.printf(
                 """
-       │                                                         ┌─────── Bistro--invoice ───────┐                                                         │
+       │                                                         ┌──────── Bistro--invoice ────────┐                                                         │
        │ ┌───────────────────────────────────────────────────────┴───────────────────────────────────┴───────────────────────────────────────────────────────┐ │
        │ │                                        ┌────────────────────────────────────────────────────────────────┐                                         │ │
        │ │                                        │          thank you for choosing our bistro restaurant          │                                         │ │
@@ -104,7 +104,7 @@ public class TUI {
             messageString = ERROR_LINE;
         System.out.printf(
                 """
-       │ ┌─────── response: to --> client ───────┐                                                                                                         │
+       │ ┌──────── response: to --> client ────────┐                                                                                                         │
        │ ├───────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
        │ │ %-41s │ %s │ │
        │ └───────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │

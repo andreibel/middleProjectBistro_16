@@ -16,9 +16,9 @@ import static com.andreibel.server.utils.TUI.*;
 public class BistroServer extends Application {
 
     public static String PORT = "8080";
-    public static String DB_URL = "jdbc:mysql://localhost:3306/bistro";
-    public static String DB_USER = "root";
-    public static String DB_PASSWORD = "root";
+    public static String DB_URL = "jdbc:mysql://localhost:3306";
+    public static String DB_USER = "admin";
+    public static String DB_PASSWORD = "admin";
 
 
     public void startScheduler() {
