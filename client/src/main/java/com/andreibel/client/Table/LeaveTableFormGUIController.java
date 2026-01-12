@@ -50,6 +50,7 @@ public class LeaveTableFormGUIController implements IServerResponseListener {
     public void onServerResponse(Message message) throws IOException {
         switch (message.getType()) {
             case COMPLETE_ORDER_RESPONSE -> {
+                txtFieldConfirmationCode.clear();
                 BistroUtilities.showMessage(
                         "Bistro Restaurant",
                         "Thank you for dining at Bistro Restaurant. See you soon!\n"
