@@ -35,7 +35,6 @@ public class WorkerService {
         Worker worker = tx.inTransaction(() ->
                 workerRepository.findByWorkerName(request.getWorkerName())
         );
-        System.out.println(worker);
         if (worker == null) return null;
 
         if (verifyPassword(request.getWorkerPassword(), worker.getWorkerPassword())) {
@@ -74,8 +73,6 @@ public class WorkerService {
                 password.getBytes(StandardCharsets.UTF_8),
                 SECRET
         );
-        System.out.println(hashedPasswordHex);
-        System.out.println(expectedHex);
         return HmacUtil.constantTimeEqualsHex(expectedHex, hashedPasswordHex);
     }
 }

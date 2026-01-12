@@ -72,7 +72,7 @@ public class WorkerRepository {
      */
     public Worker addWorker(Worker workerRequest) throws SQLException {
         String sql = """
-                INSERT INTO bistro.`worker`
+                INSERT INTO bistro.`Worker`
                 (`workerName`, `workerPassword`, `isManager`)
                 VALUES (?,?,?);
                 """;
@@ -96,8 +96,8 @@ public class WorkerRepository {
     public Worker findByWorkerName(String workerName) throws SQLException {
         String sql = """
                 SELECT *
-                FROM bistro.`worker`
-                WHERE `workerName` = ?;
+                FROM bistro.Worker
+                WHERE workerName = ?;
                 """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {

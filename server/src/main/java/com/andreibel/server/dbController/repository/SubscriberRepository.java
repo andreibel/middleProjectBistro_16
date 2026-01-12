@@ -77,7 +77,7 @@ public class SubscriberRepository {
      */
     public Subscriber addSubscriber(SubscriberRequest sub) throws SQLException {
         String sql = """
-                INSERT INTO bistro.`subscriber`
+                INSERT INTO bistro.`Subscriber`
                 (`email`, `name`, `phoneNumber`)
                 VALUES (?,?,?);
                 """;
@@ -138,7 +138,7 @@ public class SubscriberRepository {
     public List<Subscriber> findAll() throws SQLException {
         String sql = """
                 SELECT *
-                FROM bistro.`subscriber`;
+                FROM bistro.`Subscriber`;
                 """;
         List<Subscriber> subscribers = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
