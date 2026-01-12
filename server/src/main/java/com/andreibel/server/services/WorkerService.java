@@ -41,7 +41,7 @@ public class WorkerService {
             return WorkerMapper.mapWorkerToWorkerResponse(worker);
         }
 
-        return null;
+        return new WorkerResponse();
     }
 
     public WorkerResponse createWorker(WorkerNewRequest request) {

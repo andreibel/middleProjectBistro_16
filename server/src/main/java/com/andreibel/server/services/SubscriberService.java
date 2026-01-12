@@ -46,6 +46,7 @@ public class SubscriberService {
         return tx.inTransaction(
                 () -> {
                     Subscriber subscriber = subscriberRepository.findById(data);
+                    if (subscriber == null) return null;
                     return SubscriberMapper.mapSubscriberToSubscriberResponse(subscriber);
                 }
         );
