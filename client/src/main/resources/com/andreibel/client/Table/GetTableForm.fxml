@@ -48,7 +48,7 @@
                         <Insets top="10.0" />
                     </padding>
                     <graphic>
-                        <ImageView fx:id="btnGoBack" fitHeight="150.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="" fitHeight="150.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                             <Image url="@../../../../img/back.png" />
                         </ImageView>
                     </graphic>
@@ -57,7 +57,7 @@
         </HBox>
 
         <VBox alignment="CENTER" maxWidth="700.0" minWidth="700.0" prefWidth="700.0" styleClass="card">
-            <Label styleClass="subtitle" text="Enter you conformation code" />
+            <Label styleClass="subtitle" text="Enter your conformation code" />
             <HBox alignment="CENTER" spacing="30.0">
                 <!-- Confirmation Code -->
                 <Label text="Confirmation Code:" />
@@ -85,7 +85,7 @@
             </HBox>
         </VBox>
         <HBox alignment="CENTER" maxHeight="70.0" maxWidth="700.0" minHeight="70.0" minWidth="700.0" prefHeight="70.0" prefWidth="700.0" styleClass="card">
-            <Label styleClass="subtitle" text="Forget you conformation code?" wrapText="true" />
+            <Label styleClass="subtitle" text="Forget your conformation code?" wrapText="true" />
             <HBox alignment="CENTER" spacing="30.0">
                 <!-- Primary Action -->
                 <Button fx:id="btnLostMyCode" minHeight="50.0" onAction="#onLostMyCodeButtonClicked" prefHeight="50.0" prefWidth="250.0" text="Lost My Code">

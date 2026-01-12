@@ -61,7 +61,7 @@
             </HBox>
 
             <VBox alignment="CENTER" maxWidth="700.0" minWidth="700.0" prefWidth="700.0" styleClass="card">
-                <Label styleClass="subtitle" text="Enter you personal inforamtion" />
+                <Label styleClass="subtitle" text="Retrieve your lost confrimation code " />
                 <!-- Title -->
                 <Label fx:id="dis" layoutX="14.0" layoutY="21.0" prefHeight="50.0" prefWidth="560.0" text="If you lost your confirmation code, please enter either email or phone number, pick the order for the confirmation code  we'll send it to you:" wrapText="true">
                     <font>
