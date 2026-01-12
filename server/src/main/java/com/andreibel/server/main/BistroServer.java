@@ -16,9 +16,9 @@ import static com.andreibel.server.utils.TUI.*;
 public class BistroServer extends Application {
 
     public static String PORT = "8080";
-    public static String DB_URL = "jdbc:mysql://db-bistro-g16.cbe862egq27l.eu-north-1.rds.amazonaws.com:3306";
+    public static String DB_URL = "jdbc:mysql://localhost:3306";
     public static String DB_USER = "admin";
-    public static String DB_PASSWORD = "Password";
+    public static String DB_PASSWORD = "admin";
 
 
     public void startScheduler() {
@@ -40,7 +40,7 @@ public class BistroServer extends Application {
         DB_PASSWORD = System.getenv().getOrDefault("DB_PASSWORD", DB_PASSWORD);
         conf(PORT, DB_URL, DB_USER, DB_PASSWORD);
         startLog();
-        FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("../BistroServerGUI.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(BistroServer.class.getResource("BistroServerGUI.fxml"));
         Serve sv = new Serve(8080);
         Parent load = fxmlLoader.load();
         startScheduler();

@@ -63,7 +63,7 @@ public class SubscriberRepository {
      *
      * <p><b>SQL:</b>
      * <pre>
-     * INSERT INTO bistro.`subscriber` (`email`, `name`, `phoneNumber`)
+     * INSERT INTO bistro.`Subscriber` (`email`, `name`, `phoneNumber`)
      * VALUES (?,?,?);
      * </pre>
      * </p>
@@ -128,7 +128,7 @@ public class SubscriberRepository {
      * <p><b>SQL:</b>
      * <pre>
      * SELECT *
-     * FROM bistro.`subscriber`;
+     * FROM bistro.`Subscriber`;
      * </pre>
      * </p>
      *
