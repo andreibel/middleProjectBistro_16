@@ -16,9 +16,9 @@ import static com.andreibel.server.utils.TUI.*;
 public class BistroServer extends Application {
 
     public static String PORT = "8080";
-    public static String DB_URL = "jdbc:mysql://db-bistro-g16.cbe862egq27l.eu-north-1.rds.amazonaws.com:3306";
+    public static String DB_URL = "jdbc:mysql://localhost:3306";
     public static String DB_USER = "admin";
-    public static String DB_PASSWORD = "quvxid-zupHas-7hobqi";
+    public static String DB_PASSWORD = "password";
 
 
     public void startScheduler() {
@@ -33,7 +33,6 @@ public class BistroServer extends Application {
 
 
 
-        var params = getParameters().getNamed();
         PORT = System.getenv().getOrDefault("PORT",PORT);
         DB_URL = System.getenv().getOrDefault("DB_URL",DB_URL);
         DB_USER = System.getenv().getOrDefault("DB_USER",DB_USER);

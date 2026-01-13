@@ -74,7 +74,7 @@ public class OrderRepository {
         }
         return orders;
     }
-    public List<Order> findActiveOrdersByTableCapacity(int num) throws SQLException {
+    public List<Order> findActiveOrdersByTableCapacity() throws SQLException {
         String sql = """
                 SELECT * FROM bistro.`Order`
                 WHERE orderArrive = 1
@@ -287,13 +287,13 @@ public class OrderRepository {
             stmt.setString(2, newOrder.getConformationCode().toString());
             stmt.setTimestamp(3, Timestamp.valueOf(newOrder.getOrderDateTime()));
 
-            if (newOrder.getSubscriberId() == null) stmt.setNull(4, Types.INTEGER);
+            if (newOrder.getSubscriberId() == null) stmt.setNull(4, Types.NULL);
             else stmt.setInt(4, newOrder.getSubscriberId());
 
-            if (newOrder.getEmail() == null) stmt.setNull(5, Types.VARCHAR);
+            if (newOrder.getEmail() == null) stmt.setNull(5, Types.NULL);
             else stmt.setString(5, newOrder.getEmail());
 
-            if (newOrder.getPhoneNumber() == null) stmt.setNull(6, Types.VARCHAR);
+            if (newOrder.getPhoneNumber() == null) stmt.setNull(6, Types.NULL);
             else stmt.setString(6, newOrder.getPhoneNumber());
 
             stmt.executeUpdate();

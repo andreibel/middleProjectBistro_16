@@ -3,15 +3,14 @@ package com.andreibel.client.Main;
 import com.andreibel.client.Client.BistroClient;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.util.BistroUtilities;
+import java.io.IOException;
+import java.util.Objects;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-
-import java.io.IOException;
-import java.util.Objects;
 
 /**
  * Entry point of the Bistro Restaurant JavaFX client application.
@@ -41,9 +40,8 @@ public class MainForm extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
-
         FXMLLoader fxmlLoader = new FXMLLoader(
-                MainForm.class.getResource("MainForm.fxml")
+            MainForm.class.getResource("MainForm.fxml")
         );
 
         // Read optional launch parameters
@@ -68,13 +66,15 @@ public class MainForm extends Application {
 
         // Configure stage
         stage.setTitle("Bistro Restaurant");
-        stage.getIcons().add(
+        stage
+            .getIcons()
+            .add(
                 new Image(
-                        Objects.requireNonNull(
-                                getClass().getResourceAsStream("/img/logo.png")
-                        )
+                    Objects.requireNonNull(
+                        getClass().getResourceAsStream("/img/logo.png")
+                    )
                 )
-        );
+            );
         stage.setScene(scene);
         stage.setResizable(false);
         stage.sizeToScene();
@@ -84,7 +84,10 @@ public class MainForm extends Application {
             try {
                 client.closeConnection();
             } catch (IOException e) {
-                throw new RuntimeException("Failed to close client connection", e);
+                throw new RuntimeException(
+                    "Failed to close client connection",
+                    e
+                );
             }
         });
 
