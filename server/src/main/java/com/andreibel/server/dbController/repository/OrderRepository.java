@@ -6,9 +6,8 @@ import com.andreibel.server.entity.Order;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalTime;
+import java.util.*;
 
 import static com.andreibel.server.utils.OrderMapper.mapRelToOrder;
 
@@ -456,4 +455,58 @@ public class OrderRepository {
             ps.executeUpdate();
         }
     }
+
+    public Map<LocalDate, Integer> getCountInThisMount() throws SQLException {
+
+        String sql = """
+                SELECT DATE(mydate) DateOnly , COUNT(*) as subCount
+                FROM bistro.`Order`
+                WHERE subscriberId IS NOT NULL
+                  AND YEAR(orderDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+                """;
+        Map<LocalDate, Integer> map = new HashMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("subCount"));
+                }
+            }
+        }
+        return map;
+    }
+
+
+    public Map<LocalDate, Map<LocalTime, Integer>> getCountInThisMonthByTime() throws SQLException {
+
+        String sql = """
+            SELECT DATE(orderDateTime) AS dateOnly,
+                   TIME(orderDateTime) AS timeOnly,
+                   COUNT(*) AS subCount
+            FROM bistro.`Order`
+            WHERE YEAR(orderDateTime) = YEAR(CURRENT_DATE)
+              AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+            GROUP BY dateOnly, timeOnly
+            ORDER BY dateOnly, timeOnly;
+            """;
+
+        Map<LocalDate, Map<LocalTime, Integer>> map = new HashMap<>();
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("dateOnly").toLocalDate();
+                LocalTime time = rs.getTime("timeOnly").toLocalTime();
+                int count = rs.getInt("subCount");
+
+                map.computeIfAbsent(date, d -> new HashMap<>())
+                        .put(time, count);
+            }
+        }
+
+        return map;
+    }
+
 }

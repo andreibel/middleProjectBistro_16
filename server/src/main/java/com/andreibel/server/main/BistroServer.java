@@ -3,6 +3,7 @@ package com.andreibel.server.main;
 import com.andreibel.server.controller.Serve;
 import com.andreibel.server.services.OrderClosingScheduler;
 import com.andreibel.server.services.OrderTimeoutScheduler;
+import com.andreibel.server.services.WaitingListArriveScheduler;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -26,6 +27,8 @@ public class BistroServer extends Application {
         scheduler.start();
         OrderClosingScheduler closingScheduler = OrderClosingScheduler.getInstance();
         closingScheduler.start();
+        WaitingListArriveScheduler waitingListArriveScheduler = WaitingListArriveScheduler.getInstance();
+        waitingListArriveScheduler.start();
     }
 
     @Override
@@ -51,6 +54,7 @@ public class BistroServer extends Application {
                 sv.close();
                 OrderClosingScheduler.getInstance().stop();
                 OrderTimeoutScheduler.getInstance().stop();
+                WaitingListArriveScheduler.getInstance().stop();
             } catch (IOException e) {
                 throw new RuntimeException("Failed to close client connection", e);
             }

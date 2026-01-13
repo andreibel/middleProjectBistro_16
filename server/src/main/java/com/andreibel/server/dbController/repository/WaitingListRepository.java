@@ -8,9 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.*;
 
 import static com.andreibel.server.utils.WaitingListMapper.mapRelToWaiting;
 
@@ -300,6 +300,57 @@ public class WaitingListRepository {
                 return rs.next() ? mapRelToWaiting(rs) : null;
             }
         }
-
     }
+
+    public Map<LocalDate, Integer> getCountInThisMount() throws SQLException {
+
+        String sql = """
+                SELECT DATE(waitingDateTime) DateOnly, COUNT(*) as subCount
+                FROM bistro.`Waiting`
+                WHERE subscriberId IS NOT NULL
+                  AND YEAR(waitingDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+                """;
+        Map<LocalDate, Integer> map = new HashMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("subCount"));
+                }
+            }
+        }
+        return map;
+    }
+    public Map<LocalDate, Map<LocalTime, Integer>> getCountInThisMonthByTime() throws SQLException {
+
+        String sql = """
+            SELECT DATE(waitingDateTime) AS dateOnly,
+                   TIME(waitingDateTime) AS timeOnly,
+                   COUNT(*) AS subCount
+            FROM bistro.`Waiting`
+            WHERE YEAR(waitingDateTime) = YEAR(CURRENT_DATE)
+              AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
+            GROUP BY dateOnly, timeOnly
+            ORDER BY dateOnly, timeOnly;
+            """;
+
+        Map<LocalDate, Map<LocalTime, Integer>> map = new HashMap<>();
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("dateOnly").toLocalDate();
+                LocalTime time = rs.getTime("timeOnly").toLocalTime();
+                int count = rs.getInt("subCount");
+
+                map.computeIfAbsent(date, d -> new HashMap<>())
+                        .put(time, count);
+            }
+        }
+
+        return map;
+    }
+
 }
