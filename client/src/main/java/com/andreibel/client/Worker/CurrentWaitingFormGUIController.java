@@ -3,6 +3,7 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
@@ -14,6 +15,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.AnchorPane;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -32,6 +34,9 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
     /** Label displaying the current date for the waiting list. */
     @FXML
     private Label lblTitle;
+
+    @FXML
+    private AnchorPane rootPane;
 
     /** TableView displaying the current waiting list data. */
     @FXML
@@ -84,7 +89,7 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
         initializeTableColumns();
         lblTitle.setText("Current Waiting List for: " + getCurrentDate());
         requestWaitingListWhenSceneIsShown();
-        controller.requestCurrentWaitingList();
+
     }
 
     /**
@@ -131,11 +136,11 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
      * Requests the current waiting list from the server when the scene is shown.
      */
     private void requestWaitingListWhenSceneIsShown() {
-        tblViewCurrentWaiting.sceneProperty().addListener((obsScene, oldScene, newScene) -> {
+        rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
-                newScene.windowProperty().addListener((obsWindow, oldWindow, newWindow) -> {
+                newScene.windowProperty().addListener((obs, oldWindow, newWindow) -> {
                     if (newWindow != null) {
-                        newWindow.setOnShown(event -> controller.requestCurrentWaitingList());
+                        controller.requestCurrentWaitingList();
                     }
                 });
             }

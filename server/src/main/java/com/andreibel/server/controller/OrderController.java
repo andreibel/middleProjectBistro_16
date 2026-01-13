@@ -136,26 +136,7 @@ public class OrderController {
         return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 
-    /**
-     * Completes (closes) an order by confirmation code.
-     *
-     * <p><b>Expected payload:</b> {@link UUID} (confirmation code).</p>
-     *
-     * <p><b>Response:</b> always returns {@code COMPLETE_ORDER_RESPONSE}. If you want to report failure,
-     * update this method to check service result and return {@code COMPLETE_ORDER_ERROR} accordingly.</p>
-     *
-     * @param message request message containing a {@link UUID}
-     * @return completion response message
-     */
-    public Message closeOrder(Message message) {
-        OrderResponse closed = orderService.completeOrder((UUID) message.getData());
-        if(closed == null)  return new Message(COMPLETE_ORDER_ERROR, null);
-        if (closed.getConformationCode() == null)
-            return new Message(COMPLETE_ORDER_ERROR, "cant close the order due to order was candled or completed");
-        double price = closed.getNumberOfGuests() * 100 * ( closed.getSubscriberId() == 0 ? 1 : 0.9);
-        printPrice(closed);
-        return new Message(COMPLETE_ORDER_RESPONSE, "the order is closed. pay this price: $" + price);
-    }
+
 
     /**
      * Retrieves all available reservation start times for a specific date and party size.

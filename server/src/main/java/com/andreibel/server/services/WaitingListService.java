@@ -10,6 +10,7 @@ import com.andreibel.server.entity.Waiting;
 import com.andreibel.server.utils.WaitingListMapper;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Service layer for Waiting List operations.
@@ -75,5 +76,18 @@ public class WaitingListService {
                 .stream()
                 .map(WaitingListMapper::mapWaitingToWaitingResponse)
                 .toList();
+    }
+
+    public WaitingListResponse completeWaiting(UUID conformationCode) {
+        return tx.inTransaction(() -> {
+            Waiting  toClose = waitingRepository.getWaitingByConformationCode(conformationCode);
+            if  (toClose == null) return null;
+            if (toClose.isWaitingCompleted() ||
+                    toClose.isCurrentlyWaiting() ||
+                    toClose.getWaitingArriveDateTime() == null) return new WaitingListResponse();
+            waitingRepository.completeWaitingListByConformationCode(conformationCode);
+            toClose.setWaitingCompleted(true);
+            return WaitingListMapper.mapWaitingToWaitingResponse(toClose);
+        });
     }
 }

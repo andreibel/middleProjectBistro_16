@@ -49,6 +49,7 @@ public class Serve extends AbstractServer {
     /** Controller responsible for waiting-list flows and reports. */
     private final WaitingController waitingController;
     private final ReportController reportController;
+    private final PaymentController paymentController;
 
     /**
      * Optional GUI controller reference used to reflect connection state in the server UI.
@@ -68,6 +69,7 @@ public class Serve extends AbstractServer {
         this.workerController = WorkerController.getInstance();
         this.waitingController = WaitingController.getInstance();
         this.reportController = ReportController.getInstance();
+        this.paymentController = PaymentController.getInstance();
     }
 
     /**
@@ -118,7 +120,7 @@ public class Serve extends AbstractServer {
                 case GET_ONE_ORDER -> orderController.getOrder(message);
                 case ORDER_ARRIVED -> orderController.updateArrives(message);
                 case ORDER_LOST_CONFORMATION_CODE -> orderController.lostCode(message);
-                case COMPLETE_ORDER -> orderController.closeOrder(message);
+                case COMPLETE_ORDER -> paymentController.payByConformationCode(message);
                 case GET_ALL_TIMES_IN_DATE -> orderController.getAllAvailableTime(message);
 
                 case GET_ALL_SUBSCRIBERS -> subscriberController.getAllSub();

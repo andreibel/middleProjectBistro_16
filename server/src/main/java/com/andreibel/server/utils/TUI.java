@@ -3,6 +3,10 @@ package com.andreibel.server.utils;
 import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.UUID;
+
 public class TUI {
     private static String shorten(String value, int max) {
         if (value.length() <= max) return value;
@@ -64,9 +68,9 @@ public class TUI {
         """, shorten(message, 145)
         );
     }
-    public static void printPrice(OrderResponse printOrder) {
-        double totalPrice = printOrder.getNumberOfGuests() * 100;
-        if (printOrder.getSubscriberId() != 0) totalPrice =  totalPrice * 0.9;
+    public static void printPrice(UUID conformationCode, int numberOfGuests, boolean isSub) {
+        double totalPrice = numberOfGuests * 100;
+        if (isSub) totalPrice =  totalPrice * 0.9;
 
         System.out.printf(
                 """
@@ -86,10 +90,10 @@ public class TUI {
        │ │                                        │             total price: $%4.0f                                 │                                         │ │
        │ │                                        └────────────────────────────────────────────────────────────────┘                                         │ │
        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
-       """, printOrder.getConformationCode().toString(),
-                printOrder.getOrderDateTime().toString(),
-                printOrder.getNumberOfGuests(),
-                printOrder.getNumberOfGuests() * 100,
+       """, conformationCode.toString(),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                numberOfGuests,
+                numberOfGuests * 100,
                 totalPrice
         );
     }
