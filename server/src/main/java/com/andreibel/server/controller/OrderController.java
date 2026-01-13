@@ -132,9 +132,7 @@ public class OrderController {
         OrderResponse orderResponse = orderService.orderArrives((UUID) message.getData());
         if (orderResponse == null) return new Message(ORDER_ARRIVED_ERROR, null);
         if (orderResponse.getConformationCode() == null)
-            return new Message(ORDER_ARRIVED_ERROR, "Cannot arrive to order that was cancelled.");
-        if (orderResponse.getOrderDateTime().toLocalDate().isBefore(LocalDate.now()) || orderResponse.getOrderDateTime().toLocalDate().isAfter(LocalDate.now()))
-            return new Message(ORDER_ARRIVED_ERROR, "Order's date do not match to the current date.");
+            return new Message(ORDER_ARRIVED_ERROR, "can't give you table because all of them are Occupied!!");
         return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 

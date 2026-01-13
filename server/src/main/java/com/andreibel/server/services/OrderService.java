@@ -12,6 +12,7 @@ import com.andreibel.server.entity.Order;
 import com.andreibel.server.entity.Table;
 import com.andreibel.server.entity.Waiting;
 import com.andreibel.server.utils.OrderMapper;
+import com.andreibel.server.utils.WaitingListMapper;
 
 import java.sql.Date;
 import java.sql.SQLException;
@@ -74,6 +75,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final TableRepository tableRepository;
     private final OpenTimeRepository openTimeRepository;
+    private final TableService tableService;
     private final TransactionManager tx;
 
     /**
@@ -88,6 +90,7 @@ public class OrderService {
         this.tableRepository = TableRepository.getInstance();
         this.openTimeRepository = OpenTimeRepository.getInstance();
         this.tx = TransactionManager.getInstance();
+        this.tableService = TableService.getInstance();
     }
 
     /**
@@ -206,47 +209,28 @@ public class OrderService {
             if (order == null) return null;
 
             // 2. Validate not cancelled
-            if (order.isOrderCancelled() || order.isOrderCompleted()) return new OrderResponse();
+            if (order.isOrderCancelled() || order.isOrderCompleted()) return null;
 
-            // 3. Mark as arrived
             orderRepository.setArrived(conformationCode);
-            order = orderRepository.findByConformationCode(conformationCode);
 
-            // 4. Check table availability
-            if (isTableAvailable(order.getNumberOfGuests())) {
+            // 3. Check table availability
+            if (!canSeatNow(order.getNumberOfGuests())) {
+                // 4. Mark as arrived
                 // TABLE AVAILABLE - SEAT
+                order.setOrderArrive(true);
                 return OrderMapper.mapOrderToOrderResponse(order);
             } else {
+                orderRepository.deleteByConformationCode(conformationCode);
                 // NO TABLE - ADD TO WAITING
-                Waiting waitingEntry = new Waiting();
-                waitingEntry.setNumberOfGuests(order.getNumberOfGuests());
-                waitingEntry.setWaitingDateTime(LocalDateTime.now());
-                waitingEntry.setOrderNumber(order.getOrderNumber());
-                waitingEntry.setSubscriberId(order.getSubscriberId());
-                waitingEntry.setEmail(order.getEmail());
-                waitingEntry.setPhoneNumber(order.getPhoneNumber());
-                waitingEntry.setConformationCode(order.getConformationCode());
-                waitingEntry.setCurrentlyWaiting(true);
-
+                Waiting waitingEntry = WaitingListMapper.mapOrderToWaitingList(order);
                 WaitingListRepository.getInstance().addWaiting(waitingEntry);
-                return OrderMapper.mapOrderToOrderResponse(order);
+                return new OrderResponse();
             }
         });
     }
-    private boolean isTableAvailable(int numberOfGuests) throws SQLException {
-        List<Table> allTables = tableRepository.findAll();
-
-        for (Table table : allTables) {
-            if (table.getCapacity() < numberOfGuests) continue;  // Too small
-
-            List<Order> activeOrders = orderRepository
-                    .findActiveOrdersByTableCapacity(table.getCapacity());
-
-            if (activeOrders.size() < table.getQuantity()) {
-                return true;  // Found available table
-            }
-        }
-        return false;  // No suitable table
+    private boolean canSeatNow(int numberOfGuests) {
+        TreeMap<Integer, Integer> available = tableService.getAllAvailableTables();
+        return available.ceilingEntry(numberOfGuests) != null;
     }
     /**
      * Marks an order as completed/closed by its confirmation code.

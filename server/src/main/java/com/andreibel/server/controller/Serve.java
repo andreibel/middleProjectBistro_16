@@ -48,6 +48,7 @@ public class Serve extends AbstractServer {
 
     /** Controller responsible for waiting-list flows and reports. */
     private final WaitingController waitingController;
+    private final ReportController reportController;
 
     /**
      * Optional GUI controller reference used to reflect connection state in the server UI.
@@ -66,6 +67,7 @@ public class Serve extends AbstractServer {
         this.subscriberController = SubscriberController.getInstance();
         this.workerController = WorkerController.getInstance();
         this.waitingController = WaitingController.getInstance();
+        this.reportController = ReportController.getInstance();
     }
 
     /**
@@ -133,12 +135,11 @@ public class Serve extends AbstractServer {
                 case EDIT_BISTRO_LAYOUT -> workerController.updateTables(message);
                 case GET_REGULAR_OPEN_TIME -> workerController.getRegularDate();
 
-                case SCHEDULES_REPORT -> waitingController.scheduleReport(message);
-                case SUBSCRIBER_REPORT -> waitingController.subscriberReport(message);
-                case GET_WAITING_LIST -> waitingController.getWaitingList(message);
+                case SCHEDULES_REPORT -> reportController.scheduleReport(message);
+                case SUBSCRIBER_REPORT -> reportController.subscriberReport(message);
+
+                case GET_WAITING_LIST -> waitingController.getWaitingList();
                 case ADD_TO_WAITING_LIST -> waitingController.addWaitingList(message);
-                case REMOVE_FROM_WAITING_LIST -> waitingController.removeFromWaitingList(message);
-                case ARRIVE_WAITING_LIST -> waitingController.arriveWaitingList(message);
 
                 case GET_ALL_ACTIVE_ORDER -> orderController.getAllActiveOrder();
                 case GET_ALL_ARRIVED_AND_NOT_COMPLETE -> orderController.getNowEating();

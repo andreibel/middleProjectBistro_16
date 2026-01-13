@@ -74,7 +74,7 @@ public class OrderRepository {
         }
         return orders;
     }
-    public List<Order> findActiveOrdersByTableCapacity() throws SQLException {
+    public List<Order> findActiveOrders() throws SQLException {
         String sql = """
                 SELECT * FROM bistro.`Order`
                 WHERE orderArrive = 1

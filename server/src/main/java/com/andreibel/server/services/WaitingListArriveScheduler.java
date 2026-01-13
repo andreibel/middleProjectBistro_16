@@ -1,57 +1,41 @@
 package com.andreibel.server.services;
 
 import com.andreibel.server.dbController.TransactionManager;
-import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.WaitingListRepository;
+import com.andreibel.server.entity.Waiting;
 
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Periodic scheduler that automatically cancels late orders.
- *
- * <p>
- * An order is considered late if the customer did not arrive within
- * the allowed grace period (currently 15 minutes from the start time).
- * Such orders are automatically cancelled.
- * </p>
- *
- * <p>
- * The scheduler runs every {@value #CHECK_INTERVAL_MIN} minute(s).
- * </p>
- *
- * <p>
- * Implemented as a Singleton.
- * </p>
- *
- * @author Andrei Beloziyorove
- */
-public class OrderTimeoutScheduler {
+public class WaitingListArriveScheduler {
+    private static final long CHECK_INTERVAL_MIN = 5;
 
-    private static final long CHECK_INTERVAL_MIN = 1;
-
-    private static OrderTimeoutScheduler instance;
-    private final OrderRepository orderRepository;
-    private final ScheduledExecutorService scheduler;
+    private static WaitingListArriveScheduler instance;
     private final WaitingListRepository waitingListRepository;
+    private final ScheduledExecutorService scheduler;
+    private final TableService tableService;
     private final TransactionManager tx = TransactionManager.getInstance();
 
     /**
      * Private constructor for Singleton initialization.
      */
-    private OrderTimeoutScheduler() {
+    private WaitingListArriveScheduler() {
 
-        orderRepository = OrderRepository.getInstance();
         scheduler = Executors.newSingleThreadScheduledExecutor();
+        tableService = TableService.getInstance();
         waitingListRepository = WaitingListRepository.getInstance();
+
     }
 
     /**
      * @return singleton instance of OrderTimeoutScheduler
      */
-    public static OrderTimeoutScheduler getInstance() {
-        if (instance == null) instance = new OrderTimeoutScheduler();
+    public static WaitingListArriveScheduler getInstance() {
+        if (instance == null) instance = new WaitingListArriveScheduler();
         return instance;
     }
 
@@ -71,7 +55,9 @@ public class OrderTimeoutScheduler {
         );
     }
 
-    public void stop() { scheduler.shutdownNow(); }
+    public void stop() {
+        scheduler.shutdownNow();
+    }
 
     /**
      * Cancels orders that exceeded the allowed arrival grace period.
@@ -82,8 +68,17 @@ public class OrderTimeoutScheduler {
      */
     private void cancelLateOrders() {
         tx.inTransaction(() -> {
-            waitingListRepository.removeNotTodayWaitingList();
-            return orderRepository.cancelLateOrders(15);
+            List<Waiting> currentWaitingList = waitingListRepository.getCurrentWaitingActive();
+            TreeMap<Integer, Integer> available = tableService.getAllAvailableTables();
+            for (Waiting waiting : currentWaitingList) {
+                Map.Entry<Integer, Integer> integerIntegerEntry = available.ceilingEntry(waiting.getWaitingNumber());
+                if(integerIntegerEntry != null  && integerIntegerEntry.getValue() != 0){
+                    available.merge(integerIntegerEntry.getKey(), -1, Integer::sum);
+                    waitingListRepository.waitingArriveToTable(waiting.getConformationCode());
+                }
+            }
+            return null;
         });
     }
+
 }
