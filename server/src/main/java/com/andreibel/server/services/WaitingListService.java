@@ -3,8 +3,6 @@ package com.andreibel.server.services;
 import com.andreibel.message.DTO.WaitingListRequest;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.server.dbController.TransactionManager;
-import com.andreibel.server.dbController.repository.OrderRepository;
-import com.andreibel.server.dbController.repository.SubscriberRepository;
 import com.andreibel.server.dbController.repository.WaitingListRepository;
 import com.andreibel.server.entity.Waiting;
 import com.andreibel.server.utils.WaitingListMapper;

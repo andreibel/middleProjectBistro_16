@@ -1,14 +1,11 @@
 package com.andreibel.server.dbController.repository;
 
-import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.entity.Waiting;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -372,6 +369,56 @@ public class WaitingListRepository {
             }
         }
         return map;
+    }
+
+    /**
+     * Batch-completes waiting entries that have been seated for 2 hours.
+     *
+     * <p>This method is intended for a scheduler. It marks waiting entries as completed when:
+     * they have arrived (waitingArriveDateTime IS NOT NULL), are not yet completed,
+     * and their arrival time is earlier than {@code now - 2 hours}.</p>
+     *
+     * @param now reference time used to compute the cutoff {@code now.minusHours(2)}
+     * @return list of waiting entries that were closed (for printing invoices)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Waiting> findWaitingDueToClose(LocalDateTime now) throws SQLException {
+        LocalDateTime cutoff = now.minusHours(2);
+
+        // First, SELECT the waiting entries that will be closed
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Waiting`
+                WHERE waitingArriveDateTime IS NOT NULL
+                  AND isWaitingCompleted = 0
+                  AND waitingArriveDateTime <= ?
+                """;
+
+        List<Waiting> waitingToClose = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) waitingToClose.add(mapRelToWaiting(rs));
+            }
+        }
+
+        // Then, UPDATE those entries to mark them as completed
+        if (!waitingToClose.isEmpty()) {
+            String updateSql = """
+                    UPDATE bistro.`Waiting`
+                    SET isWaitingCompleted = 1
+                    WHERE waitingArriveDateTime IS NOT NULL
+                      AND isWaitingCompleted = 0
+                      AND waitingArriveDateTime <= ?
+                    """;
+
+            try (PreparedStatement ps = tx.currentConnection().prepareStatement(updateSql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+                ps.executeUpdate();
+            }
+        }
+
+        return waitingToClose;
     }
 
 }

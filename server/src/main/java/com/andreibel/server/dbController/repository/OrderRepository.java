@@ -420,28 +420,49 @@ public class OrderRepository {
      * {@code orderDateTime} is earlier than {@code now - graceMinutes}. The method updates rows by
      * setting {@code orderCancelled = 1}.</p>
      *
-     * <p><b>Recommendation:</b> return {@code ps.executeUpdate()} to expose how many orders were cancelled.</p>
-     *
      * @param graceMinutes allowed lateness window in minutes (e.g., 10–20)
-     * @return currently always {@code 1} (consider returning affected rows count)
+     * @return list of orders that were cancelled (for printing notifications)
      * @throws SQLException if a database access error occurs
      */
-    public int cancelLateOrders(int graceMinutes) throws SQLException {
-        String sql = """
-                UPDATE bistro.`Order`
-                SET orderCancelled = 1
+    public List<Order> cancelLateOrders(int graceMinutes) throws SQLException {
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
+
+        // First, SELECT the orders that will be cancelled
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Order`
                 WHERE orderCancelled = 0
                   AND orderCompleted = 0
                   AND orderArrive = 0
                   AND orderDateTime < ?
                 """;
 
-        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
-        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+        List<Order> ordersToCancel = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
             ps.setTimestamp(1, Timestamp.valueOf(cutoff));
-            ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ordersToCancel.add(mapRelToOrder(rs));
+            }
         }
-        return 1;
+
+        // Then, UPDATE those orders to mark them as cancelled
+        if (!ordersToCancel.isEmpty()) {
+            String updateSql = """
+                    UPDATE bistro.`Order`
+                    SET orderCancelled = 1
+                    WHERE orderCancelled = 0
+                      AND orderCompleted = 0
+                      AND orderArrive = 0
+                      AND orderDateTime < ?
+                    """;
+
+            try (PreparedStatement ps = tx.currentConnection().prepareStatement(updateSql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+                ps.executeUpdate();
+            }
+        }
+
+        return ordersToCancel;
     }
 
     /**
@@ -451,22 +472,48 @@ public class OrderRepository {
      * they are not cancelled, arrived, and their {@code orderDateTime} is earlier than {@code now - 2 hours}.</p>
      *
      * @param now reference time used to compute the cutoff {@code now.minusHours(2)}
+     * @return list of orders that were closed (for printing invoices)
      * @throws SQLException if a database access error occurs
      */
-    public void findOrdersDueToClose(LocalDateTime now) throws SQLException {
-        String sql = """
-                UPDATE bistro.`Order`
-                SET orderCompleted = 1
+    public List<Order> findOrdersDueToClose(LocalDateTime now) throws SQLException {
+        LocalDateTime cutoff = now.minusHours(2);
+
+        // First, SELECT the orders that will be closed
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Order`
                 WHERE orderCancelled = 0
                   AND orderArrive = 1
-                  AND orderDateTime <= ?
+                  AND orderCompleted = 0
+                  AND orderArriveDateTime <= ?
                 """;
 
-        LocalDateTime cutoff = now.minusHours(2);
-        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+        List<Order> ordersToClose = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
             ps.setTimestamp(1, Timestamp.valueOf(cutoff));
-            ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ordersToClose.add(mapRelToOrder(rs));
+            }
         }
+
+        // Then, UPDATE those orders to mark them as completed
+        if (!ordersToClose.isEmpty()) {
+            String updateSql = """
+                    UPDATE bistro.`Order`
+                    SET orderCompleted = 1
+                    WHERE orderCancelled = 0
+                      AND orderArrive = 1
+                      AND orderCompleted = 0
+                      AND orderArriveDateTime <= ?
+                    """;
+
+            try (PreparedStatement ps = tx.currentConnection().prepareStatement(updateSql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+                ps.executeUpdate();
+            }
+        }
+
+        return ordersToClose;
     }
 
     /**

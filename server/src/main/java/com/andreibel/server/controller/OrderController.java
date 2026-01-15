@@ -6,14 +6,12 @@ import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
 import static com.andreibel.message.APICallType.*;
 import static com.andreibel.server.utils.TUI.UUID_sent;
-import static com.andreibel.server.utils.TUI.printPrice;
 
 /**
  * Handles order-related API calls coming from the network layer.

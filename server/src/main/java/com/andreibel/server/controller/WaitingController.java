@@ -1,15 +1,12 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.APICallType;
-import com.andreibel.message.DTO.SchedulesReportResponse;
-import com.andreibel.message.DTO.SubscriberReportResponse;
 import com.andreibel.message.DTO.WaitingListRequest;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.WaitingListService;
 
 import java.util.List;
-import java.util.UUID;
 
 import static com.andreibel.message.APICallType.*;
 

@@ -50,16 +50,4 @@ public class WorkerMapper {
                 .build();
     }
 
-    /**
-     * Maps a worker authentication request to a {@link Worker} entity.
-     *
-     * @param request worker authentication request
-     * @return Worker entity containing authentication data
-     */
-    public static Worker mapWorkerRequestToWorker(WorkerAuth request) {
-        return Worker.builder()
-                .workerName(request.getWorkerName())
-                .workerPassword(request.getWorkerPassword())
-                .build();
-    }
 }

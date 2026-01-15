@@ -3,10 +3,14 @@ package com.andreibel.server.services;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.WaitingListRepository;
+import com.andreibel.server.entity.Order;
 
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static com.andreibel.server.utils.TUI.printOrderCancelled;
 
 /**
  * Periodic scheduler that automatically cancels late orders.
@@ -78,12 +82,19 @@ public class OrderTimeoutScheduler {
      *
      * <p>
      * Runs inside a transaction to ensure safe database access.
+     * For each cancelled order, prints a notification.
      * </p>
      */
     private void cancelLateOrders() {
         tx.inTransaction(() -> {
             waitingListRepository.removeNotTodayWaitingList();
-            return orderRepository.cancelLateOrders(15);
+
+            List<Order> cancelledOrders = orderRepository.cancelLateOrders(15);
+            for (Order order : cancelledOrders) {
+                printOrderCancelled(order.getConformationCode(), order.getNumberOfGuests(), order.getOrderDateTime());
+            }
+
+            return null;
         });
     }
 }

@@ -9,7 +9,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 import java.net.InetAddress;
-
 /**
  * JavaFX controller for the Bistro server GUI.
  *

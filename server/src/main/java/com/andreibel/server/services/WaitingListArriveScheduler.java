@@ -4,6 +4,7 @@ import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.WaitingListRepository;
 import com.andreibel.server.entity.Waiting;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.andreibel.server.utils.TUI.printPrice;
 import static com.andreibel.server.utils.TUI.printWaitingListSeated;
 
 public class WaitingListArriveScheduler {
@@ -62,28 +64,38 @@ public class WaitingListArriveScheduler {
     }
 
     /**
-     * Cancels orders that exceeded the allowed arrival grace period.
+     * Assigns tables to waiting customers and closes completed waiting entries.
      *
      * <p>
      * Runs inside a transaction to ensure safe database access.
+     * Also closes waiting entries that have been seated for 2 hours and prints invoices.
      * </p>
      */
     private void cancelLateOrders() {
         tx.inTransaction(() -> {
+            // Assign tables to waiting customers
             List<Waiting> currentWaitingList = waitingListRepository.getCurrentWaitingActive();
             TreeMap<Integer, Integer> available = tableService.getAllAvailableTables();
             for (Waiting waiting : currentWaitingList) {
-                Map.Entry<Integer, Integer> tableEntry = available.ceilingEntry(waiting.getWaitingNumber());
+                Map.Entry<Integer, Integer> tableEntry = available.ceilingEntry(waiting.getNumberOfGuests());
                 if (tableEntry != null && tableEntry.getValue() != 0) {
                     available.merge(tableEntry.getKey(), -1, Integer::sum);
                     waitingListRepository.waitingArriveToTable(waiting.getConformationCode());
                     printWaitingListSeated(
                             waiting.getConformationCode(),
-                            waiting.getWaitingNumber(),
+                            waiting.getNumberOfGuests(),
                             tableEntry.getKey()
                     );
                 }
             }
+
+            // Close waiting entries that have been seated for 2 hours
+            List<Waiting> closedWaiting = waitingListRepository.findWaitingDueToClose(LocalDateTime.now());
+            for (Waiting waiting : closedWaiting) {
+                boolean isSubscriber = waiting.getSubscriberId() != null;
+                printPrice(waiting.getConformationCode(), waiting.getNumberOfGuests(), isSubscriber);
+            }
+
             return null;
         });
     }

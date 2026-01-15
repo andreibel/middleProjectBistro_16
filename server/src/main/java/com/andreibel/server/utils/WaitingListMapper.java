@@ -89,8 +89,6 @@ public class WaitingListMapper {
                 .subscriberId(request.getSubscriberId())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
-                // isCurrentlyWaiting defaults to true in entity
-                // waitingDateTime is set by service layer
                 .build();
     }
 
@@ -102,8 +100,6 @@ public class WaitingListMapper {
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .orderNumber(request.getOrderNumber())
-                // isCurrentlyWaiting defaults to true in entity
-                // waitingDateTime is set by service layer
                 .build();
     }
 }

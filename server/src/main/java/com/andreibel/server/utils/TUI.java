@@ -1,6 +1,5 @@
 package com.andreibel.server.utils;
 
-import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.Message;
 
 import java.time.LocalDateTime;
@@ -53,7 +52,7 @@ public class TUI {
        │ ├───────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
        │ │ %-37s │ %-105s │ │
        │ └───────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
-        """, message.getType().toString(),
+       """, message.getType().toString(),
                 str
         );
     }
@@ -101,14 +100,29 @@ public class TUI {
     public static void printWaitingListSeated(UUID confirmationCode, int numberOfGuests, int tableSize) {
         System.out.printf(
                 """
-       │ ┌────── WAITING LIST --> TABLE ASSIGNED  ──────┐                                                                                                    │
-       │ ├──────────────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────┐ │
-       │ │  Confirmation: %-36s  |  Guests: %3d  |  Table Size: %3d  |  Time: %-19s │ │
-       │ └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
-        """,
+       │ ┌────── WAITING LIST --> TABLE ASSIGNED  ──────┐                                                                                                      │
+       │ ├──────────────────────────────────────────────┴────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+       │ │  Confirmation: %-36s  |  Guests: %3d  |  Table Size: %3d  |  Time: %-19s                             │ │
+       │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+       """,
                 confirmationCode.toString(),
                 numberOfGuests,
                 tableSize,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        );
+    }
+
+    public static void printOrderCancelled(UUID confirmationCode, int numberOfGuests, LocalDateTime orderDateTime) {
+        System.out.printf(
+                """
+       │ ┌────── ORDER CANCELLED --> LATE ARRIVAL  ──────┐                                                                                                     │
+       │ ├───────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+       │ │  Confirmation: %-36s  |  Guests: %3d  |  Order Time: %-19s  |  Cancelled: %-19s        │ │
+       │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+       """,
+                confirmationCode.toString(),
+                numberOfGuests,
+                orderDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         );
     }
@@ -127,29 +141,21 @@ public class TUI {
        │ ├───────────────────────────────────────────┼───────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
        │ │ %-41s │ %s │ │
        │ └───────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
-        """, message.getType().toString(),
+       """, message.getType().toString(),
                 messageString
         );
     }
     private static final String RESET = "\u001B[0m";
-    private static final java.util.regex.Pattern ANSI =
-            java.util.regex.Pattern.compile("\u001B\\[[;\\d]*m");
 
     private static String c(int r, int g, int b, char ch) {
         return "\u001B[38;2;" + r + ";" + g + ";" + b + "m" + ch + RESET;
-    }
-
-    private static int visibleLen(String s) {
-        return ANSI.matcher(s).replaceAll("").length();
     }
 
     private static String buildErrorLine101() {
         final int total = 101;
         final String centerPlain = " ERROR ";
         final String center = "\u001B[38;2;255;0;0m" + centerPlain + RESET;
-
         final int side = (total - centerPlain.length()) / 2; // 49
-
         char[] blocks = {'█', '▓', '▒', '░'};
         int[][] colors = {
                 {255, 60, 60},
@@ -157,25 +163,19 @@ public class TUI {
                 {255, 120, 60},
                 {255, 150, 60}
         };
-
         StringBuilder left = new StringBuilder(600);
         for (int i = 0; i < side; i++) {
             int idx = i % blocks.length;
             int[] col = colors[idx];
             left.append(c(col[0], col[1], col[2], blocks[idx]));
         }
-
         StringBuilder right = new StringBuilder(600);
         for (int i = 0; i < side; i++) {
             int idx = (blocks.length - 1) - (i % blocks.length); // mirror
             int[] col = colors[idx];
             right.append(c(col[0], col[1], col[2], blocks[idx]));
         }
-
         String result = left + center + right;
-
-        // sanity check: visible length must be exactly 105
-        // (optional) System.out.println("visible=" + visibleLen(result));
         return result;
     }
 

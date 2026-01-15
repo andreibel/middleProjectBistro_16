@@ -2,8 +2,11 @@ package com.andreibel.server.services;
 
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OrderRepository;
+import com.andreibel.server.entity.Order;
+import com.andreibel.server.utils.TUI;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -73,12 +76,19 @@ public class OrderClosingScheduler {
      *
      * <p>
      * Runs inside a transaction to ensure safe database access.
+     * For each closed order, prints an invoice with the price.
      * </p>
      */
     private void scanAndNotify() {
 
         tx.inTransaction(() -> {
-            orderRepository.findOrdersDueToClose(LocalDateTime.now());
+            List<Order> closedOrders = orderRepository.findOrdersDueToClose(LocalDateTime.now());
+
+            for (Order order : closedOrders) {
+                boolean isSubscriber = order.getSubscriberId() != null;
+                TUI.printPrice(order.getConformationCode(), order.getNumberOfGuests(), isSubscriber);
+            }
+
             return null;
         });
 

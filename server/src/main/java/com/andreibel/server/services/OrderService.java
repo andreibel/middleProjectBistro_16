@@ -15,7 +15,6 @@ import com.andreibel.server.utils.OrderMapper;
 import com.andreibel.server.utils.WaitingListMapper;
 
 import java.sql.Date;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
