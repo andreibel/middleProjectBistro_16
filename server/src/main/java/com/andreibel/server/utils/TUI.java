@@ -98,6 +98,21 @@ public class TUI {
         );
     }
 
+    public static void printWaitingListSeated(UUID confirmationCode, int numberOfGuests, int tableSize) {
+        System.out.printf(
+                """
+       │ ┌────── WAITING LIST --> TABLE ASSIGNED  ──────┐                                                                                                    │
+       │ ├──────────────────────────────────────────────┴──────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+       │ │  Confirmation: %-36s  |  Guests: %3d  |  Table Size: %3d  |  Time: %-19s │ │
+       │ └─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+        """,
+                confirmationCode.toString(),
+                numberOfGuests,
+                tableSize,
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        );
+    }
+
     public static void serverOutputLog(Message message) {
         if(message == null) return;
         String ERROR_LINE = buildErrorLine101();

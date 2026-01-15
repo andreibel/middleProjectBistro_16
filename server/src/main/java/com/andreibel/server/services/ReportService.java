@@ -8,11 +8,25 @@ import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.WaitingListRepository;
 import com.andreibel.server.entity.OpenTime;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
 import java.util.*;
 
+/**
+ * Service responsible for generating various reports related to restaurant operations.
+ * <p>
+ * This service provides reports for:
+ * <ul>
+ *     <li>Customer schedules (arrivals, late customers, delays)</li>
+ *     <li>Subscriber activity (orders and waiting list entries)</li>
+ * </ul>
+ * <p>
+ * Implemented as a singleton to ensure consistent report generation across the application.
+ *
+ * @author andreibel
+ */
 public class ReportService {
     private static ReportService instance;
 
@@ -21,6 +35,10 @@ public class ReportService {
     private final OpenTimeRepository openTimeRepository;
     private final TransactionManager tx;
 
+    /**
+     * Private constructor to enforce singleton pattern.
+     * Initializes all required repositories and the transaction manager.
+     */
     private ReportService() {
         openTimeRepository = OpenTimeRepository.getInstance();
         orderRepository = OrderRepository.getInstance();
@@ -28,7 +46,11 @@ public class ReportService {
         tx = TransactionManager.getInstance();
     }
 
-
+    /**
+     * Returns the singleton instance of ReportService.
+     *
+     * @return the singleton ReportService instance
+     */
     public static ReportService getInstance() {
         if (instance == null) {
             instance = new ReportService();
@@ -36,177 +58,172 @@ public class ReportService {
         return instance;
     }
 
-    public SchedulesReportResponse getSchedulesReport() {
-        // Map to store arrive times: Date -> (Time -> Count of customers)
-        // Map to store late customers count by date (arrived after reservation time)
-        Map<LocalDate, Integer> customerLate = getDaysOfCurrentMonthMap();
+    // ==================== Public Methods ====================
 
-        // Map to store total delay minutes by date (from arrival to being seated)
-        Map<LocalDate, Integer> customerDelay = getDaysOfCurrentMonthMap();
+    /**
+     * Generates a comprehensive schedules report for the current month.
+     * <p>
+     * The report includes:
+     * <ul>
+     *     <li>Customer arrival/departure counts grouped by date and time slots</li>
+     *     <li>Count of late arrivals per day</li>
+     *     <li>Delay statistics from waiting list</li>
+     * </ul>
+     * <p>
+     * Time slots are bucketed based on the restaurant's configured interval.
+     *
+     * @return {@link SchedulesReportResponse} containing all schedule-related metrics
+     */
+    public SchedulesReportResponse getSchedulesReport() {
         LocalDate start = LocalDate.now().withDayOfMonth(1);
-        LocalDate end   = start.withDayOfMonth(start.lengthOfMonth());
+        LocalDate end = start.withDayOfMonth(start.lengthOfMonth());
+
         return tx.inTransaction(() -> {
             OpenTime timeRestaurant = openTimeRepository.findRegular();
-            Map<LocalDate, Map<LocalTime, Integer>> orderPartReport = orderRepository.getCountInThisMonthByTime();
-            System.out.println(orderPartReport);
-            Map<LocalDate, Map<LocalTime, Integer>> waitingPartReport = waitingListRepository.getCountInThisMonthByTime();
-            System.out.println(waitingPartReport);
-            Map<LocalDate, Map<LocalTime, Integer>> customerArriveDeparture;
-            customerArriveDeparture = normalizeAndMerge(orderPartReport,waitingPartReport,
-                    timeRestaurant.getOpenTime().toLocalTime(),
-                    timeRestaurant.getCloseTime().toLocalTime(),
-                    timeRestaurant.getInterval());
-            customerArriveDeparture = padMissingDays(customerArriveDeparture, start, end);
-            System.out.println(customerArriveDeparture);
-            Map<LocalDate, Integer> lateResult = orderRepository.getLateOrders();
-            for (var entry : lateResult.keySet()) {
-                customerLate.merge(entry, lateResult.get(entry),Integer::sum);
-            }
+            LocalTime openTime = timeRestaurant.getOpenTime().toLocalTime();
+            LocalTime closeTime = timeRestaurant.getCloseTime().toLocalTime();
+            int interval = timeRestaurant.getInterval();
 
+            Map<LocalDate, Map<LocalTime, Integer>> orderPartReport = orderRepository.getCountInThisMonthByTime();
+            Map<LocalDate, Map<LocalTime, Integer>> waitingPartReport = waitingListRepository.getCountInThisMonthByTime();
+
+            Map<LocalDate, Map<LocalTime, Integer>> customerArriveDeparture = mergeTimeReports(
+                    openTime, closeTime, interval, orderPartReport, waitingPartReport);
+            customerArriveDeparture = padMissingDays(customerArriveDeparture, start, end);
+
+            Map<LocalDate, Integer> lateResult = orderRepository.getLateOrders();
             Map<LocalDate, Integer> delayOrders = waitingListRepository.getDelaysOrders();
-            for (var entry : delayOrders.keySet()) {
-                customerDelay.merge(entry, delayOrders.get(entry),Integer::sum);
-            }
-            SchedulesReportResponse  response = new SchedulesReportResponse(customerArriveDeparture,
+
+            return new SchedulesReportResponse(
+                    customerArriveDeparture,
                     lateResult,
                     delayOrders,
-                    timeRestaurant.getOpenTime().toLocalTime(),
-                    timeRestaurant.getCloseTime().toLocalTime(),
-                    timeRestaurant.getInterval());
-            System.out.println(response);
-
-            return response;
-
+                    openTime,
+                    closeTime,
+                    interval);
         });
     }
-    public static Map<LocalDate, Map<LocalTime, Integer>> padMissingDays(
-            Map<LocalDate, Map<LocalTime, Integer>> data,
-            LocalDate startInclusive,
-            LocalDate endInclusive
-    ) {
-        Map<LocalDate, Map<LocalTime, Integer>> out = new HashMap<>(data);
 
-        for (LocalDate d = startInclusive; !d.isAfter(endInclusive); d = d.plusDays(1)) {
-            out.computeIfAbsent(d, __ -> new HashMap<>());
-        }
-        return out;
-    }
-    private static LocalTime bucketFloor(LocalTime t, LocalTime opening, int intervalMinutes) {
-        // clamp below opening
-        if (t.isBefore(opening)) return opening;
-
-        int minutesFromOpen = (int) java.time.Duration.between(opening, t).toMinutes();
-        int bucketIndex = minutesFromOpen / intervalMinutes; // floor
-        return opening.plusMinutes((long) bucketIndex * intervalMinutes);
-    }
-
-    public static Map<LocalDate, Map<LocalTime, Integer>> normalizeAndMerge(
-            Map<LocalDate, Map<LocalTime, Integer>> orders,
-            Map<LocalDate, Map<LocalTime, Integer>> waiting,
-            LocalTime opening,
-            LocalTime closing,
-            int intervalMinutes
-    ) {
-        Map<LocalDate, Map<LocalTime, Integer>> out = new TreeMap<>();
-
-        java.util.function.BiConsumer<LocalDate, Map<LocalTime,Integer>> addDay = (date, times) -> {
-            Map<LocalTime, Integer> dayOut = out.computeIfAbsent(date, d -> new TreeMap<>());
-
-            for (var e : times.entrySet()) {
-                LocalTime raw = e.getKey();
-                int count = e.getValue();
-
-                LocalTime slot = bucketFloor(raw, opening, intervalMinutes);
-
-                // optional: drop anything after closing (or closing-interval)
-                if (slot.isAfter(closing)) continue;
-
-                dayOut.merge(slot, count, Integer::sum);
-            }
-        };
-
-        orders.forEach(addDay);
-        waiting.forEach(addDay);
-
-        return out;
-    }
-    public static Map<LocalDate, Map<LocalTime, Integer>> sumReports(
-            Map<LocalDate, Map<LocalTime, Integer>> a,
-            Map<LocalDate, Map<LocalTime, Integer>> b
-    ) {
-        Map<LocalDate, Map<LocalTime, Integer>> total = new TreeMap<>();
-
-        // helper to merge one report into total
-        java.util.function.Consumer<Map<LocalDate, Map<LocalTime, Integer>>> mergeOne = report -> {
-            for (var dateEntry : report.entrySet()) {
-                LocalDate date = dateEntry.getKey();
-                Map<LocalTime, Integer> times = dateEntry.getValue();
-
-                Map<LocalTime, Integer> totalTimes =
-                        total.computeIfAbsent(date, d -> new TreeMap<>());
-
-                for (var timeEntry : times.entrySet()) {
-                    LocalTime time = timeEntry.getKey();
-                    int count = timeEntry.getValue() == null ? 0 : timeEntry.getValue();
-
-                    totalTimes.merge(time, count, Integer::sum);
-                }
-            }
-        };
-
-        mergeOne.accept(a);
-        mergeOne.accept(b);
-
-        return total;
-    }
-    public static Map<LocalDate, Integer> getDaysOfCurrentMonthMap() {
-        Map<LocalDate, Integer> result = new TreeMap<>();
-
-        YearMonth currentMonth = YearMonth.now();
-        LocalDate startOfMonth = currentMonth.atDay(1);
-
-        for (int i = 0; i < currentMonth.lengthOfMonth(); i++) {
-            result.put(startOfMonth.plusDays(i), 0);
-        }
-
-        return result;
-    }
-    public static Map<LocalDate, Map<LocalTime,Integer>> getDaysOfCurrentMonthMapMap() {
-        Map<LocalDate, Map<LocalTime,Integer>> result = new TreeMap<>();
-
-        YearMonth currentMonth = YearMonth.now();
-        LocalDate startOfMonth = currentMonth.atDay(1);
-
-        for (int i = 0; i < currentMonth.lengthOfMonth(); i++) {
-            result.put(startOfMonth.plusDays(i), null);
-        }
-
-        return result;
-    }
-
-
+    /**
+     * Generates a subscriber activity report for the current month.
+     * <p>
+     * The report tracks daily counts of:
+     * <ul>
+     *     <li>Orders placed by subscribers</li>
+     *     <li>Waiting list entries by subscribers</li>
+     * </ul>
+     *
+     * @return {@link SubscriberReportResponse} containing subscriber activity metrics
+     */
     public SubscriberReportResponse getSubscriberReport() {
-        // Map to store subscriber order counts by date
-        Map<LocalDate, Integer> subscriberOrdersCount = getDaysOfCurrentMonthMap();
-        Map<LocalDate, Integer> subscriberWaitingListCount = getDaysOfCurrentMonthMap();
+        Map<LocalDate, Integer> subscriberOrdersCount = createMonthMap();
+        Map<LocalDate, Integer> subscriberWaitingListCount = createMonthMap();
 
-        // Map to store subscriber waiting list counts by date
         return tx.inTransaction(() -> {
-            // Get all waiting list entries and count subscribers by date
-            Map<LocalDate, Integer> countSubWaited = waitingListRepository.getCountInThisMount();
-            for (var entry : countSubWaited.keySet()) {
-                subscriberWaitingListCount.merge(entry, countSubWaited.get(entry),Integer::sum);
-            }
-
-            Map<LocalDate, Integer> countSubLate = orderRepository.getCountInThisMount();
-            for (var entry : countSubLate.keySet()) {
-                subscriberOrdersCount.merge(entry, countSubLate.get(entry),Integer::sum);
-            }
+            mergeInto(subscriberWaitingListCount, waitingListRepository.getCountInThisMount());
+            mergeInto(subscriberOrdersCount, orderRepository.getCountInThisMount());
 
             return SubscriberReportResponse.builder()
                     .SubscriberOrdersCount(subscriberOrdersCount)
                     .SubscriberWaitingListCount(subscriberWaitingListCount)
                     .build();
         });
+    }
+
+    // ==================== Utility Methods ====================
+
+    /**
+     * Creates a map with all days of the current month initialized to zero.
+     *
+     * @return a {@link TreeMap} with each day of the current month mapped to 0
+     */
+    private static Map<LocalDate, Integer> createMonthMap() {
+        Map<LocalDate, Integer> result = new TreeMap<>();
+        YearMonth currentMonth = YearMonth.now();
+        LocalDate start = currentMonth.atDay(1);
+        for (int i = 0; i < currentMonth.lengthOfMonth(); i++) {
+            result.put(start.plusDays(i), 0);
+        }
+        return result;
+    }
+
+    /**
+     * Merges values from a source map into a target map by summing counts.
+     *
+     * @param target the map to merge values into
+     * @param source the map containing values to merge
+     */
+    private static void mergeInto(Map<LocalDate, Integer> target, Map<LocalDate, Integer> source) {
+        source.forEach((date, count) -> target.merge(date, count, Integer::sum));
+    }
+
+    /**
+     * Ensures all dates within a range exist in the map with at least an empty nested map.
+     *
+     * @param data  the original data map
+     * @param start the start date (inclusive)
+     * @param end   the end date (inclusive)
+     * @return a new map with all dates in range guaranteed to have entries
+     */
+    private static Map<LocalDate, Map<LocalTime, Integer>> padMissingDays(
+            Map<LocalDate, Map<LocalTime, Integer>> data,
+            LocalDate start,
+            LocalDate end) {
+        Map<LocalDate, Map<LocalTime, Integer>> out = new HashMap<>(data);
+        for (LocalDate d = start; !d.isAfter(end); d = d.plusDays(1)) {
+            out.computeIfAbsent(d, __ -> new HashMap<>());
+        }
+        return out;
+    }
+
+    /**
+     * Rounds a time down to the nearest bucket based on opening time and interval.
+     * <p>
+     * Times before opening are clamped to the opening time.
+     *
+     * @param time            the time to bucket
+     * @param opening         the restaurant opening time
+     * @param intervalMinutes the bucket interval in minutes
+     * @return the floored time slot
+     */
+    private static LocalTime bucketFloor(LocalTime time, LocalTime opening, int intervalMinutes) {
+        if (time.isBefore(opening)) return opening;
+        int minutesFromOpen = (int) Duration.between(opening, time).toMinutes();
+        int bucketIndex = minutesFromOpen / intervalMinutes;
+        return opening.plusMinutes((long) bucketIndex * intervalMinutes);
+    }
+
+    /**
+     * Merges multiple time-based reports into unified time buckets.
+     * <p>
+     * Each report's entries are bucketed according to the restaurant's time interval,
+     * and counts are summed across all reports. Entries after closing time are excluded.
+     *
+     * @param opening         the restaurant opening time
+     * @param closing         the restaurant closing time
+     * @param intervalMinutes the time bucket interval in minutes
+     * @param reports         one or more reports to merge
+     * @return a merged map of date to (time-slot to customer count)
+     */
+    @SafeVarargs
+    private static Map<LocalDate, Map<LocalTime, Integer>> mergeTimeReports(
+            LocalTime opening,
+            LocalTime closing,
+            int intervalMinutes,
+            Map<LocalDate, Map<LocalTime, Integer>>... reports) {
+        Map<LocalDate, Map<LocalTime, Integer>> result = new TreeMap<>();
+
+        for (Map<LocalDate, Map<LocalTime, Integer>> report : reports) {
+            report.forEach((date, times) -> {
+                Map<LocalTime, Integer> dayBuckets = result.computeIfAbsent(date, d -> new TreeMap<>());
+                times.forEach((time, count) -> {
+                    LocalTime slot = bucketFloor(time, opening, intervalMinutes);
+                    if (!slot.isAfter(closing)) {
+                        dayBuckets.merge(slot, count, Integer::sum);
+                    }
+                });
+            });
+        }
+        return result;
     }
 }

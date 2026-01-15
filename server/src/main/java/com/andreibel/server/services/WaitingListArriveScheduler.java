@@ -11,6 +11,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.andreibel.server.utils.TUI.printWaitingListSeated;
+
 public class WaitingListArriveScheduler {
     private static final long CHECK_INTERVAL_MIN = 5;
 
@@ -71,10 +73,15 @@ public class WaitingListArriveScheduler {
             List<Waiting> currentWaitingList = waitingListRepository.getCurrentWaitingActive();
             TreeMap<Integer, Integer> available = tableService.getAllAvailableTables();
             for (Waiting waiting : currentWaitingList) {
-                Map.Entry<Integer, Integer> integerIntegerEntry = available.ceilingEntry(waiting.getWaitingNumber());
-                if(integerIntegerEntry != null  && integerIntegerEntry.getValue() != 0){
-                    available.merge(integerIntegerEntry.getKey(), -1, Integer::sum);
+                Map.Entry<Integer, Integer> tableEntry = available.ceilingEntry(waiting.getWaitingNumber());
+                if (tableEntry != null && tableEntry.getValue() != 0) {
+                    available.merge(tableEntry.getKey(), -1, Integer::sum);
                     waitingListRepository.waitingArriveToTable(waiting.getConformationCode());
+                    printWaitingListSeated(
+                            waiting.getConformationCode(),
+                            waiting.getWaitingNumber(),
+                            tableEntry.getKey()
+                    );
                 }
             }
             return null;

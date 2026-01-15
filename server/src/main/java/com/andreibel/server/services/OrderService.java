@@ -214,7 +214,7 @@ public class OrderService {
             orderRepository.setArrived(conformationCode);
 
             // 3. Check table availability
-            if (!canSeatNow(order.getNumberOfGuests())) {
+            if (canSeatNow(order.getNumberOfGuests())) {
                 // 4. Mark as arrived
                 // TABLE AVAILABLE - SEAT
                 order.setOrderArrive(true);

@@ -73,6 +73,19 @@ public class OrderRepository {
         }
         return orders;
     }
+    /**
+     * Loads all currently active orders (arrived but not yet completed or cancelled).
+     *
+     * <p>An order is considered active when:
+     * <ul>
+     *     <li>{@code orderArrive = 1} (customer has checked in)</li>
+     *     <li>{@code orderCompleted = 0} (not yet closed)</li>
+     *     <li>{@code orderCancelled = 0} (not cancelled)</li>
+     * </ul>
+     *
+     * @return list of active orders (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
     public List<Order> findActiveOrders() throws SQLException {
         String sql = """
                 SELECT * FROM bistro.`Order`
@@ -456,6 +469,15 @@ public class OrderRepository {
         }
     }
 
+    /**
+     * Counts subscriber orders per day for the current month.
+     *
+     * <p>Only orders with a non-null {@code subscriberId} are counted.
+     * Results are grouped by date and returned as a map.</p>
+     *
+     * @return map of date to subscriber order count for the current month
+     * @throws SQLException if a database access error occurs
+     */
     public Map<LocalDate, Integer> getCountInThisMount() throws SQLException {
 
         String sql = """
@@ -478,6 +500,16 @@ public class OrderRepository {
     }
 
 
+    /**
+     * Counts arrived orders per day and time slot for the current month.
+     *
+     * <p>Only orders with a recorded arrival time ({@code orderArriveDateTime IS NOT NULL})
+     * are included. Results are grouped by date and time, useful for generating
+     * customer traffic reports.</p>
+     *
+     * @return nested map of date to (time to order count) for the current month
+     * @throws SQLException if a database access error occurs
+     */
     public Map<LocalDate, Map<LocalTime, Integer>> getCountInThisMonthByTime() throws SQLException {
 
         String sql = """
@@ -510,6 +542,16 @@ public class OrderRepository {
         return map;
     }
 
+    /**
+     * Counts late arrivals per day for the current month.
+     *
+     * <p>An order is considered late when the customer arrived after the
+     * scheduled reservation time ({@code orderArriveDateTime > orderDateTime}).
+     * Results are grouped by date for reporting purposes.</p>
+     *
+     * @return map of date to late order count for the current month
+     * @throws SQLException if a database access error occurs
+     */
     public Map<LocalDate, Integer> getLateOrders() throws SQLException {
 
         String sql = """
