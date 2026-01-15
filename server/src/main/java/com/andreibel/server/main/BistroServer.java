@@ -12,7 +12,8 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-import static com.andreibel.server.utils.TUI.*;
+import static com.andreibel.server.utils.TUI.conf;
+import static com.andreibel.server.utils.TUI.startLog;
 
 public class BistroServer extends Application {
 
