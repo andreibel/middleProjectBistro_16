@@ -42,7 +42,13 @@ public class WaitingListRepository {
         }
         return instance;
     }
+    /*TESTING
+    */
+    public static boolean isTableAvailableToday(){
 
+
+        return true;
+    }
     /**
      * Adds a new waiting list entry to the database.
      * <p>
@@ -54,6 +60,7 @@ public class WaitingListRepository {
      * @throws SQLException if validation fails or database operation fails
      */
     public Waiting addWaiting(Waiting waiting) throws SQLException {
+
         String sql = """
                 INSERT INTO bistro.`Waiting`
                 (numberOfGuests, conformationCode, orderNumber, subscriberId, email, phoneNumber)

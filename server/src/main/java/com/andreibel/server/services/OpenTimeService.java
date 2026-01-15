@@ -7,6 +7,10 @@ import com.andreibel.server.dbController.repository.OpenTimeRepository;
 import com.andreibel.server.entity.OpenTime;
 import com.andreibel.server.utils.OpenTimeMapper;
 
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 /**
  * Service responsible for managing restaurant opening hours configuration.
  * <p>
@@ -83,6 +87,26 @@ public class OpenTimeService {
         return tx.inTransaction(() -> {
             OpenTime regular =  openTimeRepository.findRegular();
             return OpenTimeMapper.mapOpenTimeToDTO(regular);
+        });
+    }
+    public BistroTimeDTO getSpecial() {
+        return tx.inTransaction(() -> {
+            LocalDate localDate = LocalDate.now();
+            Date sqlDate = Date.valueOf(localDate);
+            OpenTime regular =  openTimeRepository.findSpecial(sqlDate);
+            return OpenTimeMapper.mapOpenTimeToDTO(regular);
+        });
+    }
+    public boolean isCurDaySpecial(){
+        return tx.inTransaction(() -> {
+            LocalDate localDate = LocalDate.now();
+            Date sqlDate = Date.valueOf(localDate);
+            OpenTime Special =  openTimeRepository.findSpecial(sqlDate);
+            if(Special==null){
+                return false;
+            }else{
+                return true;
+            }
         });
     }
 }
