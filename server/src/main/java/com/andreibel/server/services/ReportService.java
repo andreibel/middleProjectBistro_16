@@ -6,15 +6,12 @@ import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OpenTimeRepository;
 import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.dbController.repository.WaitingListRepository;
-import com.andreibel.server.entity.Order;
-import com.andreibel.server.entity.Waiting;
+import com.andreibel.server.entity.OpenTime;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ReportService {
     private static ReportService instance;
@@ -46,79 +43,92 @@ public class ReportService {
 
         // Map to store total delay minutes by date (from arrival to being seated)
         Map<LocalDate, Integer> customerDelay = getDaysOfCurrentMonthMap();
-
+        LocalDate start = LocalDate.now().withDayOfMonth(1);
+        LocalDate end   = start.withDayOfMonth(start.lengthOfMonth());
         return tx.inTransaction(() -> {
+            OpenTime timeRestaurant = openTimeRepository.findRegular();
             Map<LocalDate, Map<LocalTime, Integer>> orderPartReport = orderRepository.getCountInThisMonthByTime();
+            System.out.println(orderPartReport);
             Map<LocalDate, Map<LocalTime, Integer>> waitingPartReport = waitingListRepository.getCountInThisMonthByTime();
-            Map<LocalDate, Map<LocalTime, Integer>> customerArriveDeparture  = sumReports(orderPartReport, waitingPartReport);
+            System.out.println(waitingPartReport);
+            Map<LocalDate, Map<LocalTime, Integer>> customerArriveDeparture;
+            customerArriveDeparture = normalizeAndMerge(orderPartReport,waitingPartReport,
+                    timeRestaurant.getOpenTime().toLocalTime(),
+                    timeRestaurant.getCloseTime().toLocalTime(),
+                    timeRestaurant.getInterval());
+            customerArriveDeparture = padMissingDays(customerArriveDeparture, start, end);
+            System.out.println(customerArriveDeparture);
+            Map<LocalDate, Integer> lateResult = orderRepository.getLateOrders();
+            for (var entry : lateResult.keySet()) {
+                customerLate.merge(entry, lateResult.get(entry),Integer::sum);
+            }
 
-//
-//
-//
-//            // Get all waiting list entries for analysis
-//            List<Waiting> allWaiting = waitingListRepository.getAllWaitingSitNow();
-//
-//            // Process waiting list data
-//            for (Waiting w : allWaiting) {
-//                // Track customer arrivals at restaurant
-//                if (w.getWaitingArriveDateTime() != null) {
-//                    LocalDate arrivalDate = w.getWaitingArriveDateTime().toLocalDate();
-//                    LocalTime arrivalTime = w.getWaitingArriveDateTime().toLocalTime();
-//
-//                    // Add to arrive/departure map (how many customers arrived at this time)
-//                    customerArriveDeparture.get().computeIfAbsent(arrivalDate, k -> new LinkedHashMap<>())
-//                            .merge(arrivalTime, 1, Integer::sum);
-//                }
-//
-//                // Calculate delays and late status for customers with reservations (orders)
-//                if (w.getOrderNumber() != null && w.getWaitingArriveDateTime() != null) {
-//                    LocalDate date = w.getWaitingArriveDateTime().toLocalDate();
-//
-//                    try {
-//                        // Fetch the order to get orderDateTime and orderArriveDateTime
-//                        Order order = orderRepository.findById(w.getOrderNumber());
-//
-//                        if (order != null) {
-//                            // 1. Calculate delay (from arrival at restaurant to being seated)
-//                            if (order.getOrderArriveDateTime() != null) {
-//                                long delayMinutes = ChronoUnit.MINUTES.between(
-//                                        w.getWaitingArriveDateTime(),
-//                                        order.getOrderArriveDateTime()
-//                                );
-//
-//                                // Only count positive delays (customer waited after arriving)
-//                                if (delayMinutes > 0) {
-//                                    customerDelay.merge(date, (int) delayMinutes, Integer::sum);
-//                                }
-//                            }
-//
-//                            // 2. Check if customer arrived late (after reservation time)
-//                            if (order.getOrderDateTime() != null) {
-//                                if (w.getWaitingArriveDateTime().isAfter(order.getOrderDateTime())) {
-//                                    customerLate.merge(date, 1, Integer::sum);
-//                                }
-//                            }
-//                        }
-//                    } catch (Exception e) {
-//                        // Log error but continue processing other entries
-//                        System.err.println("Error processing order " + w.getOrderNumber() + ": " + e.getMessage());
-//                    }
-//                }
-//            }
-//
-//            // Set default opening/closing times (can be made configurable from bistro settings)
-//            LocalTime openingTime = LocalTime.of(11, 0);
-//            LocalTime closingTime = LocalTime.of(23, 0);
-//            return SchedulesReportResponse.builder()
-//                    .customerArriveDeparture(customerArriveDeparture.get())
-//                    .customerLate(customerLate)
-//                    .customerDelay(customerDelay)
-//                    .openingTime(openingTime)
-//                    .closingTime(closingTime)
-//                    .interval(30) // 30-minute intervals (configurable)
-//                    .build();
-            return null;
+            Map<LocalDate, Integer> delayOrders = waitingListRepository.getDelaysOrders();
+            for (var entry : delayOrders.keySet()) {
+                customerDelay.merge(entry, delayOrders.get(entry),Integer::sum);
+            }
+            SchedulesReportResponse  response = new SchedulesReportResponse(customerArriveDeparture,
+                    lateResult,
+                    delayOrders,
+                    timeRestaurant.getOpenTime().toLocalTime(),
+                    timeRestaurant.getCloseTime().toLocalTime(),
+                    timeRestaurant.getInterval());
+            System.out.println(response);
+
+            return response;
+
         });
+    }
+    public static Map<LocalDate, Map<LocalTime, Integer>> padMissingDays(
+            Map<LocalDate, Map<LocalTime, Integer>> data,
+            LocalDate startInclusive,
+            LocalDate endInclusive
+    ) {
+        Map<LocalDate, Map<LocalTime, Integer>> out = new HashMap<>(data);
+
+        for (LocalDate d = startInclusive; !d.isAfter(endInclusive); d = d.plusDays(1)) {
+            out.computeIfAbsent(d, __ -> new HashMap<>());
+        }
+        return out;
+    }
+    private static LocalTime bucketFloor(LocalTime t, LocalTime opening, int intervalMinutes) {
+        // clamp below opening
+        if (t.isBefore(opening)) return opening;
+
+        int minutesFromOpen = (int) java.time.Duration.between(opening, t).toMinutes();
+        int bucketIndex = minutesFromOpen / intervalMinutes; // floor
+        return opening.plusMinutes((long) bucketIndex * intervalMinutes);
+    }
+
+    public static Map<LocalDate, Map<LocalTime, Integer>> normalizeAndMerge(
+            Map<LocalDate, Map<LocalTime, Integer>> orders,
+            Map<LocalDate, Map<LocalTime, Integer>> waiting,
+            LocalTime opening,
+            LocalTime closing,
+            int intervalMinutes
+    ) {
+        Map<LocalDate, Map<LocalTime, Integer>> out = new TreeMap<>();
+
+        java.util.function.BiConsumer<LocalDate, Map<LocalTime,Integer>> addDay = (date, times) -> {
+            Map<LocalTime, Integer> dayOut = out.computeIfAbsent(date, d -> new TreeMap<>());
+
+            for (var e : times.entrySet()) {
+                LocalTime raw = e.getKey();
+                int count = e.getValue();
+
+                LocalTime slot = bucketFloor(raw, opening, intervalMinutes);
+
+                // optional: drop anything after closing (or closing-interval)
+                if (slot.isAfter(closing)) continue;
+
+                dayOut.merge(slot, count, Integer::sum);
+            }
+        };
+
+        orders.forEach(addDay);
+        waiting.forEach(addDay);
+
+        return out;
     }
     public static Map<LocalDate, Map<LocalTime, Integer>> sumReports(
             Map<LocalDate, Map<LocalTime, Integer>> a,

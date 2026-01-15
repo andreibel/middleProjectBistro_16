@@ -312,7 +312,7 @@ public class WaitingListRepository {
                   AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
                 GROUP BY DateOnly;
                 """;
-        Map<LocalDate, Integer> map = new HashMap<>();
+        Map<LocalDate, Integer> map = new TreeMap<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -335,7 +335,7 @@ public class WaitingListRepository {
             ORDER BY dateOnly, timeOnly;
             """;
 
-        Map<LocalDate, Map<LocalTime, Integer>> map = new HashMap<>();
+        Map<LocalDate, Map<LocalTime, Integer>> map = new TreeMap<>();
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -345,11 +345,32 @@ public class WaitingListRepository {
                 LocalTime time = rs.getTime("timeOnly").toLocalTime();
                 int count = rs.getInt("subCount");
 
-                map.computeIfAbsent(date, d -> new HashMap<>())
+                map.computeIfAbsent(date, d -> new TreeMap<>())
                         .put(time, count);
             }
         }
 
+        return map;
+    }
+
+    public Map<LocalDate, Integer> getDelaysOrders() throws SQLException {
+
+        String sql = """
+                SELECT DATE(waitingDateTime) DateOnly, COUNT(*) as orderCount
+                FROM bistro.`Waiting`
+                WHERE orderNumber IS NOT NULL
+                  AND YEAR(waitingDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+                """;
+        Map<LocalDate, Integer> map = new TreeMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("orderCount"));
+                }
+            }
+        }
         return map;
     }
 

@@ -19,7 +19,7 @@ public class BistroServer extends Application {
     public static String PORT = "8080";
     public static String DB_URL = "jdbc:mysql://db-bistro-g16.cbe862egq27l.eu-north-1.rds.amazonaws.com:3306";
     public static String DB_USER = "admin";
-    public static String DB_PASSWORD = "sendI9-wevkup-fivmoj";
+    public static String DB_PASSWORD = "TOKEN";
 
 
     public void startScheduler() {

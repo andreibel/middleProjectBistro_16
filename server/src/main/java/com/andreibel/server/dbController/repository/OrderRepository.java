@@ -459,14 +459,14 @@ public class OrderRepository {
     public Map<LocalDate, Integer> getCountInThisMount() throws SQLException {
 
         String sql = """
-                SELECT DATE(mydate) DateOnly , COUNT(*) as subCount
+                SELECT DATE(orderDateTime) DateOnly , COUNT(*) as subCount
                 FROM bistro.`Order`
                 WHERE subscriberId IS NOT NULL
                   AND YEAR(orderDateTime) = YEAR(CURRENT_DATE)
                   AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
                 GROUP BY DateOnly;
                 """;
-        Map<LocalDate, Integer> map = new HashMap<>();
+        Map<LocalDate, Integer> map = new TreeMap<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -487,11 +487,12 @@ public class OrderRepository {
             FROM bistro.`Order`
             WHERE YEAR(orderDateTime) = YEAR(CURRENT_DATE)
               AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+              AND orderArriveDateTime IS NOT NULL
             GROUP BY dateOnly, timeOnly
             ORDER BY dateOnly, timeOnly;
             """;
 
-        Map<LocalDate, Map<LocalTime, Integer>> map = new HashMap<>();
+        Map<LocalDate, Map<LocalTime, Integer>> map = new TreeMap<>();
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -501,11 +502,33 @@ public class OrderRepository {
                 LocalTime time = rs.getTime("timeOnly").toLocalTime();
                 int count = rs.getInt("subCount");
 
-                map.computeIfAbsent(date, d -> new HashMap<>())
+                map.computeIfAbsent(date, d -> new TreeMap<>())
                         .put(time, count);
             }
         }
 
+        return map;
+    }
+
+    public Map<LocalDate, Integer> getLateOrders() throws SQLException {
+
+        String sql = """
+            SELECT DATE(orderDateTime) DateOnly , COUNT(*) as OrderCount
+                FROM bistro.`Order`
+                WHERE orderArriveDateTime > orderDateTime
+                AND YEAR(orderDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+            """;
+
+        Map<LocalDate, Integer> map = new TreeMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("OrderCount"));
+                }
+            }
+        }
         return map;
     }
 
