@@ -91,7 +91,7 @@ public class NoOrderFormGUIController implements IServerResponseListener {
                 clearForm();
                 BistroUtilities.showSelectableMessage(
                         "Bistro Restaurant",
-                        " uccessfully added to waiting list!\n" +
+                        " Successfully added to waiting list!\n" +
                                 "\nWe'll notify you when a table becomes available." +
                                 "\nYour confirmation code is: ",
                                 response.getConformationCode().toString()
