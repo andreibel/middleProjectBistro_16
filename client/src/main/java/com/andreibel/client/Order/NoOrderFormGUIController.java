@@ -85,17 +85,16 @@ public class NoOrderFormGUIController implements IServerResponseListener {
     @Override
     public void onServerResponse(Message message) {
         switch (message.getType()) {
-
             case ADD_TO_WAITING_LIST_RESPONSE -> {
                 WaitingListResponse response =
                         (WaitingListResponse) message.getData();
                 clearForm();
-                BistroUtilities.showMessage(
+                BistroUtilities.showSelectableMessage(
                         "Bistro Restaurant",
-                        "Successfully added to waiting list!\n" +
-                                "Your confirmation code is: " +
-                                response.getConformationCode() +
-                                "\nWe'll notify you when a table becomes available."
+                        " uccessfully added to waiting list!\n" +
+                                "\nWe'll notify you when a table becomes available." +
+                                "\nYour confirmation code is: ",
+                                response.getConformationCode().toString()
                 );
             }
 

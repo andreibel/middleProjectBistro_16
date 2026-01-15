@@ -132,7 +132,7 @@ public class OrderController {
         OrderResponse orderResponse = orderService.orderArrives((UUID) message.getData());
         if (orderResponse == null) return new Message(ORDER_ARRIVED_ERROR, null);
         if (orderResponse.getConformationCode() == null)
-            return new Message(ORDER_ARRIVED_ERROR, "can't give you table because all of them are Occupied!!");
+            return new Message(ORDER_ARRIVED_ERROR, "Restaurant is currently full and we currently cannot give you a confirmation code.\nYou'll enter to a waiting list and we'll notify you when there is a table available for you.");
         return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 
