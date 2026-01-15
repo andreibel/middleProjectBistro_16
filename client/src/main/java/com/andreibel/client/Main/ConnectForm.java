@@ -1,7 +1,5 @@
 package com.andreibel.client.Main;
 
-import com.andreibel.client.Client.BistroClient;
-import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.util.BistroUtilities;
 import java.io.IOException;
 import java.util.Objects;
@@ -47,13 +45,6 @@ public class ConnectForm extends Application {
         ConnectFormGUIController controller = fxmlLoader.getController();
         controller.setMainStage(stage);
 
-//        // Create client and attach it to the controller
-//        BistroClient client = new BistroClient(host, port);
-//        BistroClientController.getInstance().attachClient(client);
-
-        // Connect to the server
-        //client.connectToServer();
-
         // Create and register scene
         Scene scene = new Scene(root, 1060, 600);
         BistroUtilities.addToSceneManager(scene, "/Main/ConnectForm.fxml");
@@ -72,19 +63,6 @@ public class ConnectForm extends Application {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.sizeToScene();
-
-        // Gracefully close connection on application exit
-//        stage.setOnCloseRequest(event -> {
-//            try {
-//                client.closeConnection();
-//            } catch (IOException e) {
-//                throw new RuntimeException(
-//                    "Failed to close client connection",
-//                    e
-//                );
-//            }
-//        });
-
         stage.show();
     }
 }
