@@ -1,4 +1,4 @@
-module com.andreibel.server {
+ module com.andreibel.server {
     // JavaFX modules
     requires javafx.controls;
     requires javafx.fxml;
@@ -12,13 +12,14 @@ module com.andreibel.server {
     requires static lombok;
 
     // Automatic modules (your custom dependencies)
-    requires message;
+    //requires message;
     requires ocsf;
 
     // MySQL JDBC driver (automatic module)
     requires mysql.connector.j;
+    requires com.andreibel.message;
 
-    // Open packages to JavaFX for FXML reflection (controllers with @FXML)
+     // Open packages to JavaFX for FXML reflection (controllers with @FXML)
     opens com.andreibel.server.main to javafx.fxml, javafx.graphics;
     opens com.andreibel.server.controller to javafx.fxml, javafx.base;
 

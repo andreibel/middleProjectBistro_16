@@ -1,0 +1,9 @@
+module:com.andreibel.client
+com.andreibel.client
+com.andreibel.client.Client
+com.andreibel.client.Main
+com.andreibel.client.Order
+com.andreibel.client.Subscriber
+com.andreibel.client.Table
+com.andreibel.client.util
+com.andreibel.client.Worker
