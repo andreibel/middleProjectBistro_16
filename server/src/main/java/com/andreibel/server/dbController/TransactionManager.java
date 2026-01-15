@@ -133,6 +133,7 @@ public class TransactionManager {
             } finally {
                 txConn.remove();
                 con.setAutoCommit(oldAutoCommit);
+                try { con.close(); } catch (SQLException ignored) {}
             }
 
         } catch (SQLException e) {

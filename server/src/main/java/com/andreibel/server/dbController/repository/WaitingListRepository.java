@@ -3,19 +3,17 @@ package com.andreibel.server.dbController.repository;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.entity.Waiting;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.sql.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.*;
 
 import static com.andreibel.server.utils.WaitingListMapper.mapRelToWaiting;
 
 /**
  * Repository for Waiting List operations.
- *
+ * <p>
  * Manages waiting list entries with smart priority sorting:
  * - Customers with reservations sorted by reservation time (earliest first)
  * - Walk-in customers sorted by arrival time (FIFO)
@@ -47,7 +45,7 @@ public class WaitingListRepository {
 
     /**
      * Adds a new waiting list entry to the database.
-     *
+     * <p>
      * If the customer has an order (reservation), validates that it exists and is not cancelled.
      * Auto-generates waitingNumber and sets waitingDateTime to current timestamp.
      *
@@ -56,35 +54,28 @@ public class WaitingListRepository {
      * @throws SQLException if validation fails or database operation fails
      */
     public Waiting addWaiting(Waiting waiting) throws SQLException {
-        // Validate that if orderNumber is provided, the order actually exists and is not cancelled
-        if (waiting.getOrderNumber() != null) {
-            validateOrderExists(waiting.getOrderNumber());
-        }
-
         String sql = """
                 INSERT INTO bistro.`Waiting`
-                (numberOfGuests, waitingDateTime, conformationCode, orderNumber, subscriberId, email, phoneNumber, isCurrentlyWaiting)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (numberOfGuests, conformationCode, orderNumber, subscriberId, email, phoneNumber)
+                VALUES (?, ?, ?, ?, ?, ?);
                 """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, waiting.getNumberOfGuests());
-            stmt.setTimestamp(2, Timestamp.valueOf(waiting.getWaitingDateTime()));
-            stmt.setString(3, waiting.getConformationCode().toString());
+            stmt.setString(2, waiting.getConformationCode().toString());
 
-            if (waiting.getOrderNumber() == null) stmt.setNull(4, java.sql.Types.INTEGER);
-            else stmt.setInt(4, waiting.getOrderNumber());
+            if (waiting.getOrderNumber() == null) stmt.setNull(3, Types.INTEGER);
+            else stmt.setInt(3, waiting.getOrderNumber());
 
-            if (waiting.getSubscriberId() == null) stmt.setNull(5, java.sql.Types.INTEGER);
-            else stmt.setInt(5, waiting.getSubscriberId());
+            if (waiting.getSubscriberId() == null) stmt.setNull(4, Types.INTEGER);
+            else stmt.setInt(4, waiting.getSubscriberId());
 
-            if (waiting.getEmail() == null) stmt.setNull(6, java.sql.Types.VARCHAR);
-            else stmt.setString(6, waiting.getEmail());
+            if (waiting.getEmail() == null) stmt.setNull(5, Types.VARCHAR);
+            else stmt.setString(5, waiting.getEmail());
 
-            if (waiting.getPhoneNumber() == null) stmt.setNull(7, java.sql.Types.VARCHAR);
-            else stmt.setString(7, waiting.getPhoneNumber());
+            if (waiting.getPhoneNumber() == null) stmt.setNull(6, Types.VARCHAR);
+            else stmt.setString(6, waiting.getPhoneNumber());
 
-            stmt.setBoolean(8, true); // isCurrentlyWaiting = 1 by default
 
             stmt.executeUpdate();
             try (ResultSet keys = stmt.getGeneratedKeys()) {
@@ -107,7 +98,7 @@ public class WaitingListRepository {
         String sql = """
                 SELECT *
                 FROM bistro.`Waiting`
-                WHERE waitingNumber = ?
+                WHERE waitingNumber = ?;
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setInt(1, id);
@@ -128,7 +119,7 @@ public class WaitingListRepository {
         String sql = """
                 SELECT *
                 FROM bistro.`Waiting`
-                WHERE conformationCode = ?
+                WHERE conformationCode = ?;
                 """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
@@ -139,34 +130,13 @@ public class WaitingListRepository {
         }
     }
 
-    /**
-     * Counts the number of currently active waiting customers.
-     *
-     * @return count of customers in waiting list where isCurrentlyWaiting = 1
-     * @throws SQLException if database operation fails
-     */
-    public int countNumberOfActive() throws SQLException {
-        String sql = """
-                SELECT COUNT(*) as count
-                FROM bistro.`Waiting`
-                WHERE isCurrentlyWaiting = 1
-                """;
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("count");
-            }
-        }
-        return 0;
-    }
 
     /**
      * Gets waiting list entries for a specific month and year.
      * Results are ordered by waitingDateTime descending (most recent first).
      *
      * @param month the month (1-12)
-     * @param year the year
+     * @param year  the year
      * @return list of waiting entries for that month
      * @throws SQLException if database operation fails
      */
@@ -176,7 +146,7 @@ public class WaitingListRepository {
                 FROM bistro.`Waiting`
                 WHERE MONTH(waitingDateTime) = ?
                 AND YEAR(waitingDateTime) = ?
-                ORDER BY waitingDateTime DESC
+                ORDER BY waitingDateTime DESC;
                 """;
         List<Waiting> waitingList = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
@@ -191,33 +161,13 @@ public class WaitingListRepository {
         return waitingList;
     }
 
-    /**
-     * Updates the waiting state of a customer (seated or left).
-     *
-     * @param conformationCode the customer's confirmation code
-     * @param isWaiting true if still waiting, false if seated/left
-     * @throws SQLException if database operation fails
-     */
-    public void updateWaitingState(UUID conformationCode, boolean isWaiting) throws SQLException {
-        String sql = """
-                UPDATE bistro.`Waiting`
-                SET isCurrentlyWaiting = ?
-                WHERE conformationCode = ?
-                """;
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setBoolean(1, isWaiting);
-            stmt.setString(2, conformationCode.toString());
-            stmt.executeUpdate();
-        }
-    }
 
     /**
      * Retrieves active waiting customers sorted by priority:
-     *
+     * <p>
      * Priority  1: Customers with reservations, sorted by reservation time (orderDateTime) - earliest first
      * Priority 2: C ustomers without reservations, sorted by FIFO (waitingDateTime) - arrival first
-     *
+     * <p>
      * Example scenario (current time 14:30):
      * - Customer with reservation 14:45 arrives at 14:30 → placed before reservation 15:00
      * - Customer with reservation 15:00 → placed after reservation 14:45
@@ -232,15 +182,17 @@ public class WaitingListRepository {
                 FROM bistro.`Waiting` w
                 LEFT JOIN bistro.`Order` o ON w.orderNumber = o.orderNumber
                 WHERE w.isCurrentlyWaiting = 1
-                ORDER BY 
-                    CASE 
+                AND w.waitingDateTime >= CURDATE()
+                  AND w.waitingDateTime  < CURDATE() + INTERVAL 1 DAY
+                ORDER BY
+                    CASE
                         WHEN w.orderNumber IS NOT NULL THEN 0  -- Reservations first
                         ELSE 1                                   -- Walk-ins second
                     END ASC,
-                    CASE 
+                    CASE
                         WHEN w.orderNumber IS NOT NULL THEN o.orderDateTime  -- Sort reservations by reservation time
                         ELSE w.waitingDateTime                                -- Sort walk-ins by arrival time
-                    END ASC
+                    END ASC;
                 """;
 
         List<Waiting> waitingList = new ArrayList<>();
@@ -255,125 +207,22 @@ public class WaitingListRepository {
 
     /**
      * Removes a customer from the waiting list.
-     *
+     * <p>
      * If the customer has a reservation (orderNumber), the order will be cancelled.
      * If the customer is a walk-in (no orderNumber), they are simply removed from waiting.
-     *
+     * <p>
      * The entry is marked as isCurrentlyWaiting = 0 (soft delete to preserve history).
      *
-     * @param conformationCode the customer's confirmation code
-     * @return true if successfully removed, false if not found
      * @throws SQLException if database operation fails or customer not found
      */
-    public boolean removeFromWaitingList(UUID conformationCode) throws SQLException {
-        // First, find the waiting entry to check if there's an associated order
-        Waiting waiting = findByConformationCode(conformationCode);
-
-        if (waiting == null) {
-            throw new SQLException("Waiting list entry with confirmation code " + conformationCode + " not found");
-        }
-
-        // If customer has a reservation, cancel the order
-        if (waiting.getOrderNumber() != null) {
-            cancelOrder(waiting.getOrderNumber());
-        }
-
-        // Remove from waiting list by setting isCurrentlyWaiting to false
+    public void removeNotTodayWaitingList() throws SQLException {
         String sql = """
                 UPDATE bistro.`Waiting`
                 SET isCurrentlyWaiting = 0
-                WHERE conformationCode = ?
+                WHERE DATE(waitingDateTime) <> CURDATE();
                 """;
-
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setString(1, conformationCode.toString());
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        }
-    }
-
-    /**
-     * Alternative method: Remove from waiting list by ID (waitingNumber).
-     * Useful if you have the waiting number instead of confirmation code.
-     *
-     * If the customer has a reservation, the order will be cancelled.
-     * If the customer is a walk-in, they are simply removed from waiting.
-     *
-     * @param waitingNumber the waiting list entry ID
-     * @return true if successfully removed, false if not found
-     * @throws SQLException if database operation fails or customer not found
-     */
-    public boolean removeFromWaitingListById(int waitingNumber) throws SQLException {
-        Waiting waiting = findById(waitingNumber);
-
-        if (waiting == null) {
-            throw new SQLException("Waiting list entry #" + waitingNumber + " not found");
-        }
-
-        // If customer has a reservation, cancel the order
-        if (waiting.getOrderNumber() != null) {
-            cancelOrder(waiting.getOrderNumber());
-        }
-
-        String sql = """
-                UPDATE bistro.`Waiting`
-                SET isCurrentlyWaiting = 0
-                WHERE waitingNumber = ?
-                """;
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, waitingNumber);
-            int rowsAffected = stmt.executeUpdate();
-            return rowsAffected > 0;
-        }
-    }
-
-    /**
-     * Validates that an order exists and is not cancelled.
-     *
-     * @param orderNumber the order number to validate
-     * @throws SQLException if order doesn't exist or is cancelled
-     */
-    private void validateOrderExists(int orderNumber) throws SQLException {
-        String sql = """
-                SELECT orderCancelled
-                FROM bistro.`Order`
-                WHERE orderNumber = ?
-                """;
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, orderNumber);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (!rs.next()) {
-                    throw new SQLException("Order #" + orderNumber + " does not exist");
-                }
-                if (rs.getBoolean("orderCancelled")) {
-                    throw new SQLException("Order #" + orderNumber + " has been cancelled");
-                }
-            }
-        }
-    }
-
-    /**
-     * Cancels an order by setting orderCancelled flag to 1.
-     *
-     * @param orderNumber the order number to cancel
-     * @throws SQLException if order doesn't exist or database operation fails
-     */
-    private void cancelOrder(int orderNumber) throws SQLException {
-        String sql = """
-                UPDATE bistro.`Order`
-                SET orderCancelled = 1
-                WHERE orderNumber = ?
-                """;
-
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, orderNumber);
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected == 0) {
-                throw new SQLException("Order #" + orderNumber + " not found for cancellation");
-            }
+            stmt.executeUpdate();
         }
     }
 
@@ -384,20 +233,16 @@ public class WaitingListRepository {
      * @param conformationCode the customer's confirmation code
      * @throws SQLException if customer not found or database operation fails
      */
-    public void updateWaitingArriveDateTime(UUID conformationCode) throws SQLException {
+    public void waitingArriveToTable(UUID conformationCode) throws SQLException {
         String sql = """
                 UPDATE bistro.`Waiting`
-                SET waitingArriveDateTime = NOW()
-                WHERE conformationCode = ?
+                SET waitingArriveDateTime = NOW(), isCurrentlyWaiting = 0
+                WHERE conformationCode = ?;
                 """;
 
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, conformationCode.toString());
-            int rowsAffected = stmt.executeUpdate();
-
-            if (rowsAffected == 0) {
-                throw new SQLException("Waiting entry with confirmation code " + conformationCode + " not found");
-            }
+            stmt.executeUpdate();
         }
     }
 
@@ -408,11 +253,13 @@ public class WaitingListRepository {
      * @return list of all Waiting entries ordered by date descending
      * @throws SQLException if database operation fails
      */
-    public List<Waiting> getAllWaitingEntries() throws SQLException {
+    public List<Waiting> getAllWaitingSitNow() throws SQLException {
         String sql = """
                 SELECT *
                 FROM bistro.`Waiting`
-                ORDER BY waitingDateTime ASC
+                WHERE isCurrentlyWaiting = 0
+                AND isWaitingCompleted = 0
+                AND waitingArriveDateTime IS NOT NULL;
                 """;
 
         List<Waiting> waitingList = new ArrayList<>();
@@ -424,4 +271,154 @@ public class WaitingListRepository {
         }
         return waitingList;
     }
+
+    public void completeWaitingListByConformationCode(UUID conformationCode) throws SQLException {
+        String sql = """
+                UPDATE bistro.`Waiting`
+                SET isWaitingCompleted = 1
+                WHERE conformationCode = ?;
+                """;
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1, conformationCode.toString());
+            stmt.executeUpdate();
+        }
+    }
+
+    public Waiting getWaitingByConformationCode(UUID conformationCode) throws SQLException {
+
+        String sql = """
+                SELECT *
+                FROM bistro.`Waiting`
+                WHERE conformationCode = ?;
+                """;
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            stmt.setString(1,conformationCode.toString());
+            try (ResultSet rs = stmt.executeQuery()) {
+                return rs.next() ? mapRelToWaiting(rs) : null;
+            }
+        }
+    }
+
+    public Map<LocalDate, Integer> getCountInThisMount() throws SQLException {
+
+        String sql = """
+                SELECT DATE(waitingDateTime) DateOnly, COUNT(*) as subCount
+                FROM bistro.`Waiting`
+                WHERE subscriberId IS NOT NULL
+                  AND YEAR(waitingDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+                """;
+        Map<LocalDate, Integer> map = new TreeMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("subCount"));
+                }
+            }
+        }
+        return map;
+    }
+    public Map<LocalDate, Map<LocalTime, Integer>> getCountInThisMonthByTime() throws SQLException {
+
+        String sql = """
+            SELECT DATE(waitingDateTime) AS dateOnly,
+                   TIME(waitingDateTime) AS timeOnly,
+                   COUNT(*) AS subCount
+            FROM bistro.`Waiting`
+            WHERE YEAR(waitingDateTime) = YEAR(CURRENT_DATE)
+              AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
+            GROUP BY dateOnly, timeOnly
+            ORDER BY dateOnly, timeOnly;
+            """;
+
+        Map<LocalDate, Map<LocalTime, Integer>> map = new TreeMap<>();
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("dateOnly").toLocalDate();
+                LocalTime time = rs.getTime("timeOnly").toLocalTime();
+                int count = rs.getInt("subCount");
+
+                map.computeIfAbsent(date, d -> new TreeMap<>())
+                        .put(time, count);
+            }
+        }
+
+        return map;
+    }
+
+    public Map<LocalDate, Integer> getDelaysOrders() throws SQLException {
+
+        String sql = """
+                SELECT DATE(waitingDateTime) DateOnly, COUNT(*) as orderCount
+                FROM bistro.`Waiting`
+                WHERE orderNumber IS NOT NULL
+                  AND YEAR(waitingDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(waitingDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+                """;
+        Map<LocalDate, Integer> map = new TreeMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("orderCount"));
+                }
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Batch-completes waiting entries that have been seated for 2 hours.
+     *
+     * <p>This method is intended for a scheduler. It marks waiting entries as completed when:
+     * they have arrived (waitingArriveDateTime IS NOT NULL), are not yet completed,
+     * and their arrival time is earlier than {@code now - 2 hours}.</p>
+     *
+     * @param now reference time used to compute the cutoff {@code now.minusHours(2)}
+     * @return list of waiting entries that were closed (for printing invoices)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Waiting> findWaitingDueToClose(LocalDateTime now) throws SQLException {
+        LocalDateTime cutoff = now.minusHours(2);
+
+        // First, SELECT the waiting entries that will be closed
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Waiting`
+                WHERE waitingArriveDateTime IS NOT NULL
+                  AND isWaitingCompleted = 0
+                  AND waitingArriveDateTime <= ?
+                """;
+
+        List<Waiting> waitingToClose = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
+            ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) waitingToClose.add(mapRelToWaiting(rs));
+            }
+        }
+
+        // Then, UPDATE those entries to mark them as completed
+        if (!waitingToClose.isEmpty()) {
+            String updateSql = """
+                    UPDATE bistro.`Waiting`
+                    SET isWaitingCompleted = 1
+                    WHERE waitingArriveDateTime IS NOT NULL
+                      AND isWaitingCompleted = 0
+                      AND waitingArriveDateTime <= ?
+                    """;
+
+            try (PreparedStatement ps = tx.currentConnection().prepareStatement(updateSql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+                ps.executeUpdate();
+            }
+        }
+
+        return waitingToClose;
+    }
+
 }

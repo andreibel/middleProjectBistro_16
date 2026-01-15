@@ -103,7 +103,7 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
                     );
                     return;
                 }
-
+                clearFields();
                 WorkerStateManager.getInstance().setWorker(worker);
 
                 BistroUtilities.switchScreen(
@@ -112,10 +112,15 @@ public class WorkerLoginFormGUIController implements IServerResponseListener {
                         "Bistro Restaurant"
                 );
             }
-            case WORKER_LOGIN_ERROR -> BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Due to server error, we were unable to log you in. Please try again later."
-            );
+            case WORKER_LOGIN_ERROR -> {
+                if (message.getData() == null)
+                    BistroUtilities.showMessage(
+                        "Bistro Restaurant",
+                        "Due to server error, we were unable to log you in. Please try again later."
+                    );
+                else
+                    BistroUtilities.showMessage("Bistro Restaurant", (String) message.getData());
+            }
         }
     }
 

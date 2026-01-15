@@ -1,5 +1,28 @@
 package com.andreibel.message;
 
+/**
+ * Enumeration of all API call types supported by the Bistro system.
+ * <p>
+ * This enum defines the communication protocol between clients and the server,
+ * categorized into the following functional areas:
+ * </p>
+ * <ul>
+ *   <li><b>Order Management:</b> Creating, retrieving, updating, and completing orders</li>
+ *   <li><b>Subscriber Management:</b> Subscriber login, registration, and profile management</li>
+ *   <li><b>Worker Management:</b> Worker authentication and creation</li>
+ *   <li><b>Table Management:</b> Restaurant table configuration and layout</li>
+ *   <li><b>Waiting List:</b> Managing walk-in customers and queue</li>
+ *   <li><b>Reports:</b> Generating schedules and subscriber activity reports</li>
+ * </ul>
+ * <p>
+ * Each request type has corresponding RESPONSE and ERROR types for handling
+ * successful responses and error conditions respectively.
+ * </p>
+ *
+ * @author Bistro Team
+ * @version 1.0
+ * @see Message
+ */
 public enum APICallType {
     /**
      * <pre>
@@ -156,6 +179,14 @@ public enum APICallType {
     ARRIVE_WAITING_LIST_RESPONSE, // none
     ARRIVE_WAITING_LIST_ERROR;
 
+    /**
+     * Returns the lowercase label representation of this API call type.
+     * <p>
+     * Useful for logging, debugging, and human-readable output.
+     * </p>
+     *
+     * @return the lowercase string representation of this enum constant
+     */
     public String label() {
         return name().toLowerCase();
     }

@@ -15,10 +15,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,34 +40,36 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
 
     /** Table view showing all active orders. */
     @FXML
-    private TableView<OrderResponse> tblActiveOrders;
+    private TableView<Active> tblActiveOrders;
 
     /** Table column displaying the number of guests for each order. */
     @FXML
-    private TableColumn<OrderResponse, Integer> colNumberOfGuests;
+    private TableColumn<Active, String> colNumberOfGuests;
 
     /** Table column displaying the subscriber ID for each order. */
     @FXML
-    private TableColumn<OrderResponse, Integer> colSubscriberId;
+    private TableColumn<Active, String> colSubscriberId;
 
     /** Table column displaying the email address for each order. */
     @FXML
-    private TableColumn<OrderResponse, String> colEmail;
+    private TableColumn<Active, String> colEmail;
 
     /** Table column displaying the phone number for each order. */
     @FXML
-    private TableColumn<OrderResponse, String> colPhoneNumber;
+    private TableColumn<Active, String> colPhoneNumber;
 
     /** Table column displaying the order date and time. */
     @FXML
-    private TableColumn<OrderResponse, String> colOrderDateTime;
+    private TableColumn<Active, String> colOrderDate;
+    @FXML
+    private TableColumn<Active, String> colOrderTime;
 
     /** Root pane of the screen used to attach scene listeners. */
     @FXML
     private AnchorPane rootPane;
 
     /** Observable list storing the active orders displayed in the table. */
-    private ObservableList<OrderResponse> activeList;
+    private ObservableList<Active> activeList;
 
     /** Singleton instance of the Bistro client controller for server communication. */
     private BistroClientController controller;
@@ -116,7 +122,16 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
      */
     private void populateTable(List<OrderResponse> data) {
         if (data == null) return;
-        activeList.setAll(data);
+        List<Active> updated = new ArrayList<>();
+        for (OrderResponse orderResponse : data) {
+            updated.add(new Active(orderResponse.getNumberOfGuests().toString(),
+                    orderResponse.getSubscriberId().toString(),
+                    orderResponse.getEmail(),
+                    orderResponse.getPhoneNumber(),
+                    orderResponse.getOrderDateTime().toLocalDate().toString(),
+                    orderResponse.getOrderDateTime().toLocalTime().toString()));
+        }
+        activeList.setAll(updated);
     }
 
     /**
@@ -146,7 +161,8 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
         colSubscriberId.setCellValueFactory(new PropertyValueFactory<>("subscriberId"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
         colPhoneNumber.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
-        colOrderDateTime.setCellValueFactory(new PropertyValueFactory<>("orderDateTime"));
+        colOrderDate.setCellValueFactory(new PropertyValueFactory<>("orderDate"));
+        colOrderTime.setCellValueFactory(new PropertyValueFactory<>("orderTime"));
     }
 
     /**
@@ -174,5 +190,30 @@ public class ActiveOrdersFormGUIController implements IServerResponseListener {
      */
     private String getCurrentDate() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    /**
+     * Represents an active order in the Bistro system.
+     *
+     * <p>This class stores the order details including number of guests, subscriber information,
+     * and order date/time. If subscriber information is missing (null), it defaults to "N/A".</p>
+     */
+    @Getter
+    @Setter
+    public static class Active{
+        private String numberOfGuests;
+        private String subscriberId;
+        private String email;
+        private String phoneNumber;
+        private String orderDate;
+        private String orderTime;
+        public Active(String numberOfGuests, String subscriberId, String email, String phoneNumber, String orderDate, String orderTime) {
+            this.numberOfGuests = numberOfGuests;
+            this.subscriberId = (subscriberId == null || !subscriberId.equals("0")) ? subscriberId : "N/A";
+            this.email = email != null ? email : "N/A";
+            this.phoneNumber = phoneNumber != null ? phoneNumber : "N/A";
+            this.orderDate = orderDate;
+            this.orderTime = orderTime;
+        }
     }
 }

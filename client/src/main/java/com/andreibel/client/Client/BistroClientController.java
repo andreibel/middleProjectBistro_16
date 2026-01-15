@@ -90,7 +90,7 @@ public class BistroClientController {
      * @param response the message received from the server
      * @throws IOException if a listener fails while processing the response
      */
-    public void handleServerResponse(Message response) throws IOException {
+    public void handleServerResponse(Message response) throws IOException, Exception {
         if (response == null || response.getType() == null) {
             BistroUtilities.showMessage("Error", "Empty response from server");
             return;
@@ -100,7 +100,7 @@ public class BistroClientController {
             for (IServerResponseListener listener : listeners) {
                 try {
                     listener.onServerResponse(response);
-                } catch (IOException e) {
+                } catch (Exception e) {
                     throw new RuntimeException("Failed to handle server response", e);
                 }
             }

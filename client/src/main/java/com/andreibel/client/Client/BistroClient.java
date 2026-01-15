@@ -58,7 +58,7 @@ public class BistroClient extends AbstractClient {
         if (msg instanceof Message m) {
             try {
                 controller.handleServerResponse(m);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 throw new RuntimeException("Failed to handle server response", e);
             }
         } else {

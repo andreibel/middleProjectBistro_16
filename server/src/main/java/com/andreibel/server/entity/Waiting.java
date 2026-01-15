@@ -68,6 +68,7 @@ public class Waiting {
     private boolean isCurrentlyWaiting;
     private UUID conformationCode;
     private LocalDateTime waitingArriveDateTime;
+    private boolean isWaitingCompleted;
     // FK
     private Integer orderNumber; // Optional
     // FK
@@ -86,5 +87,6 @@ public class Waiting {
     public static final String SUBSCRIBER_ID = "subscriberId";
     public static final String EMAIL = "email";
     public static final String PHONE_NUMBER = "phoneNumber";
+    public static final String IS_WAITING_COMPLETED = "isWaitingCompleted";
 
 }

@@ -37,5 +37,5 @@ public interface IServerResponseListener {
      *
      * @param message the response {@link Message} received from the server
      */
-    void onServerResponse(Message message) throws IOException;
+    void onServerResponse(Message message) throws IOException, Exception;
 }

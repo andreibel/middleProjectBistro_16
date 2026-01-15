@@ -90,6 +90,8 @@ public class WorkerController {
     public Message login(Message message) {
         WorkerResponse response = workerService.authWorker((WorkerAuth) message.getData());
         if (response == null) return new Message(WORKER_LOGIN_ERROR, null);
+        if (response.getWorkerName() == null) return new Message(WORKER_LOGIN_ERROR, "Staff's name or password is " +
+                "incorrect.");
         return new Message(WORKER_LOGIN_RESPONSE, response);
     }
 

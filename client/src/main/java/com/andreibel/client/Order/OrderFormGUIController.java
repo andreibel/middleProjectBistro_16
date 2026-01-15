@@ -5,6 +5,7 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
@@ -94,9 +95,9 @@ public class OrderFormGUIController implements IServerResponseListener {
             case CREATE_ORDER_RESPONSE -> {
                 clearForm();
                 wizardStep = WizardStep.PART1;
-                BistroUtilities.showMessage(
-                        "Bistro Restaurant",
-                        "Your order has been successfully created!"
+                BistroUtilities.showSelectableMessage("Bistro Restaurant",
+                        "Your order has been successfully created!\nYour confirmation code is:",
+                        ((OrderResponse)message.getData()).getConformationCode().toString()
                 );
                 BistroUtilities.switchScreen(
                         btnOrderNow,
@@ -287,6 +288,8 @@ public class OrderFormGUIController implements IServerResponseListener {
 
     /** Sends an order creation request to the server. */
     private void createOrder() {
+        String email = txtFieldEmail.getText().isBlank() ? null : txtFieldEmail.getText();
+        String phoneNumber = txtFieldPhoneNumber.getText().isBlank() ? null : txtFieldPhoneNumber.getText();
         controller.requestOrderCreation(
                 new OrderRequest(
                         null,
@@ -296,8 +299,8 @@ public class OrderFormGUIController implements IServerResponseListener {
                                 LocalTime.parse(comboBoxTime.getValue())
                         ),
                         CustomerStateManager.fillSubscriberIDDetails(),
-                        txtFieldEmail.getText(),
-                        txtFieldPhoneNumber.getText()
+                        email,
+                        phoneNumber
                 )
         );
         wizardStep = WizardStep.PART1;

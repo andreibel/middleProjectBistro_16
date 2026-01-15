@@ -105,7 +105,7 @@ public class EditRestaurantLayoutFormGUIController implements IServerResponseLis
                     tableList.add(new Table(t.getCapacity(), t.getQuantity()));
                 }
                 btnAddTable.setDisable(false);
-                btnRemoveTable.setDisable(tableList.isEmpty());
+                btnRemoveTable.setDisable(true);
                 btnConfirmChanges.setDisable(tableList.isEmpty());
             }
             case GET_ALL_TABLES_ERROR ->

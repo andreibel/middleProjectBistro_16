@@ -12,9 +12,9 @@ import com.andreibel.server.entity.Order;
 import com.andreibel.server.entity.Table;
 import com.andreibel.server.entity.Waiting;
 import com.andreibel.server.utils.OrderMapper;
+import com.andreibel.server.utils.WaitingListMapper;
 
 import java.sql.Date;
-import java.sql.SQLException;
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -74,6 +74,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final TableRepository tableRepository;
     private final OpenTimeRepository openTimeRepository;
+    private final TableService tableService;
     private final TransactionManager tx;
 
     /**
@@ -88,6 +89,7 @@ public class OrderService {
         this.tableRepository = TableRepository.getInstance();
         this.openTimeRepository = OpenTimeRepository.getInstance();
         this.tx = TransactionManager.getInstance();
+        this.tableService = TableService.getInstance();
     }
 
     /**
@@ -206,47 +208,34 @@ public class OrderService {
             if (order == null) return null;
 
             // 2. Validate not cancelled
-            if (order.isOrderCancelled() || order.isOrderCompleted()) return new OrderResponse();
+            if (order.isOrderCancelled() || order.isOrderCompleted()) return null;
 
-            // 3. Mark as arrived
             orderRepository.setArrived(conformationCode);
-            order = orderRepository.findByConformationCode(conformationCode);
 
-            // 4. Check table availability
-            if (isTableAvailable(order.getNumberOfGuests())) {
+            // 3. Check table availability
+            if (canSeatNow(order.getNumberOfGuests())) {
+                // 4. Mark as arrived
                 // TABLE AVAILABLE - SEAT
+                order.setOrderArrive(true);
                 return OrderMapper.mapOrderToOrderResponse(order);
             } else {
+                orderRepository.deleteByConformationCode(conformationCode);
                 // NO TABLE - ADD TO WAITING
-                Waiting waitingEntry = new Waiting();
-                waitingEntry.setNumberOfGuests(order.getNumberOfGuests());
-                waitingEntry.setWaitingDateTime(LocalDateTime.now());
-                waitingEntry.setOrderNumber(order.getOrderNumber());
-                waitingEntry.setSubscriberId(order.getSubscriberId());
-                waitingEntry.setEmail(order.getEmail());
-                waitingEntry.setPhoneNumber(order.getPhoneNumber());
-                waitingEntry.setConformationCode(order.getConformationCode());
-                waitingEntry.setCurrentlyWaiting(true);
-
+                Waiting waitingEntry = WaitingListMapper.mapOrderToWaitingList(order);
                 WaitingListRepository.getInstance().addWaiting(waitingEntry);
-                return OrderMapper.mapOrderToOrderResponse(order);
+                return new OrderResponse();
             }
         });
     }
-    private boolean isTableAvailable(int numberOfGuests) throws SQLException {
-        List<Table> allTables = tableRepository.findAll();
-
-        for (Table table : allTables) {
-            if (table.getCapacity() < numberOfGuests) continue;  // Too small
-
-            List<Order> activeOrders = orderRepository
-                    .findActiveOrdersByTableCapacity(table.getCapacity());
-
-            if (activeOrders.size() < table.getQuantity()) {
-                return true;  // Found available table
-            }
-        }
-        return false;  // No suitable table
+    /**
+     * Checks if there is currently a table available to seat the specified number of guests.
+     *
+     * @param numberOfGuests the number of guests to seat
+     * @return true if an available table with sufficient capacity exists, false otherwise
+     */
+    private boolean canSeatNow(int numberOfGuests) {
+        TreeMap<Integer, Integer> available = tableService.getAllAvailableTables();
+        return available.ceilingEntry(numberOfGuests) != null;
     }
     /**
      * Marks an order as completed/closed by its confirmation code.
@@ -265,6 +254,7 @@ public class OrderService {
     public OrderResponse completeOrder(UUID conformationCode) {
         return tx.inTransaction(() -> {
             Order order = orderRepository.findByConformationCode(conformationCode);
+            if (order == null) return null;
             if (order.isOrderCancelled() || order.isOrderCompleted() || !order.isOrderArrive()) return new OrderResponse();
             orderRepository.completeOrder(conformationCode);
             return OrderMapper.mapOrderToOrderResponse(orderRepository.findByConformationCode(conformationCode));
@@ -472,6 +462,15 @@ public class OrderService {
         return true;
     }
 
+    /**
+     * Retrieves future orders for a customer who lost their confirmation code.
+     * <p>
+     * Searches by subscriber ID, email, or phone number (in that priority order).
+     * Only returns orders scheduled after the current time.
+     *
+     * @param request the request containing customer identification (subscriberId, email, or phone)
+     * @return list of matching future orders as response DTOs
+     */
     public List<OrderResponse> lostConformCode(OrderRequest request) {
         List<OrderResponse>response  = new ArrayList<>();
         if (request.getSubscriberId() != null)
@@ -505,6 +504,11 @@ public class OrderService {
     }
 
 
+    /**
+     * Retrieves all active orders for today (not yet completed).
+     *
+     * @return list of today's active orders as response DTOs
+     */
     public List<OrderResponse> getAllActiveOrders() {
         return tx.inTransaction(() -> {
             List<Order> orders = orderRepository.findAll();
@@ -516,6 +520,11 @@ public class OrderService {
         });
     }
 
+    /**
+     * Retrieves all orders for customers currently eating (arrived but not completed).
+     *
+     * @return list of current dining orders as response DTOs
+     */
     public List<OrderResponse> getCurrentEat() {
         return tx.inTransaction(() -> {
            List<Order> orders = orderRepository.findAll();

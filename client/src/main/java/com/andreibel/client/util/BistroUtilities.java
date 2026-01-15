@@ -5,6 +5,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Priority;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -120,7 +125,7 @@ public final class BistroUtilities {
     }
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+            "^(?:^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$|)$"
     );
 
     /**
@@ -195,6 +200,47 @@ public final class BistroUtilities {
         alert.showAndWait();
     }
     /**
+     * Displays an informational alert with selectable text content.
+     *
+     * <p>This method creates a JavaFX {@link Alert} of type INFORMATION and
+     * sets a {@link TextArea} as its content, allowing the user to select
+     * and copy the text. The TextArea's size is dynamically adjusted to match
+     * the length of the content while respecting maximum width and height limits.</p>
+     *
+     * <p>The text area is non-editable and wraps long lines automatically.</p>
+     *
+     * @param title   the title of the alert window
+     * @param header  the header text displayed at the top of the alert
+     * @param content the main content text to display in a selectable TextArea
+     */
+    public static void showSelectableMessage(String title, String header, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+
+        TextArea textArea = new TextArea(content);
+        textArea.setWrapText(true);
+        textArea.setEditable(false);
+
+        Text text = new Text(content);
+        text.setFont(Font.getDefault());
+        double width = text.getLayoutBounds().getWidth() + 20;
+        double height = text.getLayoutBounds().getHeight() + 20;
+
+        textArea.setPrefWidth(Math.min(width, 600));
+        textArea.setPrefHeight(Math.min(height, 400));
+
+        GridPane.setVgrow(textArea, Priority.ALWAYS);
+        GridPane.setHgrow(textArea, Priority.ALWAYS);
+
+        GridPane pane = new GridPane();
+        pane.setMaxWidth(Double.MAX_VALUE);
+        pane.add(textArea, 0, 0);
+
+        alert.getDialogPane().setContent(pane);
+        alert.showAndWait();
+    }
+    /**
      * Extracts the base name of an FXML file from a given path,
      * without the ".fxml" extension.
      * <p>
@@ -225,7 +271,7 @@ public final class BistroUtilities {
         int lastSlashIndex = path.lastIndexOf('/');
         String fileName = lastSlashIndex >= 0 ? path.substring(lastSlashIndex + 1) : path;
 
-        // Remove the ".fxml" extension if present
+        // Remove the .fxml extension if present
         if (fileName.toLowerCase().endsWith(".fxml")) {
             fileName = fileName.substring(0, fileName.length() - 5);
         }

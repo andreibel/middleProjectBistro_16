@@ -6,9 +6,8 @@ import com.andreibel.server.entity.Order;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.time.LocalTime;
+import java.util.*;
 
 import static com.andreibel.server.utils.OrderMapper.mapRelToOrder;
 
@@ -74,12 +73,25 @@ public class OrderRepository {
         }
         return orders;
     }
-    public List<Order> findActiveOrdersByTableCapacity(int num) throws SQLException {
+    /**
+     * Loads all currently active orders (arrived but not yet completed or cancelled).
+     *
+     * <p>An order is considered active when:
+     * <ul>
+     *     <li>{@code orderArrive = 1} (customer has checked in)</li>
+     *     <li>{@code orderCompleted = 0} (not yet closed)</li>
+     *     <li>{@code orderCancelled = 0} (not cancelled)</li>
+     * </ul>
+     *
+     * @return list of active orders (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findActiveOrders() throws SQLException {
         String sql = """
-                SELECT o FROM Order o " +
-                           "WHERE o.orderArrive = 1 " +
-                           "AND o.orderCompleted = false " +
-                           "AND o.orderCancelled = false;
+                SELECT * FROM bistro.`Order`
+                WHERE orderArrive = 1
+                AND orderCompleted = 0
+                AND orderCancelled = 0;
                 """;
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
@@ -287,13 +299,13 @@ public class OrderRepository {
             stmt.setString(2, newOrder.getConformationCode().toString());
             stmt.setTimestamp(3, Timestamp.valueOf(newOrder.getOrderDateTime()));
 
-            if (newOrder.getSubscriberId() == null) stmt.setNull(4, Types.INTEGER);
+            if (newOrder.getSubscriberId() == null) stmt.setNull(4, Types.NULL);
             else stmt.setInt(4, newOrder.getSubscriberId());
 
-            if (newOrder.getEmail() == null) stmt.setNull(5, Types.VARCHAR);
+            if (newOrder.getEmail() == null) stmt.setNull(5, Types.NULL);
             else stmt.setString(5, newOrder.getEmail());
 
-            if (newOrder.getPhoneNumber() == null) stmt.setNull(6, Types.VARCHAR);
+            if (newOrder.getPhoneNumber() == null) stmt.setNull(6, Types.NULL);
             else stmt.setString(6, newOrder.getPhoneNumber());
 
             stmt.executeUpdate();
@@ -383,7 +395,7 @@ public class OrderRepository {
     public List<Order> findAllDateOrders(LocalDate date) throws SQLException {
         String sql = """
                 SELECT *
-                FROM bistro.`order`
+                FROM bistro.`Order`
                 WHERE orderDateTime >= ?
                   AND orderDateTime <  ?
                   AND orderCancelled = 0
@@ -408,28 +420,49 @@ public class OrderRepository {
      * {@code orderDateTime} is earlier than {@code now - graceMinutes}. The method updates rows by
      * setting {@code orderCancelled = 1}.</p>
      *
-     * <p><b>Recommendation:</b> return {@code ps.executeUpdate()} to expose how many orders were cancelled.</p>
-     *
      * @param graceMinutes allowed lateness window in minutes (e.g., 10–20)
-     * @return currently always {@code 1} (consider returning affected rows count)
+     * @return list of orders that were cancelled (for printing notifications)
      * @throws SQLException if a database access error occurs
      */
-    public int cancelLateOrders(int graceMinutes) throws SQLException {
-        String sql = """
-                UPDATE bistro.`Order`
-                SET orderCancelled = 1
+    public List<Order> cancelLateOrders(int graceMinutes) throws SQLException {
+        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
+
+        // First, SELECT the orders that will be cancelled
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Order`
                 WHERE orderCancelled = 0
                   AND orderCompleted = 0
                   AND orderArrive = 0
                   AND orderDateTime < ?
                 """;
 
-        LocalDateTime cutoff = LocalDateTime.now().minusMinutes(graceMinutes);
-        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+        List<Order> ordersToCancel = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
             ps.setTimestamp(1, Timestamp.valueOf(cutoff));
-            ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ordersToCancel.add(mapRelToOrder(rs));
+            }
         }
-        return 1;
+
+        // Then, UPDATE those orders to mark them as cancelled
+        if (!ordersToCancel.isEmpty()) {
+            String updateSql = """
+                    UPDATE bistro.`Order`
+                    SET orderCancelled = 1
+                    WHERE orderCancelled = 0
+                      AND orderCompleted = 0
+                      AND orderArrive = 0
+                      AND orderDateTime < ?
+                    """;
+
+            try (PreparedStatement ps = tx.currentConnection().prepareStatement(updateSql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+                ps.executeUpdate();
+            }
+        }
+
+        return ordersToCancel;
     }
 
     /**
@@ -439,21 +472,153 @@ public class OrderRepository {
      * they are not cancelled, arrived, and their {@code orderDateTime} is earlier than {@code now - 2 hours}.</p>
      *
      * @param now reference time used to compute the cutoff {@code now.minusHours(2)}
+     * @return list of orders that were closed (for printing invoices)
      * @throws SQLException if a database access error occurs
      */
-    public void findOrdersDueToClose(LocalDateTime now) throws SQLException {
-        String sql = """
-                UPDATE bistro.`Order`
-                SET orderCompleted = 1
+    public List<Order> findOrdersDueToClose(LocalDateTime now) throws SQLException {
+        LocalDateTime cutoff = now.minusHours(2);
+
+        // First, SELECT the orders that will be closed
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Order`
                 WHERE orderCancelled = 0
                   AND orderArrive = 1
-                  AND orderDateTime <= ?
+                  AND orderCompleted = 0
+                  AND orderArriveDateTime <= ?
                 """;
 
-        LocalDateTime cutoff = now.minusHours(2);
-        try (PreparedStatement ps = tx.currentConnection().prepareStatement(sql)) {
+        List<Order> ordersToClose = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
             ps.setTimestamp(1, Timestamp.valueOf(cutoff));
-            ps.executeUpdate();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ordersToClose.add(mapRelToOrder(rs));
+            }
         }
+
+        // Then, UPDATE those orders to mark them as completed
+        if (!ordersToClose.isEmpty()) {
+            String updateSql = """
+                    UPDATE bistro.`Order`
+                    SET orderCompleted = 1
+                    WHERE orderCancelled = 0
+                      AND orderArrive = 1
+                      AND orderCompleted = 0
+                      AND orderArriveDateTime <= ?
+                    """;
+
+            try (PreparedStatement ps = tx.currentConnection().prepareStatement(updateSql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(cutoff));
+                ps.executeUpdate();
+            }
+        }
+
+        return ordersToClose;
     }
+
+    /**
+     * Counts subscriber orders per day for the current month.
+     *
+     * <p>Only orders with a non-null {@code subscriberId} are counted.
+     * Results are grouped by date and returned as a map.</p>
+     *
+     * @return map of date to subscriber order count for the current month
+     * @throws SQLException if a database access error occurs
+     */
+    public Map<LocalDate, Integer> getCountInThisMount() throws SQLException {
+
+        String sql = """
+                SELECT DATE(orderDateTime) DateOnly , COUNT(*) as subCount
+                FROM bistro.`Order`
+                WHERE subscriberId IS NOT NULL
+                  AND YEAR(orderDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+                """;
+        Map<LocalDate, Integer> map = new TreeMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("subCount"));
+                }
+            }
+        }
+        return map;
+    }
+
+
+    /**
+     * Counts arrived orders per day and time slot for the current month.
+     *
+     * <p>Only orders with a recorded arrival time ({@code orderArriveDateTime IS NOT NULL})
+     * are included. Results are grouped by date and time, useful for generating
+     * customer traffic reports.</p>
+     *
+     * @return nested map of date to (time to order count) for the current month
+     * @throws SQLException if a database access error occurs
+     */
+    public Map<LocalDate, Map<LocalTime, Integer>> getCountInThisMonthByTime() throws SQLException {
+
+        String sql = """
+            SELECT DATE(orderDateTime) AS dateOnly,
+                   TIME(orderDateTime) AS timeOnly,
+                   COUNT(*) AS subCount
+            FROM bistro.`Order`
+            WHERE YEAR(orderDateTime) = YEAR(CURRENT_DATE)
+              AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+              AND orderArriveDateTime IS NOT NULL
+            GROUP BY dateOnly, timeOnly
+            ORDER BY dateOnly, timeOnly;
+            """;
+
+        Map<LocalDate, Map<LocalTime, Integer>> map = new TreeMap<>();
+
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            while (rs.next()) {
+                LocalDate date = rs.getDate("dateOnly").toLocalDate();
+                LocalTime time = rs.getTime("timeOnly").toLocalTime();
+                int count = rs.getInt("subCount");
+
+                map.computeIfAbsent(date, d -> new TreeMap<>())
+                        .put(time, count);
+            }
+        }
+
+        return map;
+    }
+
+    /**
+     * Counts late arrivals per day for the current month.
+     *
+     * <p>An order is considered late when the customer arrived after the
+     * scheduled reservation time ({@code orderArriveDateTime > orderDateTime}).
+     * Results are grouped by date for reporting purposes.</p>
+     *
+     * @return map of date to late order count for the current month
+     * @throws SQLException if a database access error occurs
+     */
+    public Map<LocalDate, Integer> getLateOrders() throws SQLException {
+
+        String sql = """
+            SELECT DATE(orderDateTime) DateOnly , COUNT(*) as OrderCount
+                FROM bistro.`Order`
+                WHERE orderArriveDateTime > orderDateTime
+                AND YEAR(orderDateTime) = YEAR(CURRENT_DATE)
+                  AND MONTH(orderDateTime) = MONTH(CURRENT_DATE)
+                GROUP BY DateOnly;
+            """;
+
+        Map<LocalDate, Integer> map = new TreeMap<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    map.put(LocalDate.from(rs.getTimestamp(1).toLocalDateTime()), rs.getInt("OrderCount"));
+                }
+            }
+        }
+        return map;
+    }
+
 }

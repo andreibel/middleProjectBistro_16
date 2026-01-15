@@ -2,6 +2,7 @@ package com.andreibel.server.utils;
 
 import com.andreibel.message.DTO.WaitingListRequest;
 import com.andreibel.message.DTO.WaitingListResponse;
+import com.andreibel.server.entity.Order;
 import com.andreibel.server.entity.Waiting;
 
 import java.sql.ResultSet;
@@ -10,7 +11,7 @@ import java.util.UUID;
 
 /**
  * Mapper for Waiting List entity conversions.
- * 
+ * <p>
  * Handles conversions between:
  * - ResultSet → Waiting entity (database to object)
  * - Waiting entity → WaitingListResponse DTO (object to API response)
@@ -20,10 +21,10 @@ public class WaitingListMapper {
 
     /**
      * Maps a database ResultSet row to a Waiting entity.
-     * 
+     * <p>
      * Converts all columns from the Waiting table row to the Waiting object.
      * Handles nullable fields appropriately.
-     * 
+     *
      * @param rs the ResultSet row from database query
      * @return Waiting entity object with all fields populated
      * @throws SQLException if column access fails
@@ -36,10 +37,11 @@ public class WaitingListMapper {
                 .isCurrentlyWaiting(rs.getBoolean(Waiting.IS_CURRENTLY_WAITING))
                 .conformationCode(UUID.fromString(rs.getString(Waiting.CONFIRMATION_CODE)))
                 .waitingArriveDateTime(
-                    rs.getTimestamp(Waiting.WAITING_ARRIVE_DATE_TIME) != null 
-                        ? rs.getTimestamp(Waiting.WAITING_ARRIVE_DATE_TIME).toLocalDateTime() 
-                        : null
+                        rs.getTimestamp(Waiting.WAITING_ARRIVE_DATE_TIME) != null
+                                ? rs.getTimestamp(Waiting.WAITING_ARRIVE_DATE_TIME).toLocalDateTime()
+                                : null
                 )
+                .isWaitingCompleted(rs.getBoolean(Waiting.IS_WAITING_COMPLETED))
                 .orderNumber(rs.getObject(Waiting.ORDER_NUMBER) != null ? rs.getInt(Waiting.ORDER_NUMBER) : null)
                 .subscriberId(rs.getObject(Waiting.SUBSCRIBER_ID) != null ? rs.getInt(Waiting.SUBSCRIBER_ID) : null)
                 .email(rs.getString(Waiting.EMAIL))
@@ -49,10 +51,10 @@ public class WaitingListMapper {
 
     /**
      * Maps a Waiting entity to a WaitingListResponse DTO.
-     * 
+     * <p>
      * Converts the internal entity to the API response format.
      * All fields are included for client representation.
-     * 
+     *
      * @param waiting the Waiting entity to convert
      * @return WaitingListResponse DTO ready for API response
      */
@@ -72,11 +74,11 @@ public class WaitingListMapper {
 
     /**
      * Maps a WaitingListRequest DTO to a Waiting entity.
-     * 
+     * <p>
      * Converts incoming API request to internal entity format.
      * Auto-generates confirmation code and initializes waiting status.
      * Note: waitingDateTime should be set by the service layer to current time.
-     * 
+     *
      * @param request the WaitingListRequest DTO from API
      * @return Waiting entity ready for persistence
      */
@@ -87,8 +89,26 @@ public class WaitingListMapper {
                 .subscriberId(request.getSubscriberId())
                 .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
-                // isCurrentlyWaiting defaults to true in entity
-                // waitingDateTime is set by service layer
+                .build();
+    }
+
+    /**
+     * Maps an {@link Order} entity to a {@link Waiting} entity.
+     * <p>
+     * Used when an order cannot be seated immediately and needs
+     * to be added to the waiting list. Auto-generates a new confirmation code.
+     *
+     * @param request the Order entity to convert
+     * @return Waiting entity ready for persistence with the order reference
+     */
+    public static Waiting mapOrderToWaitingList(Order request) {
+        return Waiting.builder()
+                .numberOfGuests(request.getNumberOfGuests())
+                .conformationCode(UUID.randomUUID())
+                .subscriberId(request.getSubscriberId())
+                .email(request.getEmail())
+                .phoneNumber(request.getPhoneNumber())
+                .orderNumber(request.getOrderNumber())
                 .build();
     }
 }

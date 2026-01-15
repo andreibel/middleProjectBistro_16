@@ -1,0 +1,8 @@
+module:com.andreibel.server
+com.andreibel.server.controller
+com.andreibel.server.dbController
+com.andreibel.server.dbController.repository
+com.andreibel.server.entity
+com.andreibel.server.main
+com.andreibel.server.services
+com.andreibel.server.utils

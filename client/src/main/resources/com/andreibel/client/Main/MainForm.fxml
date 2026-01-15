@@ -107,7 +107,7 @@
                   <children>
       
                           <!-- No Order -->
-                          <Button fx:id="btnNoOrder" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onNoOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Enter to Wating List" wrapText="true">
+                          <Button fx:id="btnNoOrder" maxWidth="Infinity" minHeight="60.0" mnemonicParsing="false" onAction="#onNoOrderButtonClicked" prefHeight="56.0" prefWidth="300.0" text="Enter to Waiting List" wrapText="true">
                               <styleClass>
                                   <String fx:value="action-btn" />
                                   <String fx:value="outline" />
