@@ -85,7 +85,7 @@
             </HBox>
         </VBox>
         <HBox alignment="CENTER" maxHeight="70.0" maxWidth="700.0" minHeight="70.0" minWidth="700.0" prefHeight="70.0" prefWidth="700.0" styleClass="card">
-            <Label styleClass="subtitle" text="Forget your conformation code?" wrapText="true" />
+            <Label styleClass="subtitle" text="Forgot your conformation code?" wrapText="true" />
             <HBox alignment="CENTER" spacing="30.0">
                 <!-- Primary Action -->
                 <Button fx:id="btnLostMyCode" minHeight="50.0" onAction="#onLostMyCodeButtonClicked" prefHeight="50.0" prefWidth="250.0" text="Lost My Code">

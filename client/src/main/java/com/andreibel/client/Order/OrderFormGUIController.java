@@ -5,6 +5,7 @@ import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
 import com.andreibel.message.DTO.OrderRequest;
+import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
@@ -94,9 +95,9 @@ public class OrderFormGUIController implements IServerResponseListener {
             case CREATE_ORDER_RESPONSE -> {
                 clearForm();
                 wizardStep = WizardStep.PART1;
-                BistroUtilities.showMessage(
-                        "Bistro Restaurant",
-                        "Your order has been successfully created!"
+                BistroUtilities.showSelectableMessage("Bistro Restaurant",
+                        "Your order has been successfully created!\nYour confirmation code is:",
+                        ((OrderResponse)message.getData()).getConformationCode().toString()
                 );
                 BistroUtilities.switchScreen(
                         btnOrderNow,

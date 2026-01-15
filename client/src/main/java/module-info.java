@@ -6,6 +6,8 @@ module com.andreibel.client {
     requires message;
     requires jdk.compiler;
     requires java.desktop;
+    requires com.google.zxing;
+    requires com.google.zxing.javase;
 
     // FXML controllers:
     opens com.andreibel.client to javafx.fxml;

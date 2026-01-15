@@ -170,17 +170,6 @@ public class NoOrderFormGUIController implements IServerResponseListener {
                 return;
             }
         }
-
-        // Send waiting list request
-        controller.requestDiningWithoutOrder(
-                new WaitingListRequest(
-                        null,
-                        numberOfPeople,
-                        CustomerStateManager.fillSubscriberIDDetails(),
-                        txtFieldEmail.getText(),
-                        txtFieldPhoneNumber.getText()
-                )
-        );
     }
 
     /**

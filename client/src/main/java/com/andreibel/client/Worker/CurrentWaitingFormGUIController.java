@@ -16,10 +16,14 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,37 +44,33 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
 
     /** TableView displaying the current waiting list data. */
     @FXML
-    private TableView<WaitingListResponse> tblViewCurrentWaiting;
+    private TableView<WaitingListUpdated> tblViewCurrentWaiting;
 
     /** TableColumn displaying the waiting number of the customer. */
     @FXML
-    private TableColumn<WaitingListResponse, Integer> colWaitingNumber;
-
-    /** TableColumn displaying the order number associated with the waiting customer. */
-    @FXML
-    private TableColumn<WaitingListResponse, Integer> colOrderNumber;
+    private TableColumn<WaitingListUpdated, Integer> colWaitingNumber;
 
     /** TableColumn displaying the number of guests for the waiting order. */
     @FXML
-    private TableColumn<WaitingListResponse, Integer> colNumberOfGuests;
+    private TableColumn<WaitingListUpdated, Integer> colNumberOfGuests;
 
     /** TableColumn displaying the subscriber ID if available. */
     @FXML
-    private TableColumn<WaitingListResponse, Integer> colSubscriberID;
+    private TableColumn<WaitingListUpdated, String> colSubscriberID;
 
     /** TableColumn displaying the subscriber's email address. */
     @FXML
-    private TableColumn<WaitingListResponse, String> colEmail;
+    private TableColumn<WaitingListUpdated, String> colEmail;
 
     /** TableColumn displaying the subscriber's phone number. */
     @FXML
-    private TableColumn<WaitingListResponse, String> colPhoneNumber;
+    private TableColumn<WaitingListUpdated, String> colPhoneNumber;
 
     /** Singleton instance of the Bistro client controller for server communication. */
     private BistroClientController controller;
 
     /** Observable list holding the current waiting list data for the table view. */
-    private final ObservableList<WaitingListResponse> waitingList = FXCollections.observableArrayList();
+    private final ObservableList<WaitingListUpdated> waitingList = FXCollections.observableArrayList();
 
     /**
      * Initializes the controller after the FXML has been loaded.
@@ -97,7 +97,6 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
      */
     private void initializeTableColumns() {
         colWaitingNumber.setCellValueFactory(new PropertyValueFactory<>("waitingNumber"));
-        colOrderNumber.setCellValueFactory(new PropertyValueFactory<>("orderNumber"));
         colNumberOfGuests.setCellValueFactory(new PropertyValueFactory<>("numberOfGuests"));
         colSubscriberID.setCellValueFactory(new PropertyValueFactory<>("subscriberId"));
         colEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
@@ -129,7 +128,15 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
      * @param data a list of {@link WaitingListResponse} objects to display
      */
     private void populateTable(List<WaitingListResponse> data) {
-        waitingList.setAll(data);
+        List<WaitingListUpdated> updated = new ArrayList<>();
+        for (WaitingListResponse waitingListResponse : data) {
+            updated.add(new WaitingListUpdated(waitingListResponse.getWaitingNumber(),
+                    waitingListResponse.getNumberOfGuests(),
+                     waitingListResponse.getSubscriberId().toString(),
+                    waitingListResponse.getEmail(),
+                    waitingListResponse.getPhoneNumber()));
+        }
+        waitingList.setAll(updated);
     }
 
     /**
@@ -172,5 +179,28 @@ public class CurrentWaitingFormGUIController implements IServerResponseListener 
      */
     private String getCurrentDate() {
         return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    }
+
+    /**
+     * Represents an updated entry in the waiting list for the Bistro system.
+     *
+     * <p>This class stores the waiting number, number of guests, and subscriber information.
+     * If subscriber details are not available (null), they can be represented as "N/A" in the UI.</p>
+     */
+    @Getter
+    @Setter
+    public static class WaitingListUpdated{
+        private Integer waitingNumber;
+        private Integer numberOfGuests;
+        private String subscriberId;
+        private String email;
+        private String phoneNumber;
+        public WaitingListUpdated(Integer waitingNumber, Integer numberOfGuests, String subscriberId, String email, String phoneNumber) {
+            this.waitingNumber = waitingNumber;
+            this.numberOfGuests = numberOfGuests;
+            this.subscriberId = (subscriberId == null || !subscriberId.equals("0")) ? "N/A" : subscriberId;
+            this.email = email != null ? email : "N/A";
+            this.phoneNumber = phoneNumber != null ? phoneNumber : "N/A";
+        }
     }
 }
