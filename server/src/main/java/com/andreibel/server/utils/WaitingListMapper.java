@@ -92,6 +92,15 @@ public class WaitingListMapper {
                 .build();
     }
 
+    /**
+     * Maps an {@link Order} entity to a {@link Waiting} entity.
+     * <p>
+     * Used when an order cannot be seated immediately and needs
+     * to be added to the waiting list. Auto-generates a new confirmation code.
+     *
+     * @param request the Order entity to convert
+     * @return Waiting entity ready for persistence with the order reference
+     */
     public static Waiting mapOrderToWaitingList(Order request) {
         return Waiting.builder()
                 .numberOfGuests(request.getNumberOfGuests())

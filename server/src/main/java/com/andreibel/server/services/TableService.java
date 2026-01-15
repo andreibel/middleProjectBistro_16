@@ -12,6 +12,15 @@ import com.andreibel.server.utils.TableMapper;
 
 import java.util.*;
 
+/**
+ * Service responsible for restaurant table management and availability.
+ * <p>
+ * Handles table configuration, availability calculations, and table layout updates.
+ * Implements a greedy allocation algorithm for determining available tables.
+ * </p>
+ *
+ * @author Andrei Beloziyorove
+ */
 public class TableService {
     private static TableService instance;
     private final TransactionManager tx;
@@ -26,6 +35,11 @@ public class TableService {
         waitingListRepository = WaitingListRepository.getInstance();
     }
 
+    /**
+     * Returns the singleton instance of {@link TableService}.
+     *
+     * @return the singleton TableService instance
+     */
     public static TableService getInstance() {
         if (instance == null) {
             instance = new TableService();
@@ -33,6 +47,14 @@ public class TableService {
         return instance;
     }
 
+    /**
+     * Calculates currently available tables after accounting for active orders and waiting customers.
+     * <p>
+     * Uses a greedy allocation algorithm: larger groups are allocated first to the smallest
+     * table that can accommodate them.
+     *
+     * @return a TreeMap of available tables (capacity to quantity), sorted by capacity
+     */
     public TreeMap<Integer, Integer>  getAllAvailableTables() {
         List<TableResponse> tables = getAllTables();
         List<Integer> demands = tx.inTransaction(() -> {
@@ -71,6 +93,11 @@ public class TableService {
         return available;
     }
 
+    /**
+     * Updates the restaurant table layout configuration.
+     *
+     * @param tableRequest list of table configurations to apply
+     */
     public void editTables(List<TableRequest> tableRequest) {
 
         tx.inTransaction(() -> {
@@ -80,6 +107,11 @@ public class TableService {
 
     }
 
+    /**
+     * Retrieves all table configurations from the database.
+     *
+     * @return list of all tables as response DTOs
+     */
     public List<TableResponse> getAllTables() {
         return tx.inTransaction(tableRepository::findAll)
                 .stream()

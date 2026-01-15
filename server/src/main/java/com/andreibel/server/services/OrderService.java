@@ -227,6 +227,12 @@ public class OrderService {
             }
         });
     }
+    /**
+     * Checks if there is currently a table available to seat the specified number of guests.
+     *
+     * @param numberOfGuests the number of guests to seat
+     * @return true if an available table with sufficient capacity exists, false otherwise
+     */
     private boolean canSeatNow(int numberOfGuests) {
         TreeMap<Integer, Integer> available = tableService.getAllAvailableTables();
         return available.ceilingEntry(numberOfGuests) != null;
@@ -456,6 +462,15 @@ public class OrderService {
         return true;
     }
 
+    /**
+     * Retrieves future orders for a customer who lost their confirmation code.
+     * <p>
+     * Searches by subscriber ID, email, or phone number (in that priority order).
+     * Only returns orders scheduled after the current time.
+     *
+     * @param request the request containing customer identification (subscriberId, email, or phone)
+     * @return list of matching future orders as response DTOs
+     */
     public List<OrderResponse> lostConformCode(OrderRequest request) {
         List<OrderResponse>response  = new ArrayList<>();
         if (request.getSubscriberId() != null)
@@ -489,6 +504,11 @@ public class OrderService {
     }
 
 
+    /**
+     * Retrieves all active orders for today (not yet completed).
+     *
+     * @return list of today's active orders as response DTOs
+     */
     public List<OrderResponse> getAllActiveOrders() {
         return tx.inTransaction(() -> {
             List<Order> orders = orderRepository.findAll();
@@ -500,6 +520,11 @@ public class OrderService {
         });
     }
 
+    /**
+     * Retrieves all orders for customers currently eating (arrived but not completed).
+     *
+     * @return list of current dining orders as response DTOs
+     */
     public List<OrderResponse> getCurrentEat() {
         return tx.inTransaction(() -> {
            List<Order> orders = orderRepository.findAll();

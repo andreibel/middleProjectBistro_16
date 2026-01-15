@@ -76,6 +76,13 @@ public class WaitingListService {
                 .toList();
     }
 
+    /**
+     * Marks a waiting list entry as completed (customer finished dining).
+     *
+     * @param conformationCode the confirmation code of the waiting entry
+     * @return the completed waiting response DTO, null if not found,
+     *         or empty response if already completed or still waiting
+     */
     public WaitingListResponse completeWaiting(UUID conformationCode) {
         return tx.inTransaction(() -> {
             Waiting  toClose = waitingRepository.getWaitingByConformationCode(conformationCode);
