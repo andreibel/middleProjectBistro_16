@@ -27,7 +27,7 @@ import javafx.stage.Stage;
  * <p>Connection parameters (host and port) can be passed as
  * named application arguments.</p>
  */
-public class MainForm extends Application {
+public class ConnectForm extends Application {
 
     /**
      * Starts the JavaFX application.
@@ -41,28 +41,22 @@ public class MainForm extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(
-            MainForm.class.getResource("MainForm.fxml")
+            ConnectForm.class.getResource("ConnectForm.fxml")
         );
-
-        // Read optional launch parameters
-        var params = getParameters().getNamed();
-        String host = params.getOrDefault("host", "localhost");
-        int port = Integer.parseInt(params.getOrDefault("port", "8080"));
-
-        System.out.println("Connecting to " + host + ":" + port);
-
         Parent root = fxmlLoader.load();
+        ConnectFormGUIController controller = fxmlLoader.getController();
+        controller.setMainStage(stage);
 
-        // Create client and attach it to the controller
-        BistroClient client = new BistroClient(host, port);
-        BistroClientController.getInstance().attachClient(client);
+//        // Create client and attach it to the controller
+//        BistroClient client = new BistroClient(host, port);
+//        BistroClientController.getInstance().attachClient(client);
 
         // Connect to the server
-        client.connectToServer();
+        //client.connectToServer();
 
         // Create and register scene
         Scene scene = new Scene(root, 1060, 600);
-        BistroUtilities.addToSceneManager(scene, "/Main/MainForm.fxml");
+        BistroUtilities.addToSceneManager(scene, "/Main/ConnectForm.fxml");
 
         // Configure stage
         stage.setTitle("Bistro Restaurant");
@@ -80,16 +74,16 @@ public class MainForm extends Application {
         stage.sizeToScene();
 
         // Gracefully close connection on application exit
-        stage.setOnCloseRequest(event -> {
-            try {
-                client.closeConnection();
-            } catch (IOException e) {
-                throw new RuntimeException(
-                    "Failed to close client connection",
-                    e
-                );
-            }
-        });
+//        stage.setOnCloseRequest(event -> {
+//            try {
+//                client.closeConnection();
+//            } catch (IOException e) {
+//                throw new RuntimeException(
+//                    "Failed to close client connection",
+//                    e
+//                );
+//            }
+//        });
 
         stage.show();
     }
