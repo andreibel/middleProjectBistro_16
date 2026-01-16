@@ -6,7 +6,6 @@ import com.andreibel.message.DTO.TimeGetterRequest;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.OrderService;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
@@ -116,15 +115,12 @@ public class OrderController {
         if (orderResponse == null) return new Message(ORDER_ARRIVED_ERROR, null);
         if (orderResponse.getConformationCode() == null)
             return new Message(ORDER_ARRIVED_ERROR, "Restaurant is currently full and we currently cannot give you a confirmation code.\nYou'll enter to a waiting list and we'll notify you when there is a table available for you.");
-        if (!isOrderDateToday(orderResponse.getOrderDateTime().toLocalDate()))
+        if (orderResponse.getNumberOfGuests() == 0)
             return new Message(ORDER_ARRIVED_ERROR, "You cannot confirm arrival for Future/Old orders.");
 
         return new Message(ORDER_ARRIVED_RESPONSE, orderResponse);
     }
 
-    public boolean isOrderDateToday(LocalDate orderDate){
-        return (orderDate.isEqual(LocalDate.now()));
-    }
 
     /**
      * Retrieves all available reservation start times for a specific date and party size.

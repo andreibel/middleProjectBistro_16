@@ -174,7 +174,10 @@ public class OrderService {
             // 2. Validate not cancelled
             if (order.isOrderCancelled() || order.isOrderCompleted()) return null;
 
-            orderRepository.setArrived(conformationCode);
+            if (orderRepository.setArrived(conformationCode) == 0){
+                order.setNumberOfGuests(0);
+                return OrderMapper.mapOrderToOrderResponse(order);
+            }
 
             // 3. Check table availability
             if (canSeatNow(order.getNumberOfGuests())) {
