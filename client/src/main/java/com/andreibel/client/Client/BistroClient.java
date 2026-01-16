@@ -90,20 +90,18 @@ public class BistroClient extends AbstractClient {
     }
 
     /**
-     * Establishes a connection to the server.
+     * Attempts to open a connection to the server.
      *
-     * <p>If the connection attempt fails, an error message is displayed.</p>
+     * @return true if the connection was opened successfully, false otherwise
      */
-    public void connectToServer() {
+    public boolean connectToServer() {
         try {
             openConnection();
+            return true;
         } catch (IOException e) {
-            if (controller != null) {
-                BistroUtilities.showMessage(
-                        "Bistro Restaurant",
-                        "Failed to connect to server: " + e.getMessage()
-                );
-            }
+            return false;
         }
+
     }
 }
+
