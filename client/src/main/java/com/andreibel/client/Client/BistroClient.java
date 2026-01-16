@@ -94,12 +94,12 @@ public class BistroClient extends AbstractClient {
      *
      * @return true if the connection was opened successfully, false otherwise
      */
-    public boolean connectToServer() {
+    public void connectToServer() throws Exception {
         try {
             openConnection();
-            return true;
-        } catch (IOException e) {
-            return false;
+
+        } catch (Exception e) {
+            throw new Exception("Failed to open connection", e);
         }
 
     }

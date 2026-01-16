@@ -121,16 +121,7 @@ public class ConnectFormGUIController {
         try {
             BistroClient client = new BistroClient(host, port);
             BistroClientController.getInstance().attachClient(client);
-
-            boolean connected = client.connectToServer();
-            if (!connected) {
-                BistroUtilities.showMessage(
-                        "Bistro Restaurant",
-                        "Failed to connect to " + host + ":" + port
-                );
-                return; // Stay on the same screen
-            }
-
+            client.connectToServer();
             BistroUtilities.switchScreen(
                     (Node) event.getSource(),
                     "/Main/MainForm.fxml",
@@ -138,15 +129,10 @@ public class ConnectFormGUIController {
             );
 
 
-        } catch (IOException ex) {
-            BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Failed to connect to " + host + ":" + port
-            );
         } catch (Exception ex) {
             BistroUtilities.showMessage(
                     "Bistro Restaurant",
-                    "Unexpected error while connecting to the server."
+                    "Failed to connect to " + host + ":" + port
             );
         }
     }
