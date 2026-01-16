@@ -42,13 +42,6 @@ public class WaitingListRepository {
         }
         return instance;
     }
-    /*TESTING
-    */
-    public static boolean isTableAvailableToday(){
-
-
-        return true;
-    }
     /**
      * Adds a new waiting list entry to the database.
      * <p>
@@ -115,58 +108,7 @@ public class WaitingListRepository {
         }
     }
 
-    /**
-     * Finds a waiting list entry by confirmation code (UUID).
-     *
-     * @param conformationCode the customer's confirmation code
-     * @return the Waiting object, or null if not found
-     * @throws SQLException if database operation fails
-     */
-    public Waiting findByConformationCode(UUID conformationCode) throws SQLException {
-        String sql = """
-                SELECT *
-                FROM bistro.`Waiting`
-                WHERE conformationCode = ?;
-                """;
 
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setString(1, conformationCode.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                return rs.next() ? mapRelToWaiting(rs) : null;
-            }
-        }
-    }
-
-
-    /**
-     * Gets waiting list entries for a specific month and year.
-     * Results are ordered by waitingDateTime descending (most recent first).
-     *
-     * @param month the month (1-12)
-     * @param year  the year
-     * @return list of waiting entries for that month
-     * @throws SQLException if database operation fails
-     */
-    public List<Waiting> getWaitingByMonth(int month, int year) throws SQLException {
-        String sql = """
-                SELECT *
-                FROM bistro.`Waiting`
-                WHERE MONTH(waitingDateTime) = ?
-                AND YEAR(waitingDateTime) = ?
-                ORDER BY waitingDateTime DESC;
-                """;
-        List<Waiting> waitingList = new ArrayList<>();
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setInt(1, month);
-            stmt.setInt(2, year);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    waitingList.add(mapRelToWaiting(rs));
-                }
-            }
-        }
-        return waitingList;
-    }
 
 
     /**

@@ -74,13 +74,11 @@ public class SubscriberService {
      * @return the subscriber as a response DTO, or null if not found
      */
     public SubscriberResponse getSubscriber(Integer data) {
-        return tx.inTransaction(
-                () -> {
-                    Subscriber subscriber = subscriberRepository.findById(data);
-                    if (subscriber == null) return null;
-                    return SubscriberMapper.mapSubscriberToSubscriberResponse(subscriber);
-                }
-        );
+        return tx.inTransaction(() -> {
+            Subscriber subscriber = subscriberRepository.findById(data);
+            if (subscriber == null) return null;
+            return SubscriberMapper.mapSubscriberToSubscriberResponse(subscriber);
+        });
     }
 
     /**
@@ -92,12 +90,10 @@ public class SubscriberService {
     public SubscriberResponse getSubscriberAndOrders(Integer data) {
         return tx.inTransaction(() -> {
             SubscriberResponse subscriber = getSubscriber(data);
-            subscriber.setOrders(
-                    orderRepository.findBySubscriberId(subscriber.getSubscriberId())
-                            .stream()
-                            .map(OrderMapper::mapOrderToOrderResponse)
-                            .toList()
-            );
+            subscriber.setOrders(orderRepository.findBySubscriberId(subscriber.getSubscriberId())
+                    .stream()
+                    .map(OrderMapper::mapOrderToOrderResponse)
+                    .toList());
             return subscriber;
         });
     }
@@ -110,7 +106,7 @@ public class SubscriberService {
      * @return the updated subscriber as a response DTO
      */
     public SubscriberResponse updateSub(SubscriberRequest data) {
-        return tx.inTransaction( () -> {
+        return tx.inTransaction(() -> {
             subscriberRepository.updateBySubID(data);
             return getSubscriber(data.getSubscriberId());
         });
