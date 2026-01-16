@@ -478,10 +478,8 @@ public class OrderService {
      */
     public List<OrderResponse> getAllActiveOrders() {
         return tx.inTransaction(() -> {
-            List<Order> orders = orderRepository.findAll();
+            List<Order> orders = orderRepository.findAllActive();
             return orders.stream()
-                    .filter(order -> order.getOrderDateTime().toLocalDate().equals(LocalDate.now()))
-                    .filter(order -> !order.isOrderCompleted())
                     .map(OrderMapper::mapOrderToOrderResponse)
                     .toList();
         });

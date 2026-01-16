@@ -101,6 +101,31 @@ public class OrderRepository {
     }
 
     /**
+     * Loads all orders.
+     *
+     * <p>This method is useful for subscriber history/report screens. If you want truly "all orders",
+     * remove the {@code subscriberId IS NOT NULL} filter.</p>
+     *
+     * @return list of subscriber orders (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findAllActive() throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE orderCancelled = 0
+                  AND orderCompleted = 0
+                  AND Date(orderDateTime) = CURRENT_DATE
+                """;
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) orders.add(mapRelToOrder(rs));
+        }
+        return orders;
+    }
+
+    /**
      * Finds an order by its primary key ({@code orderNumber}).
      *
      * @param orderNumber primary key value

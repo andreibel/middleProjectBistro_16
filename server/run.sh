@@ -9,7 +9,7 @@ set -euo pipefail
 DEFAULT_PORT="8080"
 DEFAULT_DB_URL="jdbc:mysql://db-bistro-g16.cbe862egq27l.eu-north-1.rds.amazonaws.com:3306"
 DEFAULT_DB_USER="admin"
-DEFAULT_DB_PASSWORD="quvxid-zupHas-7hobqi"
+DEFAULT_DB_PASSWORD="TOKEN"
 
 # ---- Export env vars (use existing values if already set) ----
 export PORT="${PORT:-$DEFAULT_PORT}"
@@ -32,6 +32,8 @@ echo "DB_URL=$DB_URL"
 echo "DB_USER=$DB_USER"
 echo "DB_PASSWORD=(hidden)"
 echo "JAR=$JAR_PATH"
-
+exec java \
+  --enable-native-access=ALL-UNNAMED \
+  -Dsun.misc.Unsafe.disableWarnings=true \
+  -jar "$JAR_PATH"
 # Optional JVM opts via JAVA_OPTS env var (e.g. export JAVA_OPTS="-Xms256m -Xmx512m")
-exec java ${JAVA_OPTS:-} -jar "$JAR_PATH"
