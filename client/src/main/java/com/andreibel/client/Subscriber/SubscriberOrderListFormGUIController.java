@@ -85,7 +85,7 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         switch (message.getType()) {
             case GET_SUBSCRIBER_ORDERS_RESPONSE -> {
                 List<OrderResponse> orders = ((SubscriberResponse) message.getData()).getOrders();
-                if (orders != null) populateTable(orders);
+                if (orders != null && !orders.isEmpty()) populateTable(orders);
                 else BistroUtilities.showMessage("Bistro Restaurant", "No orders were found.");
             }
             case GET_SUBSCRIBER_ORDERS_ERROR -> BistroUtilities.showMessage(
