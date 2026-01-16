@@ -11,7 +11,9 @@ import com.andreibel.message.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
 import java.io.IOException;
@@ -53,6 +55,14 @@ public class NoOrderFormGUIController implements IServerResponseListener {
      */
     @FXML
     private TextField txtFieldNumberOfPeople;
+    /**
+     * Label for displaying additional information for guests.
+     */
+    @FXML
+    private Label lblGuest;
+    /** Root pane */
+    @FXML
+    private AnchorPane rootPane;
 
     /**
      * Singleton controller responsible for client-server communication.
@@ -69,7 +79,7 @@ public class NoOrderFormGUIController implements IServerResponseListener {
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-        adjustElementsBasedOnUserType();
+        adjustFormBasedOnUserType();
     }
 
     /**
@@ -210,16 +220,25 @@ public class NoOrderFormGUIController implements IServerResponseListener {
     }
 
     /**
-     * Adjusts the visibility of input fields based on user type.
+     * Adjusts the visibility of form based on user type.
      *
      * <p>Email and phone fields are hidden for logged-in subscribers
      * and shown for guests.</p>
      */
-    private void adjustElementsBasedOnUserType() {
-        boolean isSubscriber =
-                CustomerStateManager.getInstance().getSubscriber() != null;
-
-        EmailPhoneVBOX.setVisible(!isSubscriber);
-        EmailPhoneVBOX.setManaged(!isSubscriber);
+    private void adjustFormBasedOnUserType() {
+        rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((o, ow, nw) -> {
+                    if (nw != null) {
+                        boolean isSubscriber =
+                                CustomerStateManager.getInstance().getSubscriber() != null;
+                        lblGuest.setVisible(!isSubscriber);
+                        lblGuest.setManaged(!isSubscriber);
+                        EmailPhoneVBOX.setVisible(!isSubscriber);
+                        EmailPhoneVBOX.setManaged(!isSubscriber);
+                    }
+                });
+            }
+        });
     }
 }
