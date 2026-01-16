@@ -102,23 +102,6 @@ public class OrderService {
         return instance;
     }
 
-    /**
-     * Retrieves all orders from the database.
-     *
-     * <p>
-     * Transactional read operation:
-     * calls {@link OrderRepository#findAllSubscribersOrders()} and maps each {@link Order} to {@link OrderResponse}
-     * using {@link OrderMapper#mapOrderToOrderResponse(Order)}.
-     * </p>
-     *
-     * @return list of all orders as DTOs
-     */
-    public List<OrderResponse> getAllOrders() {
-        return tx.inTransaction(orderRepository::findAllSubscribersOrders)
-                .stream()
-                .map(OrderMapper::mapOrderToOrderResponse)
-                .toList();
-    }
 
     /**
      * Creates a new order in the database.
@@ -142,25 +125,6 @@ public class OrderService {
         });
     }
 
-    /**
-     * Retrieves a single order by confirmation code (provided inside the request).
-     *
-     * <p>
-     * Transactional read operation:
-     * calls {@link OrderRepository#findByConformationCode(java.util.UUID)} and maps the result
-     * to {@link OrderResponse}.
-     * </p>
-     *
-     * @param conformationCode request containing {@code conformationCode}
-     * @return matching order as DTO (may represent {@code null} if mapping permits)
-     */
-    public OrderResponse getOrderByConformationCode(UUID conformationCode) {
-        return tx.inTransaction(() ->
-                OrderMapper.mapOrderToOrderResponse(
-                        orderRepository.findByConformationCode(conformationCode)
-                )
-        );
-    }
 
     /**
      * Cancels (soft-deletes) an order by its confirmation code.

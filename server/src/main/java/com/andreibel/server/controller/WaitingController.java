@@ -5,13 +5,10 @@ import com.andreibel.message.DTO.TableResponse;
 import com.andreibel.message.DTO.WaitingListRequest;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
-import com.andreibel.server.dbController.repository.TableRepository;
-import com.andreibel.server.entity.Table;
 import com.andreibel.server.services.OpenTimeService;
 import com.andreibel.server.services.TableService;
 import com.andreibel.server.services.WaitingListService;
 
-import java.time.LocalTime;
 import java.util.List;
 
 import static com.andreibel.message.APICallType.*;
@@ -66,8 +63,8 @@ public class WaitingController {
      * to be seated.</p>
      *
      * @return a {@link Message} containing either
-     *         {@link APICallType#GET_WAITING_LIST_RESPONSE} with the waiting list
-     *         or {@link APICallType#GET_WAITING_LIST_ERROR} if retrieval fails
+     * {@link APICallType#GET_WAITING_LIST_RESPONSE} with the waiting list
+     * or {@link APICallType#GET_WAITING_LIST_ERROR} if retrieval fails
      */
     public Message getWaitingList() {
         List<WaitingListResponse> result = waitingListService.getCurrentWaitingActive();
@@ -84,45 +81,34 @@ public class WaitingController {
      * @param message the incoming request message containing
      *                {@link WaitingListRequest} data
      * @return a {@link Message} containing either
-     *         {@link APICallType#ADD_TO_WAITING_LIST_RESPONSE} with the created entry
-     *         or {@link APICallType#ADD_TO_WAITING_LIST_ERROR} if the operation fails
+     * {@link APICallType#ADD_TO_WAITING_LIST_RESPONSE} with the created entry
+     * or {@link APICallType#ADD_TO_WAITING_LIST_ERROR} if the operation fails
      */
     public Message addWaitingList(Message message) {
 
-        WaitingListResponse result = waitingListService.addNewWaiting((WaitingListRequest)message.getData());
+        WaitingListResponse result = waitingListService.addNewWaiting((WaitingListRequest) message.getData());
         if (result == null) return new Message(ADD_TO_WAITING_LIST_ERROR, null);
-        if((!isTableAvailableToday(result.getNumberOfGuests()))){
+        if ((!isTableAvailableToday(result.getNumberOfGuests()))) {
             return new Message(ADD_TO_WAITING_LIST_ERROR, "There is no matching Tables for provided amount of people");
         }
-        if(!canEnter()){
+        if (!canEnter()) {
             return new Message(ADD_TO_WAITING_LIST_ERROR, "Cannot enter waiting list outside the opening hours!");
         }
         return new Message(ADD_TO_WAITING_LIST_RESPONSE, result);
     }
 
-    /*TESTING
-     */
-    private boolean isTableAvailableToday(int waitingNumOfGuests){
-        try{
 
-            List<TableResponse>  tableList = TableService.getInstance().getAllTables();
-            for(int i = 0; i < tableList.size(); i++){
-                if(tableList.get(i).getCapacity()>waitingNumOfGuests){
-                    return true;
-                }
-            }
-        }
-        catch(Exception e) {
-            return false;
-        }
-
-
-
+    private boolean isTableAvailableToday(int waitingNumOfGuests) {
+        List<TableResponse> tableList = TableService.getInstance().getAllTables();
+        for (TableResponse tableResponse : tableList)
+            if (tableResponse.getCapacity() > waitingNumOfGuests)
+                return true;
         return false;
     }
-    private boolean canEnter(){
-    return OpenTimeService.getInstance().isInOpeningHours();
-}
+
+    private boolean canEnter() {
+        return OpenTimeService.getInstance().isInOpeningHours();
+    }
 
 
 }

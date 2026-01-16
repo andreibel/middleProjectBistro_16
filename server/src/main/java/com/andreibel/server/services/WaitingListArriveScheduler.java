@@ -88,7 +88,6 @@ public class WaitingListArriveScheduler {
                     );
                 }
             }
-
             // Close waiting entries that have been seated for 2 hours
             List<Waiting> closedWaiting = waitingListRepository.findWaitingDueToClose(LocalDateTime.now());
             for (Waiting waiting : closedWaiting) {

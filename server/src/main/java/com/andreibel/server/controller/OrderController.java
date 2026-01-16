@@ -82,22 +82,6 @@ public class OrderController {
         return new Message(CREATE_ORDER_RESPONSE, newOrder);
     }
 
-    /**
-     * Retrieves an order by confirmation code.
-     *
-     * <p><b>Expected payload:</b> {@link UUID} (confirmation code).</p>
-     *
-     * <p><b>Response:</b> {@code GET_ONE_ORDER_RESPONSE} with {@link OrderResponse} on success,
-     * or {@code GET_ONE_ORDER_ERROR} if not found.</p>
-     *
-     * @param message request message containing a {@link UUID}
-     * @return response message containing the requested order or an error type
-     */
-    public Message getOrder(Message message) {
-        OrderResponse orderResponse = orderService.getOrderByConformationCode((UUID) message.getData());
-        if (orderResponse == null) return new Message(GET_ONE_ORDER_ERROR, null);
-        return new Message(GET_ONE_ORDER_RESPONSE, orderResponse);
-    }
 
     /**
      * Cancels (soft-deletes) an order by confirmation code.

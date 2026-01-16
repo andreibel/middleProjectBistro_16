@@ -9,7 +9,6 @@ import com.andreibel.server.utils.OpenTimeMapper;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 /**
@@ -25,19 +24,19 @@ public class OpenTimeService {
     private static OpenTimeService instance;
     private final OpenTimeRepository openTimeRepository;
     private final TransactionManager tx;
+
     private OpenTimeService() {
         openTimeRepository = OpenTimeRepository.getInstance();
         tx = TransactionManager.getInstance();
     }
+
     /**
      * Returns the singleton instance of {@link OpenTimeService}.
      *
      * @return the singleton OpenTimeService instance
      */
     public static OpenTimeService getInstance() {
-        if (instance == null) {
-            instance = new OpenTimeService();
-        }
+        if (instance == null) instance = new OpenTimeService();
         return instance;
     }
 
@@ -49,7 +48,7 @@ public class OpenTimeService {
      *
      * @param data the special day request containing date, title, and hours
      */
-    public void addSpecialDay(SpecialDayRequest data)  {
+    public void addSpecialDay(SpecialDayRequest data) {
         tx.inTransaction(() -> {
             openTimeRepository.addNewSpecial(
                     data.getDate(),
@@ -86,42 +85,28 @@ public class OpenTimeService {
      */
     public BistroTimeDTO getRegular() {
         return tx.inTransaction(() -> {
-            OpenTime regular =  openTimeRepository.findRegular();
+            OpenTime regular = openTimeRepository.findRegular();
             return OpenTimeMapper.mapOpenTimeToDTO(regular);
         });
     }
+
     public BistroTimeDTO getSpecial() {
         return tx.inTransaction(() -> {
             LocalDate localDate = LocalDate.now();
             Date sqlDate = Date.valueOf(localDate);
-            OpenTime regular =  openTimeRepository.findSpecial(sqlDate);
-            return OpenTimeMapper.mapOpenTimeToDTO(regular);
+            OpenTime special = openTimeRepository.findSpecial(sqlDate);
+            if (special == null) return null;
+            return OpenTimeMapper.mapOpenTimeToDTO(special);
         });
     }
-    public boolean isCurDaySpecial(){
-        return tx.inTransaction(() -> {
-            LocalDate localDate = LocalDate.now();
-            Date sqlDate = Date.valueOf(localDate);
-            OpenTime Special =  openTimeRepository.findSpecial(sqlDate);
-            if(Special==null){
-                return false;
-            }else{
-                return true;
-            }
+
+    public boolean isInOpeningHours() {
+        BistroTimeDTO day = tx.inTransaction(() -> {
+            BistroTimeDTO isSpecial = getSpecial();
+            if (isSpecial != null) return isSpecial;
+            return getRegular();
         });
-    }
-    public boolean isInOpeningHours(){
-        return tx.inTransaction(() -> {
-          //  Date sqlDateConv = Date.valueOf(curDate);
-            if(isCurDaySpecial()){
-                return(getSpecial().getEndTime().isAfter(LocalTime.now()) && getSpecial().getStartTime().isBefore(LocalTime.now()));
-            }else{
-                return(getRegular().getEndTime().isAfter(LocalTime.now()) && getRegular().getStartTime().isBefore(LocalTime.now()));
-            }
-        });
-    }
-    public boolean isInCorrectDay(LocalDate curDate) {
-        return true;
+        return day.getEndTime().isAfter(LocalTime.now()) && day.getStartTime().isBefore(LocalTime.now());
     }
 
 }

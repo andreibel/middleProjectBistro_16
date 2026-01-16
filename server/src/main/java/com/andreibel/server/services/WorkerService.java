@@ -28,8 +28,7 @@ public class WorkerService {
     private final TransactionManager tx;
 
     // TODO: move to config or ENV file
-    private static final String SECRET =
-            "8b6de9f7c15fa54fd4fb30e5fc583fa237e0b39bc24264c4c93426a1a4b585ab";
+    private static final String SECRET = "8b6de9f7c15fa54fd4fb30e5fc583fa237e0b39bc24264c4c93426a1a4b585ab";
 
     private WorkerService() {
         this.workerRepository = WorkerRepository.getInstance();
@@ -51,19 +50,14 @@ public class WorkerService {
      *
      * @param request the authentication request containing username and password
      * @return the worker response DTO if authentication succeeds, null if worker not found,
-     *         or empty response if password is incorrect
+     * or empty response if password is incorrect
      */
     public WorkerResponse authWorker(WorkerAuth request) {
-        Worker worker = tx.inTransaction(() ->
-                workerRepository.findByWorkerName(request.getWorkerName())
-        );
+        Worker worker = tx.inTransaction(() -> workerRepository.findByWorkerName(request.getWorkerName()));
         if (worker == null) return null;
 
-        if (verifyPassword(request.getWorkerPassword(), worker.getWorkerPassword())) {
-            return WorkerMapper.mapWorkerToWorkerResponse(worker);
-        }
-
-        return new WorkerResponse();
+        if (!verifyPassword(request.getWorkerPassword(), worker.getWorkerPassword())) return new WorkerResponse();
+        return WorkerMapper.mapWorkerToWorkerResponse(worker);
     }
 
     /**
@@ -71,27 +65,18 @@ public class WorkerService {
      * <p>
      * The password is hashed using HMAC-SHA256 before storage.
      * Returns null if a worker with the same name already exists.
-     *
+     * </p>
      * @param request the new worker request containing name, password, and manager flag
      * @return the created worker response DTO, or null if worker already exists
      */
     public WorkerResponse createWorker(WorkerNewRequest request) {
 
+        String passwordHmacHex = HmacUtil.hmacSha256Hex(request.getPassword().getBytes(StandardCharsets.UTF_8), SECRET);
+        Worker toInsert = WorkerMapper.newWorker(request, passwordHmacHex);
         return tx.inTransaction(() -> {
             // prevent duplicates
             Worker existing = workerRepository.findByWorkerName(request.getName());
             if (existing != null) return null;
-
-            String passwordHmacHex = HmacUtil.hmacSha256Hex(
-                    request.getPassword().getBytes(StandardCharsets.UTF_8),
-                    SECRET
-            );
-
-            Worker toInsert = Worker.builder()
-                    .workerName(request.getName())
-                    .workerPassword(passwordHmacHex)
-                    .isManager(request.isManager())
-                    .build();
             Worker saved = workerRepository.addWorker(toInsert);
             return WorkerMapper.mapWorkerToWorkerResponse(saved);
         });
@@ -107,10 +92,7 @@ public class WorkerService {
     private static boolean verifyPassword(String password, String hashedPasswordHex) {
         if (password == null || hashedPasswordHex == null) return false;
 
-        String expectedHex = HmacUtil.hmacSha256Hex(
-                password.getBytes(StandardCharsets.UTF_8),
-                SECRET
-        );
+        String expectedHex = HmacUtil.hmacSha256Hex(password.getBytes(StandardCharsets.UTF_8), SECRET);
         return HmacUtil.constantTimeEqualsHex(expectedHex, hashedPasswordHex);
     }
 }
