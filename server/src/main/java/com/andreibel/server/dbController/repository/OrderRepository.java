@@ -52,28 +52,6 @@ public class OrderRepository {
     }
 
     /**
-     * Loads all orders that belong to a subscriber (i.e., {@code subscriberId IS NOT NULL}).
-     *
-     * <p>This method is useful for subscriber history/report screens. If you want truly "all orders",
-     * remove the {@code subscriberId IS NOT NULL} filter.</p>
-     *
-     * @return list of subscriber orders (possibly empty)
-     * @throws SQLException if a database access error occurs
-     */
-    public List<Order> findAllSubscribersOrders() throws SQLException {
-        String sql = """
-                SELECT *
-                FROM bistro.`Order`
-                WHERE subscriberId IS NOT NULL;
-                """;
-        List<Order> orders = new ArrayList<>();
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
-            while (rs.next()) orders.add(mapRelToOrder(rs));
-        }
-        return orders;
-    }
-    /**
      * Loads all currently active orders (arrived but not yet completed or cancelled).
      *
      * <p>An order is considered active when:
@@ -113,6 +91,31 @@ public class OrderRepository {
         String sql = """
                 SELECT *
                 FROM bistro.`Order`;
+                """;
+        List<Order> orders = new ArrayList<>();
+        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) orders.add(mapRelToOrder(rs));
+        }
+        return orders;
+    }
+
+    /**
+     * Loads all orders.
+     *
+     * <p>This method is useful for subscriber history/report screens. If you want truly "all orders",
+     * remove the {@code subscriberId IS NOT NULL} filter.</p>
+     *
+     * @return list of subscriber orders (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> findAllActive() throws SQLException {
+        String sql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE orderCancelled = 0
+                  AND orderCompleted = 0
+                  AND Date(orderDateTime) = CURRENT_DATE
                 """;
         List<Order> orders = new ArrayList<>();
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql);
@@ -165,41 +168,6 @@ public class OrderRepository {
                 return rs.next() ? mapRelToOrder(rs) : null;
             }
         }
-    }
-
-    /**
-     * Returns all orders that overlap the fixed reservation window {@code [date, date + 2h)}.
-     *
-     * <p>Only active orders are considered: not cancelled and not completed. This method is typically
-     * used during availability checks in order creation logic.</p>
-     *
-     * @param date requested reservation start date-time
-     * @return list of colliding orders (possibly empty)
-     * @throws SQLException if a database access error occurs
-     */
-    public List<Order> findOrdersCollideByDateTime(LocalDateTime date) throws SQLException {
-        Timestamp start = Timestamp.valueOf(date);
-        Timestamp end = Timestamp.valueOf(date.plusHours(2));
-
-        String sql = """
-                SELECT *
-                FROM bistro.`Order`
-                WHERE orderCancelled = 0
-                  AND orderCompleted = 0
-                  AND orderDateTime < ?
-                  AND DATE_ADD(orderDateTime, INTERVAL 2 HOUR) > ?
-                ORDER BY orderDateTime ASC;
-                """;
-
-        List<Order> orders = new ArrayList<>();
-        try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
-            stmt.setTimestamp(1, end);
-            stmt.setTimestamp(2, start);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) orders.add(mapRelToOrder(rs));
-            }
-        }
-        return orders;
     }
 
     /**
@@ -353,7 +321,8 @@ public class OrderRepository {
         String sql = """
                 UPDATE bistro.`Order`
                 SET orderArrive = 1, orderArriveDateTime = NOW()
-                WHERE conformationCode = ?;
+                WHERE conformationCode = ?
+                  AND orderDateTime BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 MINUTE)
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, conformationCode.toString());

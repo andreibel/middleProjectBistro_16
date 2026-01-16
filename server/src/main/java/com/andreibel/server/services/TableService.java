@@ -41,9 +41,7 @@ public class TableService {
      * @return the singleton TableService instance
      */
     public static TableService getInstance() {
-        if (instance == null) {
-            instance = new TableService();
-        }
+        if (instance == null) instance = new TableService();
         return instance;
     }
 
@@ -66,21 +64,15 @@ public class TableService {
             return d;
         });
         demands.sort(Comparator.reverseOrder());
-
-
         // capacity -> qty (sorted by capacity)
         TreeMap<Integer, Integer> available = new TreeMap<>();
         for (TableResponse t : tables) {
             available.put(t.getCapacity(), t.getQuantity());
         }
-
-
         // allocate larger groups first
-
         for (int guests : demands) {
-            Map.Entry<Integer, Integer> fit = available.ceilingEntry(guests); // smallest table >= guests
+            Map.Entry<Integer, Integer> fit = available.ceilingEntry(guests);
             if (fit == null) {
-                // no table can fit this group => skip / break (depends on your business rule)
                 continue;
             }
 

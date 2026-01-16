@@ -38,6 +38,8 @@ public class WorkerStateManager {
      * The single instance of {@link WorkerStateManager}.
      */
     private static WorkerStateManager instance;
+    /** A boolean variable that determines whether the Worker is currently viewing subscriber's orders history. **/
+    private boolean isInViewMode = false;
 
     private WorkerResponse worker;
 

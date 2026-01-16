@@ -4,11 +4,13 @@ import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
 import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.client.util.WorkerStateManager;
 import com.andreibel.message.DTO.OrderResponse;
 import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Worker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -64,7 +66,6 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         tblViewOrderHistory.setEditable(false);
 
         initializeTableColumns();
-        updateSubscriberLabel();
         requestOrdersWhenSceneIsShown();
     }
 
@@ -74,18 +75,6 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         colOrderDateTime.setCellValueFactory(new PropertyValueFactory<>("orderDateTime"));
         colNumberOfPeople.setCellValueFactory(new PropertyValueFactory<>("numberOfPeople"));
     }
-
-    /** Updates the subscriber greeting label based on the logged-in subscriber */
-    private void updateSubscriberLabel() {
-        if (CustomerStateManager.getInstance().getSubscriber() != null) {
-            lblSubscriber.setText(
-                    "Hi, " + CustomerStateManager.getInstance().getSubscriber().getName()
-            );
-        } else {
-            lblSubscriber.setText("Orders History:");
-        }
-    }
-
     /**
      * Handles server responses related to retrieving subscriber orders.
      *
@@ -96,7 +85,7 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         switch (message.getType()) {
             case GET_SUBSCRIBER_ORDERS_RESPONSE -> {
                 List<OrderResponse> orders = ((SubscriberResponse) message.getData()).getOrders();
-                if (orders != null) populateTable(orders);
+                if (orders != null && !orders.isEmpty()) populateTable(orders);
                 else BistroUtilities.showMessage("Bistro Restaurant", "No orders were found.");
             }
             case GET_SUBSCRIBER_ORDERS_ERROR -> BistroUtilities.showMessage(
@@ -121,7 +110,7 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
         }
     }
 
-    /** Requests subscriber orders when the scene is first displayed */
+    /** Requests subscriber orders when the scene is first displayed and adjust the elements in the form based on the user type whether it is a subscriber or a worker to view the subscriber's orders history.*/
     private void requestOrdersWhenSceneIsShown() {
         rootPane.sceneProperty().addListener((observable, oldScene, newScene) -> {
             if (newScene != null) {
@@ -129,12 +118,27 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
                     if (newWindow != null) {
                         Integer subscriberId = CustomerStateManager.fillSubscriberIDDetails();
                         if (subscriberId != null) {
+                            adjustFormBasedOnUserType();
                             controller.requestAllSubscriberOrders(subscriberId);
                         }
                     }
                 });
             }
         });
+    }
+    /**
+     * Updates the subscriber label based on whether the user is viewing
+     * a subscriber's order history or in normal mode.
+     */
+    private void adjustFormBasedOnUserType() {
+        if (WorkerStateManager.getInstance().isInViewMode()) {
+            lblSubscriber.setText("Orders History for " + CustomerStateManager.getInstance().getSubscriber().getName() + ":");
+        }
+        else{
+            lblSubscriber.setText(
+                    "Hi, " + CustomerStateManager.getInstance().getSubscriber().getName()
+            );
+        }
     }
 
     /**
@@ -147,11 +151,18 @@ public class SubscriberOrderListFormGUIController implements IServerResponseList
     @FXML
     private void onGoBackButtonClicked(ActionEvent event) throws IOException {
         orderHistoryList.clear();
-        BistroUtilities.switchScreen(
-                (Node) event.getSource(),
-                "/Subscriber/SubscriberZoneForm.fxml",
-                "Bistro Restaurant - Subscriber Area"
-        );
+        if (WorkerStateManager.getInstance().isInViewMode()) {
+            WorkerStateManager.getInstance().setInViewMode(false);
+            CustomerStateManager.getInstance().setSubscriber(null);
+            BistroUtilities.switchScreen((Node) event.getSource(), "/Worker/RegisteredSubscribersForm.fxml", "Bistro Restaurant - Subscriber List");
+        }
+        else{
+            BistroUtilities.switchScreen(
+                    (Node) event.getSource(),
+                    "/Subscriber/SubscriberZoneForm.fxml",
+                    "Bistro Restaurant - Subscriber Area"
+            );
+        }
     }
 
     /**

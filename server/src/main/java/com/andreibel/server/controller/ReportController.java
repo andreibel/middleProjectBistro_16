@@ -6,6 +6,8 @@ import com.andreibel.message.DTO.SubscriberReportResponse;
 import com.andreibel.message.Message;
 import com.andreibel.server.services.ReportService;
 
+import static com.andreibel.message.APICallType.*;
+
 public class ReportController {
 
     private static ReportController instance;
@@ -17,9 +19,7 @@ public class ReportController {
     }
 
     public static ReportController getInstance() {
-        if (instance == null) {
-            instance = new ReportController();
-        }
+        if (instance == null) instance = new ReportController();
         return instance;
     }
 
@@ -30,46 +30,27 @@ public class ReportController {
      * <p>This method retrieves aggregated scheduling data from the service
      * layer and returns it to the client.</p>
      *
-     * @param message the incoming request message (data not used)
      * @return a {@link Message} containing either
      * {@link APICallType#SCHEDULES_REPORT_RESPONSE} with report data
      * or {@link APICallType#SCHEDULES_REPORT_ERROR} if retrieval fails
      */
-    public Message scheduleReport(Message message) {
-        SchedulesReportResponse schedulesReportResponse =
-                reportService.getSchedulesReport();
-
-        if (schedulesReportResponse == null) {
-            return new Message(APICallType.SCHEDULES_REPORT_ERROR, null);
-        }
-
-        return new Message(
-                APICallType.SCHEDULES_REPORT_RESPONSE,
-                schedulesReportResponse
-        );
+    public Message scheduleReport() {
+        SchedulesReportResponse schedulesReportResponse = reportService.getSchedulesReport();
+        if (schedulesReportResponse == null) return new Message(SCHEDULES_REPORT_ERROR, null);
+        return new Message(SCHEDULES_REPORT_RESPONSE, schedulesReportResponse);
     }
 
     /**
      * Handles a request for the subscriber report.
      *
      * <p>This report provides aggregated data about restaurant subscribers.</p>
-     *
-     * @param message the incoming request message (data not used)
      * @return a {@link Message} containing either
      * {@link APICallType#SUBSCRIBER_REPORT_RESPONSE} with report data
      * or {@link APICallType#SUBSCRIBER_REPORT_ERROR} if retrieval fails
      */
-    public Message subscriberReport(Message message) {
-        SubscriberReportResponse subscriberReportResponse =
-                reportService.getSubscriberReport();
-
-        if (subscriberReportResponse == null) {
-            return new Message(APICallType.SUBSCRIBER_REPORT_ERROR, null);
-        }
-
-        return new Message(
-                APICallType.SUBSCRIBER_REPORT_RESPONSE,
-                subscriberReportResponse
-        );
+    public Message subscriberReport() {
+        SubscriberReportResponse subscriberReportResponse = reportService.getSubscriberReport();
+        if (subscriberReportResponse == null) return new Message(SUBSCRIBER_REPORT_ERROR, null);
+        return new Message(SUBSCRIBER_REPORT_RESPONSE, subscriberReportResponse);
     }
 }

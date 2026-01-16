@@ -12,7 +12,10 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -38,15 +41,19 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     /** Combo box displaying the list of orders available for confirmation code retrieval. */
     @FXML
     private ComboBox<String> comboBoxOrders;
+    /** Vbox contains the guests elements in the form (Email and phone Number) **/
+    @FXML
+    private VBox vBoxGuest;
+
+    @FXML
+    private Label lblInfo;
 
     /** Button used to fetch orders or retrieve the confirmation code. */
     @FXML
     private Button btnRetrieveCode;
-
-    /** Button used to navigate back to the previous screen. */
+    /** Root Pane **/
     @FXML
-    private Button btnGoBack;
-
+    private AnchorPane rootPane;
     /** Tracks whether the controller is currently fetching orders (true) or retrieving code (false). */
     private boolean isFetchingOrders = true;
 
@@ -62,7 +69,7 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
     private void initialize() {
         controller = BistroClientController.getInstance();
         controller.addListener(this);
-
+        adjustFormBasedOnUserType();
         comboBoxOrders.setDisable(true);
         btnRetrieveCode.setText("Get Orders");
     }
@@ -194,6 +201,27 @@ public class LostMyCodeFormGUIController implements IServerResponseListener {
      * <p>Resets the fetching mode, clears text fields, empties the combo box,
      * disables the combo box, and sets the button text to "Get Orders".</p>
      */
+
+    private void adjustFormBasedOnUserType(){
+        rootPane.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null) {
+                newScene.windowProperty().addListener((o, ow, nw) -> {
+                    if (nw != null) {
+                        if (CustomerStateManager.hasSubscriberLoggedIn()) {
+                            lblInfo.setText("You are logged in as subscriber, click on get orders to select the order you wish to retrieve it's confirmation code:");
+                            vBoxGuest.setVisible(false);
+                            vBoxGuest.setManaged(false);
+                        }
+                        else{
+                            lblInfo.setText("If you lost your confirmation code, please enter either email or phone number, pick the order for the confirmation code  we'll send it to you:");
+                            vBoxGuest.setVisible(true);
+                            vBoxGuest.setManaged(true);
+                        }
+                    }
+                });
+            }
+        });
+    }
     private void clearForm() {
         isFetchingOrders = true;
         txtFieldEmail.clear();

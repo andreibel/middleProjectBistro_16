@@ -84,6 +84,7 @@ public class WaitingListService {
      *         or empty response if already completed or still waiting
      */
     public WaitingListResponse completeWaiting(UUID conformationCode) {
+
         return tx.inTransaction(() -> {
             Waiting  toClose = waitingRepository.getWaitingByConformationCode(conformationCode);
             if  (toClose == null) return null;

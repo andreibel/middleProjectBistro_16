@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"com.andreibel.client"}];updateSearchResults();

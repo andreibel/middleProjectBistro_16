@@ -3,8 +3,11 @@ package com.andreibel.client.Worker;
 import com.andreibel.client.Client.BistroClientController;
 import com.andreibel.client.Client.IServerResponseListener;
 import com.andreibel.client.util.BistroUtilities;
+import com.andreibel.client.util.CustomerStateManager;
+import com.andreibel.client.util.WorkerStateManager;
 import com.andreibel.message.DTO.SubscriberResponse;
 import com.andreibel.message.Message;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -69,6 +72,7 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
         tblSubscribers.setItems(subscribersList);
         tblSubscribers.setEditable(false);
 
+        setupRowSelection();
         initializeTableColumns();
         requestSubscribersWhenSceneIsShown();
     }
@@ -123,6 +127,52 @@ public class RegisteredSubscribersFormGUIController implements IServerResponseLi
                 });
             }
         });
+    }
+    /**
+     * Sets up a listener on the TableView's row selection.
+     *
+     * <p>Whenever a subscriber row is selected, this listener will trigger
+     * the display of that subscriber's order history in a new screen.
+     * The action is deferred using {@link javafx.application.Platform#runLater(Runnable)}
+     * to avoid JavaFX concurrency issues and ensure the TableView's selection
+     * updates safely.</p>
+     */
+    private void setupRowSelection() {
+        tblSubscribers.getSelectionModel().selectedItemProperty().addListener(
+                (obs, oldVal, newVal) -> {
+                    Platform.runLater(() -> {
+                        try {
+                            onSelectedSubscriberFromTableView(newVal);
+                        } catch (IOException e) {
+                            BistroUtilities.showMessage("Bistro Restaurant", e.getMessage());
+                        }
+                    });
+                }
+        );
+    }
+
+    /**
+     * Displays the selected subscriber's order history screen and updates
+     * the application state accordingly.
+     *
+     * @param subscriber The selected subscriber. If null, the method returns immediately.
+     * @throws IOException if there is an error loading the FXML for the order history screen.
+     */
+    private void onSelectedSubscriberFromTableView(SubscriberResponse subscriber) throws IOException {
+        if (subscriber == null) return;
+
+        WorkerStateManager.getInstance().setInViewMode(true);
+        CustomerStateManager.getInstance().setSubscriber(subscriber);
+
+        Platform.runLater(subscribersList::clear);
+
+        Node node = rootPane.getScene() != null ? rootPane : tblSubscribers;
+
+        BistroUtilities.switchScreen(
+                node,
+                "/Subscriber/SubscriberOrderListForm.fxml",
+                "Bistro Restaurants - Orders History"
+        );
     }
 
     /**

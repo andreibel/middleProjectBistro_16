@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"com.andreibel.message","l":"com.andreibel.message"},{"m":"com.andreibel.message","l":"com.andreibel.message.DTO"}];updateSearchResults();

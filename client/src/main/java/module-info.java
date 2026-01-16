@@ -3,7 +3,7 @@ module com.andreibel.client {
     requires javafx.fxml;
     requires static lombok;
     requires ocsf;
-    requires message;
+    requires com.andreibel.message;
     requires jdk.compiler;
     requires java.desktop;
     requires com.google.zxing;
