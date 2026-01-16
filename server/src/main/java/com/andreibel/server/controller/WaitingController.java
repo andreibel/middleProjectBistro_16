@@ -121,11 +121,7 @@ public class WaitingController {
         return false;
     }
     private boolean canEnter(){
-        if(OpenTimeService.getInstance().isCurDaySpecial()){
-            return(OpenTimeService.getInstance().getSpecial().getEndTime().isAfter(LocalTime.now()) && OpenTimeService.getInstance().getSpecial().getStartTime().isBefore(LocalTime.now()));
-        }else{
-            return(OpenTimeService.getInstance().getRegular().getEndTime().isAfter(LocalTime.now()) && OpenTimeService.getInstance().getRegular().getStartTime().isBefore(LocalTime.now()));
-        }
+    return OpenTimeService.getInstance().isInOpeningHours();
 }
 
 

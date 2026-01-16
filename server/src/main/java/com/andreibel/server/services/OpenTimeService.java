@@ -10,6 +10,7 @@ import com.andreibel.server.utils.OpenTimeMapper;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 /**
  * Service responsible for managing restaurant opening hours configuration.
@@ -109,4 +110,18 @@ public class OpenTimeService {
             }
         });
     }
+    public boolean isInOpeningHours(){
+        return tx.inTransaction(() -> {
+          //  Date sqlDateConv = Date.valueOf(curDate);
+            if(isCurDaySpecial()){
+                return(getSpecial().getEndTime().isAfter(LocalTime.now()) && getSpecial().getStartTime().isBefore(LocalTime.now()));
+            }else{
+                return(getRegular().getEndTime().isAfter(LocalTime.now()) && getRegular().getStartTime().isBefore(LocalTime.now()));
+            }
+        });
+    }
+    public boolean isInCorrectDay(LocalDate curDate) {
+        return true;
+    }
+
 }
