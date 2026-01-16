@@ -1,0 +1,14 @@
+package com.andreibel.server.main;
+
+import javafx.application.Application;
+
+import java.io.IOException;
+
+import static com.andreibel.server.utils.TUI.title;
+
+public class Launcher {
+    public static void main(String[] args) throws IOException {
+
+        Application.launch(BistroServer.class, args);
+    }
+}
