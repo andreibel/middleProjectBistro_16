@@ -1,1 +1,0 @@
-moduleSearchIndex = [{"l":"com.andreibel.message"}];updateSearchResults();
