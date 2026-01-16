@@ -1,6 +1,6 @@
 package com.andreibel.server.utils;
 
-import com.andreibel.message.DTO.WorkerAuth;
+import com.andreibel.message.DTO.WorkerNewRequest;
 import com.andreibel.message.DTO.WorkerResponse;
 import com.andreibel.server.entity.Worker;
 
@@ -14,6 +14,7 @@ import java.sql.SQLException;
  * <p>
  * Contains only static mapping methods and holds no state.
  * </p>
+ *
  * @author Aviv peer
  */
 public class WorkerMapper {
@@ -47,6 +48,25 @@ public class WorkerMapper {
         return WorkerResponse.builder()
                 .workerName(worker.getWorkerName())
                 .isManager(worker.isManager())
+                .build();
+    }
+
+    /**
+     * Maps a {@link WorkerNewRequest} entity to a {@link Worker}
+     *
+     * <p>
+     * Sensitive fields such as passwords are intentionally excluded.
+     * </p>
+     *
+     * @param request        worker entity
+     * @param hashedPassword string
+     * @return worker response DTO
+     */
+    public static Worker newWorker(WorkerNewRequest request, String hashedPassword) {
+        return Worker.builder()
+                .workerName(request.getName())
+                .workerPassword(hashedPassword)
+                .isManager(request.isManager())
                 .build();
     }
 

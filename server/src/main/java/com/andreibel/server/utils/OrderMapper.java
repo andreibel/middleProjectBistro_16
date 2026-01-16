@@ -55,23 +55,6 @@ public class OrderMapper {
     }
 
     /**
-     * maps an order request DTO to an order entity.
-     * @param order {@link OrderRequest} DTO to be mapped.
-     * @return {@link Order} entity.
-     */
-    public static Order mapOrderRequestToOrder(OrderRequest order) {
-        return Order.builder()
-                .orderNumber(-1)
-                .conformationCode(UUID.randomUUID())
-                .numberOfGuests(order.getNumberOfGuests())
-                .orderDateTime(order.getOrderDateTime())
-                .subscriberId(order.getSubscriberId())
-                .email(order.getEmail())
-                .phoneNumber(order.getPhoneNumber())
-                .build();
-    }
-
-    /**
      * maps a result set to an order entity.
      * @param rs {@link ResultSet} to be mapped.
      * @return {@link Order} entity.
