@@ -7,6 +7,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 
 import java.net.InetAddress;
 /**
@@ -25,7 +26,8 @@ import java.net.InetAddress;
  * and {@link #editConnection(ConnectionToClient)} using {@code Platform.runLater(...)}.</p>
  */
 public class BistroServerGUIController {
-
+    @FXML
+    public VBox serverGUI;
     /** Table that displays all client connections shown in the GUI. */
     @FXML
     private TableView<ClientConnection> connectionsTableView;
