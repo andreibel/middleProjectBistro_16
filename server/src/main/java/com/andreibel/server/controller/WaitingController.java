@@ -1,11 +1,17 @@
 package com.andreibel.server.controller;
 
 import com.andreibel.message.APICallType;
+import com.andreibel.message.DTO.TableResponse;
 import com.andreibel.message.DTO.WaitingListRequest;
 import com.andreibel.message.DTO.WaitingListResponse;
 import com.andreibel.message.Message;
+import com.andreibel.server.dbController.repository.TableRepository;
+import com.andreibel.server.entity.Table;
+import com.andreibel.server.services.OpenTimeService;
+import com.andreibel.server.services.TableService;
 import com.andreibel.server.services.WaitingListService;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.andreibel.message.APICallType.*;
@@ -82,8 +88,41 @@ public class WaitingController {
      *         or {@link APICallType#ADD_TO_WAITING_LIST_ERROR} if the operation fails
      */
     public Message addWaitingList(Message message) {
+
         WaitingListResponse result = waitingListService.addNewWaiting((WaitingListRequest)message.getData());
         if (result == null) return new Message(ADD_TO_WAITING_LIST_ERROR, null);
+        if((!isTableAvailableToday(result.getNumberOfGuests()))){
+            return new Message(ADD_TO_WAITING_LIST_ERROR, "There is no matching Tables for provided amount of people");
+        }
+        if(!canEnter()){
+            return new Message(ADD_TO_WAITING_LIST_ERROR, "Cannot enter waiting list outside the opening hours!");
+        }
         return new Message(ADD_TO_WAITING_LIST_RESPONSE, result);
     }
+
+    /*TESTING
+     */
+    private boolean isTableAvailableToday(int waitingNumOfGuests){
+        try{
+
+            List<TableResponse>  tableList = TableService.getInstance().getAllTables();
+            for(int i = 0; i < tableList.size(); i++){
+                if(tableList.get(i).getCapacity()>waitingNumOfGuests){
+                    return true;
+                }
+            }
+        }
+        catch(Exception e) {
+            return false;
+        }
+
+
+
+        return false;
+    }
+    private boolean canEnter(){
+    return OpenTimeService.getInstance().isInOpeningHours();
+}
+
+
 }

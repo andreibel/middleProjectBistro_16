@@ -91,17 +91,27 @@ public class NoOrderFormGUIController implements IServerResponseListener {
                 clearForm();
                 BistroUtilities.showSelectableMessage(
                         "Bistro Restaurant",
-                        " Successfully added to waiting list!\n" +
+                        "Successfully added to waiting list!\n" +
                                 "\nWe'll notify you when a table becomes available." +
                                 "\nYour confirmation code is: ",
                                 response.getConformationCode().toString()
                 );
             }
 
-            case ADD_TO_WAITING_LIST_ERROR -> BistroUtilities.showMessage(
-                    "Bistro Restaurant",
-                    "Due to a server error, we were unable to add you to the waiting list. Please try again."
-            );
+            case ADD_TO_WAITING_LIST_ERROR -> {
+                if(message.getData()!=null){
+                    BistroUtilities.showMessage(
+                            "Bistro Restaurant",
+                            (String)message.getData()
+                    );
+                }else{
+                    BistroUtilities.showMessage(
+                            "Bistro Restaurant",
+                            "Due to a server error, we were unable to add you to the waiting list. Please try again."
+                    );
+                }
+
+            }
         }
     }
 
