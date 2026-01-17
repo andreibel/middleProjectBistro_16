@@ -322,7 +322,8 @@ public class OrderRepository {
                 UPDATE bistro.`Order`
                 SET orderArrive = 1, orderArriveDateTime = NOW()
                 WHERE conformationCode = ?
-                  AND orderDateTime BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 30 MINUTE)
+                  AND orderDateTime BETWEEN DATE_SUB(NOW(), INTERVAL 15 MINUTE)
+                                        AND DATE_ADD(NOW(), INTERVAL 30 MINUTE)
                 """;
         try (PreparedStatement stmt = tx.currentConnection().prepareStatement(sql)) {
             stmt.setString(1, conformationCode.toString());
