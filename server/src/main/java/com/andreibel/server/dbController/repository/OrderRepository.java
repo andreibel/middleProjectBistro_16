@@ -1,9 +1,12 @@
 package com.andreibel.server.dbController.repository;
 
+import com.andreibel.message.DTO.BistroTimeDTO;
+import com.andreibel.message.DTO.SpecialDayRequest;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.entity.Order;
 
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -591,4 +594,114 @@ public class OrderRepository {
         return map;
     }
 
+    /**
+     * Cancels (soft-deletes) orders on a special date that fall outside the allowed time range.
+     *
+     * <p>This method performs two steps inside the current transaction:
+     * <ol>
+     *   <li>Selects all orders for the given calendar date where the order time is strictly
+     *       before {@code data.getStartTime()} or strictly after {@code data.getEndTime()},
+     *       and {@code orderCancelled = 0}.</li>
+     *   <li>If any such orders are found, updates those rows setting {@code orderCancelled = 1}.</li>
+     * </ol>
+     *
+     * The method returns the list of orders that were selected (and then cancelled) so callers
+     * can, for example, print notifications or audit the affected orders.
+     *
+     * @param data request payload with the target {@code date}, {@code startTime} and {@code endTime}
+     * @return list of {@link com.andreibel.server.entity.Order} objects that were cancelled (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> deleteOrdersInDateNotInRange(SpecialDayRequest data) throws SQLException  {
+        // First, SELECT the orders that will be closed
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE DATE(orderDateTime) = ?
+                  AND (TIME(orderDateTime) < ? OR TIME(orderDateTime) > ?)
+                  AND orderCancelled = 0;
+                """;
+
+        List<Order> ordersToDelete = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
+            ps.setDate(1, Date.valueOf(data.getDate()));
+            ps.setTime(2, Time.valueOf(data.getStartTime()));
+            ps.setTime(3, Time.valueOf(data.getEndTime()));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ordersToDelete.add(mapRelToOrder(rs));
+            }
+        }
+
+        // Then, UPDATE those orders to mark them as completed
+        if (!ordersToDelete.isEmpty()) {
+            String deleteSql = """
+                UPDATE bistro.`Order`
+                SET orderCancelled = 1
+                WHERE DATE(orderDateTime) = ?
+                  AND (TIME(orderDateTime) < ? OR TIME(orderDateTime) > ?)
+                  AND orderCancelled = 0;
+                """;
+
+            try (PreparedStatement stmt = tx.currentConnection().prepareStatement(deleteSql)) {
+                stmt.setDate(1, Date.valueOf(data.getDate()));
+                stmt.setTime(2, Time.valueOf(data.getStartTime()));
+                stmt.setTime(3, Time.valueOf(data.getEndTime()));
+                stmt.executeUpdate();
+            }
+        }
+        return ordersToDelete;
+    }
+    /**
+     * Cancels (soft-deletes) orders on a regular date that fall outside the allowed time range.
+     *
+     * <p>This method performs two steps inside the current transaction:
+     * <ol>
+     *   <li>Selects all orders for the given calendar date where the order time is strictly
+     *       before {@code data.getStartTime()} or strictly after {@code data.getEndTime()},
+     *       and {@code orderCancelled = 0}.</li>
+     *   <li>If any such orders are found, updates those rows setting {@code orderCancelled = 1}.</li>
+     * </ol>
+     *
+     * The method returns the list of orders that were selected (and then cancelled) so callers
+     * can, for example, print notifications or audit the affected orders.
+     *
+     * @param data request payload with the target , {@code startTime} and {@code endTime}
+     * @return list of {@link com.andreibel.server.entity.Order} objects that were cancelled (possibly empty)
+     * @throws SQLException if a database access error occurs
+     */
+    public List<Order> deleteOrdersNotInRange(BistroTimeDTO data) throws SQLException  {
+        // First, SELECT the orders that will be closed
+        String selectSql = """
+                SELECT *
+                FROM bistro.`Order`
+                WHERE (TIME(orderDateTime) < ? OR TIME(orderDateTime) > ?)
+                  AND orderCancelled = 0;
+                """;
+
+        List<Order> ordersToDelete = new ArrayList<>();
+        try (PreparedStatement ps = tx.currentConnection().prepareStatement(selectSql)) {
+            ps.setTime(1, Time.valueOf(data.getStartTime()));
+            ps.setTime(2, Time.valueOf(data.getEndTime()));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) ordersToDelete.add(mapRelToOrder(rs));
+            }
+        }
+
+        // Then, UPDATE those orders to mark them as completed
+        if (!ordersToDelete.isEmpty()) {
+            String deleteSql = """
+                UPDATE bistro.`Order`
+                SET orderCancelled = 1
+                WHERE (TIME(orderDateTime) < ? OR TIME(orderDateTime) > ?)
+                  AND orderCancelled = 0;
+                """;
+
+            try (PreparedStatement stmt = tx.currentConnection().prepareStatement(deleteSql)) {
+                stmt.setTime(1, Time.valueOf(data.getStartTime()));
+                stmt.setTime(2, Time.valueOf(data.getEndTime()));
+                stmt.executeUpdate();
+            }
+        }
+        return ordersToDelete;
+    }
 }

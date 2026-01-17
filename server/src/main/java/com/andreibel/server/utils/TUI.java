@@ -1,6 +1,7 @@
 package com.andreibel.server.utils;
 
 import com.andreibel.message.Message;
+import com.andreibel.server.entity.Order;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -105,7 +106,7 @@ public class TUI {
        │ ├───────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────────────┐ │
        │ │ %-145s │ │
        │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
-        """, shorten(message, 145)
+       """, shorten(message, 145)
         );
     }
     /**
@@ -185,6 +186,26 @@ public class TUI {
                 confirmationCode.toString(),
                 numberOfGuests,
                 orderDateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+        );
+    }
+
+    /**
+     * Prints a notification when an order is cancelled due to late arrival.
+     *
+     * @param order dated order
+     */
+    public static void deletedOrders(Order order) {
+        System.out.printf(
+                """
+       │ ┌───── ORDER DELETED CHANGELING OPEN TIME  ─────┐                                                                                                     │
+       │ ├───────────────────────────────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────┐ │
+       │ │  Confirmation: %-36s  |  Guests: %3d  |  Order Time: %-19s  |  Deleted: %-19s          │ │
+       │ └───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────┘ │
+       """,
+                order.getConformationCode().toString(),
+                order.getNumberOfGuests(),
+                order.getOrderDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")),
                 LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         );
     }

@@ -4,12 +4,16 @@ import com.andreibel.message.DTO.BistroTimeDTO;
 import com.andreibel.message.DTO.SpecialDayRequest;
 import com.andreibel.server.dbController.TransactionManager;
 import com.andreibel.server.dbController.repository.OpenTimeRepository;
+import com.andreibel.server.dbController.repository.OrderRepository;
 import com.andreibel.server.entity.OpenTime;
+import com.andreibel.server.entity.Order;
 import com.andreibel.server.utils.OpenTimeMapper;
+import com.andreibel.server.utils.TUI;
 
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 /**
  * Service responsible for managing restaurant opening hours configuration.
@@ -24,10 +28,12 @@ public class OpenTimeService {
     private static OpenTimeService instance;
     private final OpenTimeRepository openTimeRepository;
     private final TransactionManager tx;
+    private final OrderRepository orderRepository;
 
     private OpenTimeService() {
         openTimeRepository = OpenTimeRepository.getInstance();
         tx = TransactionManager.getInstance();
+        orderRepository = OrderRepository.getInstance();
     }
 
     /**
@@ -49,7 +55,7 @@ public class OpenTimeService {
      * @param data the special day request containing date, title, and hours
      */
     public void addSpecialDay(SpecialDayRequest data) {
-        tx.inTransaction(() -> {
+        List<Order> deletedOrders  = tx.inTransaction(() -> {
             openTimeRepository.addNewSpecial(
                     data.getDate(),
                     data.getTitle(),
@@ -57,8 +63,9 @@ public class OpenTimeService {
                     data.getEndTime(),
                     data.getInterval()
             );
-            return null;
+            return orderRepository.deleteOrdersInDateNotInRange(data);
         });
+        deletedOrders.forEach(TUI::deletedOrders);
     }
 
     /**
@@ -67,14 +74,15 @@ public class OpenTimeService {
      * @param data the new regular opening hours to apply
      */
     public void editRegulaDay(BistroTimeDTO data) {
-        tx.inTransaction(() -> {
+        List<Order> deletedOrders  = tx.inTransaction(() -> {
             openTimeRepository.updateRegular(
                     data.getStartTime(),
                     data.getEndTime(),
                     data.getInterval()
             );
-            return null;
+            return orderRepository.deleteOrdersNotInRange(data);
         });
+        deletedOrders.forEach(TUI::deletedOrders);
 
     }
 

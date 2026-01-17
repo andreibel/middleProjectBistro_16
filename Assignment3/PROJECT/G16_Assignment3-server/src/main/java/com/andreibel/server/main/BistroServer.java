@@ -13,14 +13,13 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 import static com.andreibel.server.utils.TUI.*;
-import static java.lang.Thread.sleep;
 
 public class BistroServer extends Application {
 
-    public static String PORT = "8080";
+   public static String PORT = "8080";
     public static String DB_URL = "jdbc:mysql://localhost:3306";
     public static String DB_USER = "root";
-    public static String DB_PASSWORD = "root";
+    public static String DB_PASSWORD = "root" 
 
 
     public void startScheduler() {
